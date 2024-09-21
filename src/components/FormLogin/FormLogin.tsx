@@ -34,8 +34,8 @@ const FormLogin = ({ setIsLoggedIn }: ILoginForm) => {
             }
         }).catch(err => {
             let mess = err.message
-            if (err.response?.data?.message) {
-                mess = err.response.data?.message
+            if (err.response?.data) {
+                mess = err.response.data
             }
             setNotification({
                 message: mess,
