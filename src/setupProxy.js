@@ -6,7 +6,6 @@ module.exports = function(app) {
         createProxyMiddleware({
             target: 'https://api.space-21.ru',
             changeOrigin: true,
-            logLevel: 'debug'
         })
     );
 };
