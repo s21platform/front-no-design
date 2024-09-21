@@ -7,7 +7,7 @@ const Header = () => {
             <div className="container mx-auto flex justify-between items-center">
                 {/* Логотип или название */}
                 <h1 className="text-2xl font-bold">
-                    <Link to="/">Мой Сайт</Link>
+                    <Link to="/">Space 21</Link>
                 </h1>
 
                 {/* Навигационные ссылки */}
