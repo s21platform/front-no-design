@@ -13,7 +13,7 @@ const FormLogin = ({ setIsLoggedIn }: ILoginForm) => {
     const [notification, setNotification] = useState<{ message: string; type: "error" | "success"} | null>(null);
 
     const handleLogin = () => {
-        axios.post("/api/auth/login", {
+        axios.post("/auth/login", {
             username: username,
             password: password,
         }, {
@@ -22,12 +22,15 @@ const FormLogin = ({ setIsLoggedIn }: ILoginForm) => {
             }
         }).then(res => {
             if (res.status === 200) {
+                const currentTime = Date.now();
+                const expiryTime = currentTime + 10 * 60 * 60 * 1000;
+
+                localStorage.setItem("expiry", expiryTime.toString());
                 setIsLoggedIn(true);
                 setNotification({
                     message: "Успех",
                     type: "success"
                 })
-                // localStorage.setItem("")
             }
         }).catch(err => {
             let mess = err.message

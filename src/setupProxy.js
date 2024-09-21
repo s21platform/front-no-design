@@ -2,9 +2,9 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 
 module.exports = function(app) {
     app.use(
-        '/api',
+        '/auth',
         createProxyMiddleware({
-            target: 'http://217.28.222.68:6050',
+            target: 'https://api.space-21.ru',
             changeOrigin: true,
             logLevel: 'debug'
         })
