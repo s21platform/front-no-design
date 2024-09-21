@@ -14,7 +14,7 @@ const MainPage = () => {
     }, []);
 
     const registration = () => {
-        axios.post("/api/auth/login", {
+        axios.post("/auth/login", {
             username: login,
             password
         }).then(res => {
