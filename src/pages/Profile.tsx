@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import Header from "../components/Header/Header";
 import axios from "axios";
 import FormLogin from "../components/FormLogin/FormLogin";
+import Profile from "../components/Profile/Profile";
 
 const ProfilePage = () => {
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
@@ -25,7 +26,7 @@ const ProfilePage = () => {
             <Header />
             {!isLoggedIn
                 ? <FormLogin setIsLoggedIn={setIsLoggedIn} />
-                : <>Auth</>
+                : <Profile />
             }
         </>
 
