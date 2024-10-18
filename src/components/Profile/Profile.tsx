@@ -1,4 +1,4 @@
-import React, {ChangeEvent, FormEvent, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
 import Avatar from "../Avatar/Avatar";
@@ -62,13 +62,7 @@ const Profile: React.FC = () => {
             <div className="bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-4xl flex">
                 {/* Левая колонка с фото и кнопками */}
                 <div className="w-1/4 bg-gray-50 p-6 flex flex-col items-center">
-                    {/*<img*/}
-                    {/*    src={profileData.avatar}*/}
-                    {/*    alt={profileData.nickname}*/}
-                    {/*    className="w-32 h-32 rounded-full mb-4"*/}
-                    {/*/>*/}
                     {loading ? <Loader/> : <Avatar initialAvatarUrl={profileData.avatar} onAvatarChange={avatarChange}/>}
-                    {/*<h3 className="text-lg font-semibold">{profileData.name ?? profileData.nickname} {profileData.surname ?? null}</h3>*/}
                     <div className="flex space-x-4 mt-4">
                         <div className="text-center">
                             <span className="font-bold">{profileData.followersCount ?? "Отсутсвует"}</span>
@@ -122,10 +116,13 @@ const Profile: React.FC = () => {
                         <h4 className="text-xl font-semibold mb-4">Дополнительная информация</h4>
                         {loading ? <Loader/> :
                             <div>
-                                <p><strong>GitHub:</strong> <a href={profileData.gitLink ?? "Отсутсвует"}
-                                                               target="_blank"
-                                                               rel="noopener noreferrer"
-                                                               className="text-blue-500 hover:underline">{profileData.gitLink}</a>
+                                <p><strong>GitHub:</strong>
+                                    {profileData.gitLink ??
+                                        <a href={profileData.gitLink}
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           className="text-blue-500 hover:underline">{profileData.gitLink}</a>
+                                    }
                                 </p>
                                 <p><strong>Операционная система:</strong> {profileData.os ?? "Отсутсвует"}</p>
                                 <p><strong>Место работы:</strong> {profileData.work ?? "Отсутсвует"}</p>
