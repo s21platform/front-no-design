@@ -2,6 +2,7 @@ import React, {ChangeEvent, FormEvent, useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
 import Avatar from "../Avatar/Avatar";
+import Loader from "../Loader/Loader";
 
 type ProfileProps = {
     nickname: string;
@@ -33,6 +34,7 @@ const Profile: React.FC = () => {
         nickname: "",
         avatar: "https://i.pravatar.cc/150?img=3",
     })
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         axios.get("/api/profile", {
@@ -40,6 +42,7 @@ const Profile: React.FC = () => {
         }).then(data => {
             setProfileData(data.data)
             console.log(data);
+            setLoading(false);
         }).catch(err => {
             if (err.status === 401) {
                 console.log("remove expiry")
@@ -64,7 +67,7 @@ const Profile: React.FC = () => {
                     {/*    alt={profileData.nickname}*/}
                     {/*    className="w-32 h-32 rounded-full mb-4"*/}
                     {/*/>*/}
-                    <Avatar initialAvatarUrl={profileData.avatar} onAvatarChange={avatarChange}/>
+                    {loading ? <Loader/> : <Avatar initialAvatarUrl={profileData.avatar} onAvatarChange={avatarChange}/>}
                     {/*<h3 className="text-lg font-semibold">{profileData.name ?? profileData.nickname} {profileData.surname ?? null}</h3>*/}
                     <div className="flex space-x-4 mt-4">
                         <div className="text-center">
@@ -94,25 +97,43 @@ const Profile: React.FC = () => {
                         Редактировать профиль
                     </button>
                     {/* Первый блок информации */}
+
                     <div className="mb-6">
                         <h4 className="text-xl font-semibold mb-4">Основная информация</h4>
-                        <p>
-                            <strong>Имя:</strong> {profileData.name ?? profileData.nickname} {profileData.surname ?? null}
-                        </p>
-                        <p><strong>Дата рождения:</strong> {profileData.birthdate ? `${profileData.birthdate.day} ${profileData.birthdate.month} ${profileData.birthdate.year}` : "Отсутсвует"}</p>
-                        <p><strong>Город:</strong> {profileData.city ?? "Отсутсвует"}</p>
-                        <p><strong>Telegram:</strong> <a href={`https://t.me/${profileData.telegram?.substring(1)}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">{profileData.telegram}</a></p>
+                        {loading ? <Loader/> :
+                            <div>
+                                <p>
+                                    <strong>Имя:</strong> {profileData.name ?? profileData.nickname} {profileData.surname ?? null}
+                                </p>
+                                <p><strong>Дата рождения:</strong> {profileData.birthdate ? `${profileData.birthdate.day} ${profileData.birthdate.month} ${profileData.birthdate.year}` : "Отсутсвует"}
+                                </p>
+                                <p><strong>Город:</strong> {profileData.city ?? "Отсутсвует"}</p>
+                                <p><strong>Telegram:</strong> <a
+                                    href={`https://t.me/${profileData.telegram?.substring(1)}`}
+                                    target="_blank" rel="noopener noreferrer"
+                                    className="text-blue-500 hover:underline">{profileData.telegram}</a>
+                                </p>
+                            </div>
+                        }
                     </div>
 
                     {/* Второй блок информации */}
                     <div>
                         <h4 className="text-xl font-semibold mb-4">Дополнительная информация</h4>
-                        <p><strong>GitHub:</strong> <a href={profileData.gitLink ?? "Отсутсвует"} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">{profileData.gitLink}</a></p>
-                        <p><strong>Операционная система:</strong> {profileData.os ?? "Отсутсвует"}</p>
-                        <p><strong>Место работы:</strong> {profileData.work ?? "Отсутсвует"}</p>
-                        <p><strong>Место учебы:</strong> {profileData.university ?? "Отсутсвует"}</p>
-                        <p><strong>Навыки:</strong> {profileData.skills?.join(", ")}</p>
-                        <p><strong>Хобби:</strong> {profileData.hobbies?.join(", ")}</p>
+                        {loading ? <Loader/> :
+                            <div>
+                                <p><strong>GitHub:</strong> <a href={profileData.gitLink ?? "Отсутсвует"}
+                                                               target="_blank"
+                                                               rel="noopener noreferrer"
+                                                               className="text-blue-500 hover:underline">{profileData.gitLink}</a>
+                                </p>
+                                <p><strong>Операционная система:</strong> {profileData.os ?? "Отсутсвует"}</p>
+                                <p><strong>Место работы:</strong> {profileData.work ?? "Отсутсвует"}</p>
+                                <p><strong>Место учебы:</strong> {profileData.university ?? "Отсутсвует"}</p>
+                                <p><strong>Навыки:</strong> {profileData.skills?.join(", ")}</p>
+                                <p><strong>Хобби:</strong> {profileData.hobbies?.join(", ")}</p>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>

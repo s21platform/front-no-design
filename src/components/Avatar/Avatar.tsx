@@ -10,16 +10,20 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
     const [avatarUrl, setAvatarUrl] = useState<string>(initialAvatarUrl);
     const [loading, setLoading] = useState<boolean>(false);
 
-    useEffect(() => {
-        setAvatarUrl(initialAvatarUrl);
-    }, [initialAvatarUrl]);
+    // useEffect(() => {
+    //     setAvatarUrl(initialAvatarUrl);
+    // }, [initialAvatarUrl]);
 
     const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
 
+        const filename = file.name;
+
         const formData = new FormData();
         formData.append('avatar', file);
+        formData.append('filename', filename);
+
 
         setLoading(true);
 
