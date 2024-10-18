@@ -1,6 +1,7 @@
 import React, {ChangeEvent, FormEvent, useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
+import Avatar from "../Avatar/Avatar";
 
 type ProfileProps = {
     nickname: string;
@@ -32,8 +33,6 @@ const Profile: React.FC = () => {
         nickname: "",
         avatar: "https://i.pravatar.cc/150?img=3",
     })
-    const [file, setFile] = useState<File | null>(null); // Состояние для файла
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false); // Состояние для блокировки кнопки при отправке
 
     useEffect(() => {
         axios.get("/api/profile", {
@@ -51,50 +50,22 @@ const Profile: React.FC = () => {
         })
     }, []);
 
-    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files.length > 0) {
-            setFile(e.target.files[0]); // Устанавливаем файл в состояние
-        }
-    };
-
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault(); // Предотвращаем стандартное поведение отправки формы
-
-        if (!file) {
-            alert("Please select a file");
-            return;
-        }
-
-        setIsSubmitting(true); // Устанавливаем состояние отправки
-
-        // Создаем объект FormData
-        const formData = new FormData();
-        formData.append('avatar', file); // Добавляем файл
-
-        axios.post('/api/avatar', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        }).then(data => {
-            setProfileData({...profileData, avatar: data.data.link})
-        }).catch(e => {
-            console.error('Error uploading file', e);
-        }).finally(() => {
-            setIsSubmitting(false);
-        })
-    };
+    const avatarChange = (newUrl: string) => {
+        setProfileData({...profileData, avatar: newUrl});
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
             <div className="bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-4xl flex">
                 {/* Левая колонка с фото и кнопками */}
                 <div className="w-1/4 bg-gray-50 p-6 flex flex-col items-center">
-                    <img
-                        src={profileData.avatar}
-                        alt={profileData.nickname}
-                        className="w-32 h-32 rounded-full mb-4"
-                    />
-                    <h3 className="text-lg font-semibold">{profileData.name ?? profileData.nickname} {profileData.surname ?? null}</h3>
+                    {/*<img*/}
+                    {/*    src={profileData.avatar}*/}
+                    {/*    alt={profileData.nickname}*/}
+                    {/*    className="w-32 h-32 rounded-full mb-4"*/}
+                    {/*/>*/}
+                    <Avatar initialAvatarUrl={profileData.avatar} onAvatarChange={avatarChange}/>
+                    {/*<h3 className="text-lg font-semibold">{profileData.name ?? profileData.nickname} {profileData.surname ?? null}</h3>*/}
                     <div className="flex space-x-4 mt-4">
                         <div className="text-center">
                             <span className="font-bold">{profileData.followersCount ?? "Отсутсвует"}</span>
@@ -111,29 +82,6 @@ const Profile: React.FC = () => {
                     >
                         Поиск людей
                     </button>
-                    <form
-                        onSubmit={handleSubmit}
-                        className="flex flex-col items-center p-4 bg-gray-100 rounded-lg shadow-lg max-w-md mx-auto"
-                    >
-                        <h1 className="text-2xl font-bold mb-4 text-gray-700">Upload Avatar</h1>
-
-                        <input
-                            type="file"
-                            name="avatar"
-                            onChange={handleFileChange}
-                            className="border border-gray-300 p-2 rounded-lg mb-4 w-full text-gray-700"
-                        />
-
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className={`bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300 ${
-                                isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
-                            }`}
-                        >
-                            {isSubmitting ? 'Uploading...' : 'Submit'}
-                        </button>
-                    </form>
                 </div>
 
                 {/* Центральная колонка с информацией */}
