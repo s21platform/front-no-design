@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import axios from 'axios';
+import Loader from "../Loader/Loader";
 
 interface AvatarUploaderProps {
     initialAvatarUrl: string;
@@ -9,6 +10,7 @@ interface AvatarUploaderProps {
 const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChange }) => {
     const [avatarUrl, setAvatarUrl] = useState<string>(initialAvatarUrl);
     const [loading, setLoading] = useState<boolean>(false);
+    const [loadingAll, setLoadingAll] = useState<boolean>(false);
     const [allAvatars, setAllAvatars] = useState<string[]>([]);
     const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
     const [currentAvatarIndex, setCurrentAvatarIndex] = useState<number>(0);
@@ -49,6 +51,7 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
 
     const openPopup = async () => {
         setIsPopupOpen(true);
+        setLoadingAll(true)
         try {
             const response = await axios.get('/api/avatar');
             console.log(response.data.avatar_list)
@@ -56,6 +59,8 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
             setCurrentAvatarIndex(response.data.avatars.findIndex((url: string) => url === avatarUrl));
         } catch (error) {
             console.error('Ошибка при получении аватарок', error);
+        } finally {
+            setLoadingAll(false)
         }
     };
 
@@ -96,43 +101,45 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
             {/* Popup для просмотра и перелистывания аватарок */}
             {isPopupOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
-                    <div className="bg-white p-4 rounded-lg max-w-sm w-full relative flex items-center">
-                        {/* Закрыть popup */}
-                        <button
-                            className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
-                            onClick={closePopup}
-                        >
-                            ✖
-                        </button>
+                    {loadingAll ? <Loader/>
+                        : <div className="bg-white p-4 rounded-lg max-w-sm w-full relative flex items-center">
+                            {/* Закрыть popup */}
+                            <button
+                                className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+                                onClick={closePopup}
+                            >
+                                ✖
+                            </button>
 
-                        {/* Отображение номера аватарки */}
-                        <div className="absolute top-2 text-gray-700 font-bold mb-2">
-                            {currentAvatarIndex + 1}/{allAvatars.length}
+                            {/* Отображение номера аватарки */}
+                            <div className="absolute top-2 text-gray-700 font-bold mb-2">
+                                {currentAvatarIndex + 1}/{allAvatars.length}
+                            </div>
+
+                            {/* Стрелка влево */}
+                            <button
+                                className="absolute left-2 text-gray-600 hover:text-gray-900 text-4xl"
+                                onClick={prevAvatar}
+                            >
+                                &larr;
+                            </button>
+
+                            {/* Отображение текущей аватарки */}
+                            <img
+                                src={allAvatars[currentAvatarIndex]}
+                                alt={`Avatar ${currentAvatarIndex}`}
+                                className="w-48 h-48 object-cover mx-auto mb-4"
+                            />
+
+                            {/* Стрелка вправо */}
+                            <button
+                                className="absolute right-2 text-gray-600 hover:text-gray-900 text-4xl"
+                                onClick={nextAvatar}
+                            >
+                                &rarr;
+                            </button>
                         </div>
-
-                        {/* Стрелка влево */}
-                        <button
-                            className="absolute left-2 text-gray-600 hover:text-gray-900 text-4xl"
-                            onClick={prevAvatar}
-                        >
-                            &larr;
-                        </button>
-
-                        {/* Отображение текущей аватарки */}
-                        <img
-                            src={allAvatars[currentAvatarIndex]}
-                            alt={`Avatar ${currentAvatarIndex}`}
-                            className="w-48 h-48 object-cover mx-auto mb-4"
-                        />
-
-                        {/* Стрелка вправо */}
-                        <button
-                            className="absolute right-2 text-gray-600 hover:text-gray-900 text-4xl"
-                            onClick={nextAvatar}
-                        >
-                            &rarr;
-                        </button>
-                    </div>
+                    }
                 </div>
             )}
         </div>
