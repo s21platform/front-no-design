@@ -7,11 +7,16 @@ interface AvatarUploaderProps {
     onAvatarChange?: (newAvatarUrl: string) => void;
 }
 
+interface AvatarUploaderState {
+    id: number;
+    link: string;
+}
+
 const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChange }) => {
     const [avatarUrl, setAvatarUrl] = useState<string>(initialAvatarUrl);
     const [loading, setLoading] = useState<boolean>(false);
     const [loadingAll, setLoadingAll] = useState<boolean>(false);
-    const [allAvatars, setAllAvatars] = useState<string[]>([]);
+    const [allAvatars, setAllAvatars] = useState<AvatarUploaderState[]>([]);
     const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
     const [currentAvatarIndex, setCurrentAvatarIndex] = useState<number>(0);
 
@@ -66,6 +71,7 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
 
     // Закрытие popup
     const closePopup = () => {
+        setCurrentAvatarIndex(0)
         setIsPopupOpen(false);
     };
 
@@ -126,7 +132,7 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
 
                             {/* Отображение текущей аватарки */}
                             <img
-                                src={allAvatars[currentAvatarIndex]}
+                                src={allAvatars[currentAvatarIndex].link}
                                 alt={`Avatar ${currentAvatarIndex}`}
                                 className="w-48 h-48 object-cover mx-auto mb-4"
                             />
