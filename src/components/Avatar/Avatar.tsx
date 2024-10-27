@@ -85,6 +85,24 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
         setCurrentAvatarIndex((prevIndex) => (prevIndex - 1 + allAvatars.length) % allAvatars.length);
     };
 
+    const deleteAvatar = () => {
+        if (window.confirm("Удалить аватар?")) {
+            axios.delete("/api/avatar", {
+                data: {
+                    id: allAvatars[currentAvatarIndex].id,
+                },
+                withCredentials: true,
+            }).then(data => {
+                console.log(data);
+                setAllAvatars(allAvatars.filter(ava => ava.id !== data.data.id))
+                setCurrentAvatarIndex((prevIndex) => (prevIndex + 1) % allAvatars.length-1);
+            }).catch(err => {
+                alert("Не удалось")
+                console.error(err)
+            })
+        }
+    }
+
     return (
         <div className="flex flex-col items-center">
             <img
@@ -115,6 +133,13 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
                                 onClick={closePopup}
                             >
                                 ✖
+                            </button>
+
+                            <button
+                                className="absolute bottom-2 right-2 text-gray-600 hover:text-gray-900"
+                                onClick={deleteAvatar}
+                            >
+                                Удалить
                             </button>
 
                             {/* Отображение номера аватарки */}
