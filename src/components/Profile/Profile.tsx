@@ -3,6 +3,9 @@ import {useNavigate} from "react-router-dom";
 import axios from "axios";
 import Avatar from "../Avatar/Avatar";
 import Loader from "../Loader/Loader";
+import Notification from "../Notification/Notification";
+import NotificationWidget from "../Widgets/NotificationWidget/NotificationWidget";
+import Chat from "../Chat/Chat";
 
 type ProfileProps = {
     nickname: string;
@@ -84,12 +87,18 @@ const Profile: React.FC = () => {
                 {/* Центральная колонка с информацией */}
                 <div className="w-3/4 p-6 relative">
                     {/* Кнопка редактирования профиля */}
-                    <button
-                        onClick={() => navigate("/edit")}
-                        className="absolute top-0 right-0 mt-2 mr-2 px-4 py-2 bg-yellow-500 text-white rounded-full hover:bg-yellow-600"
-                    >
-                        Редактировать профиль
-                    </button>
+                    <div className="absolute top-0 right-0 mt-2 mr-4 flex flex-row items-center">
+                        <button
+                            onClick={() => navigate("/edit")}
+                            className="mr-2 px-4 py-2 bg-yellow-500 text-white rounded-full hover:bg-yellow-600"
+                        >
+                            Редактировать профиль
+                        </button>
+                        <div>
+                            <NotificationWidget/>
+                        </div>
+                    </div>
+
                     {/* Первый блок информации */}
 
                     <div className="mb-6">
@@ -131,6 +140,7 @@ const Profile: React.FC = () => {
                                 <p><strong>Хобби:</strong> {profileData.hobbies?.join(", ")}</p>
                             </div>
                         }
+                        <Chat/>
                     </div>
                 </div>
             </div>

@@ -10,8 +10,8 @@ function App() {
             <Route path="/profile" element={<ProfilePage/>}/>
             <Route path="/edit" element={<EditProfilePage/>}/>
 
-            {/* Fallback для всех несуществующих роутов */}
-            <Route path="*" element={<div>Not Found Page</div>}/>
+            {/*/!* Fallback для всех несуществующих роутов *!/*/}
+            {/*<Route path="*" element={<div>Not Found Page</div>}/>*/}
         </Routes>
     );
 }
