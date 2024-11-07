@@ -66,7 +66,10 @@ const Profile: React.FC = () => {
         axios.get("/api/friends/counts", {
             withCredentials: true
         }).then(data => {
-            setFriends(data.data)
+            setFriends({
+                subscribers: data.data.subscribers ?? 0,
+                subscription: data.data.subscription ?? 0,
+            })
             console.log(data);
         }).catch(err => {
             console.warn(err)
