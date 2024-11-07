@@ -24,18 +24,26 @@ type ProfileProps = {
     skills?: string[];
     hobbies?: string[];
     avatar: string;
-    followersCount?: number;
-    followingCount?: number;
+
     phone?: string;
     telegram?: string;
     email?: string;
 };
+
+type Friends = {
+    followersCount?: number;
+    followingCount?: number;
+}
 
 const Profile: React.FC = () => {
     const navigate = useNavigate();
     const [profileData, setProfileData] = useState<ProfileProps>({
         nickname: "",
         avatar: "https://i.pravatar.cc/150?img=3",
+    })
+    const [friends, setFriends] = useState<Friends>({
+        followersCount: 0,
+        followingCount: 0
     })
     const [loading, setLoading] = useState<boolean>(true);
 
@@ -54,7 +62,18 @@ const Profile: React.FC = () => {
             }
             console.warn(err)
         })
+
+        axios.get("/api/friends/counts", {
+            withCredentials: true
+        }).then(data => {
+            setFriends(data.data)
+            console.log(data);
+        }).catch(err => {
+            console.warn(err)
+        })
     }, []);
+
+
 
     const avatarChange = (newUrl: string) => {
         setProfileData({...profileData, avatar: newUrl});
@@ -68,11 +87,11 @@ const Profile: React.FC = () => {
                     {loading ? <Loader/> : <Avatar initialAvatarUrl={profileData.avatar} onAvatarChange={avatarChange}/>}
                     <div className="flex space-x-4 mt-4">
                         <div className="text-center">
-                            <span className="font-bold">{profileData.followersCount ?? "Отсутсвует"}</span>
+                            <span className="font-bold">{friends.followersCount ?? "Отсутсвует"}</span>
                             <p className="text-sm text-gray-600">Подписчиков</p>
                         </div>
                         <div className="text-center">
-                            <span className="font-bold">{profileData.followingCount ?? "Отсутсвует"}</span>
+                            <span className="font-bold">{friends.followingCount ?? "Отсутсвует"}</span>
                             <p className="text-sm text-gray-600">Подписок</p>
                         </div>
                     </div>
