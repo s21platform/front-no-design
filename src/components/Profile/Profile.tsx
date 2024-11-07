@@ -31,8 +31,8 @@ type ProfileProps = {
 };
 
 type Friends = {
-    followersCount?: number;
-    followingCount?: number;
+    subscribers?: number;
+    subscription?: number;
 }
 
 const Profile: React.FC = () => {
@@ -42,8 +42,8 @@ const Profile: React.FC = () => {
         avatar: "https://i.pravatar.cc/150?img=3",
     })
     const [friends, setFriends] = useState<Friends>({
-        followersCount: 0,
-        followingCount: 0
+        subscribers: 0,
+        subscription: 0
     })
     const [loading, setLoading] = useState<boolean>(true);
 
@@ -87,11 +87,11 @@ const Profile: React.FC = () => {
                     {loading ? <Loader/> : <Avatar initialAvatarUrl={profileData.avatar} onAvatarChange={avatarChange}/>}
                     <div className="flex space-x-4 mt-4">
                         <div className="text-center">
-                            <span className="font-bold">{friends.followersCount ?? "Отсутсвует"}</span>
+                            <span className="font-bold">{friends.subscribers ?? "Отсутсвует"}</span>
                             <p className="text-sm text-gray-600">Подписчиков</p>
                         </div>
                         <div className="text-center">
-                            <span className="font-bold">{friends.followingCount ?? "Отсутсвует"}</span>
+                            <span className="font-bold">{friends.subscription ?? "Отсутсвует"}</span>
                             <p className="text-sm text-gray-600">Подписок</p>
                         </div>
                     </div>
