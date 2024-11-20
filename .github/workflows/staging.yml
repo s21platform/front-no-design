@@ -1,6 +1,6 @@
 name: Dev CI/CD to Development server
 on:
-  push:
+  pull_request:
     branches:
       - main
 
