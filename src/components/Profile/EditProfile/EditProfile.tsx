@@ -99,7 +99,7 @@ const EditProfile = ({profileData}: ProfileDataI) => {
                     <input
                         type="text"
                         value={data.git}
-                        onChange={(e) => handleInputChange(e, "gitLink")}
+                        onChange={(e) => handleInputChange(e, "git")}
                         className="w-full p-2 border border-gray-300 rounded"
                     />
                 </div>
