@@ -1,49 +1,17 @@
 import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
-import Avatar from "../Avatar/Avatar";
 import Loader from "../Loader/Loader";
-import Notification from "../Notification/Notification";
 import NotificationWidget from "../Widgets/NotificationWidget/NotificationWidget";
 import Chat from "../Chat/Chat";
+import {ProfileProps} from "./types";
+import SideProfile from "./SideProfile/SideProfile";
 
-type ProfileProps = {
-    nickname: string;
-    name?: string;
-    surname?: string;
-    birthdate?: {
-        day: string;
-        month: string;
-        year: string;
-    };
-    city?: string;
-    gitLink?: string;
-    os?: string;
-    work?: string;
-    university?: string;
-    skills?: string[];
-    hobbies?: string[];
-    avatar: string;
-
-    phone?: string;
-    telegram?: string;
-    email?: string;
-};
-
-type Friends = {
-    subscribers?: number;
-    subscription?: number;
-}
 
 const Profile: React.FC = () => {
     const navigate = useNavigate();
     const [profileData, setProfileData] = useState<ProfileProps>({
-        nickname: "",
         avatar: "https://i.pravatar.cc/150?img=3",
-    })
-    const [friends, setFriends] = useState<Friends>({
-        subscribers: 0,
-        subscription: 0
     })
     const [loading, setLoading] = useState<boolean>(true);
 
@@ -62,18 +30,6 @@ const Profile: React.FC = () => {
             }
             console.warn(err)
         })
-
-        axios.get("/api/friends/counts", {
-            withCredentials: true
-        }).then(data => {
-            setFriends({
-                subscribers: data.data.subscribers ?? 0,
-                subscription: data.data.subscription ?? 0,
-            })
-            console.log(data);
-        }).catch(err => {
-            console.warn(err)
-        })
     }, []);
 
 
@@ -86,26 +42,7 @@ const Profile: React.FC = () => {
         <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
             <div className="bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-4xl flex">
                 {/* Левая колонка с фото и кнопками */}
-                <div className="w-1/4 bg-gray-50 p-6 flex flex-col items-center">
-                    {loading ? <Loader/> : <Avatar initialAvatarUrl={profileData.avatar} onAvatarChange={avatarChange}/>}
-                    <div className="flex space-x-4 mt-4">
-                        <div className="text-center">
-                            <span className="font-bold">{friends.subscribers ?? "Отсутсвует"}</span>
-                            <p className="text-sm text-gray-600">Подписчиков</p>
-                        </div>
-                        <div className="text-center">
-                            <span className="font-bold">{friends.subscription ?? "Отсутсвует"}</span>
-                            <p className="text-sm text-gray-600">Подписок</p>
-                        </div>
-                    </div>
-                    <button
-                        className="mt-6 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600"
-                        onClick={() => alert("В разработке")}
-                    >
-                        Поиск людей
-                    </button>
-                </div>
-
+                <SideProfile avatarUrl={profileData.avatar} avatarChange={avatarChange}/>
                 {/* Центральная колонка с информацией */}
                 <div className="w-3/4 p-6 relative">
                     {/* Кнопка редактирования профиля */}
@@ -127,12 +64,8 @@ const Profile: React.FC = () => {
                         <h4 className="text-xl font-semibold mb-4">Основная информация</h4>
                         {loading ? <Loader/> :
                             <div>
-                                <p>
-                                    <strong>Имя:</strong> {profileData.name ?? profileData.nickname} {profileData.surname ?? null}
-                                </p>
-                                <p><strong>Дата рождения:</strong> {profileData.birthdate ? `${profileData.birthdate.day} ${profileData.birthdate.month} ${profileData.birthdate.year}` : "Отсутсвует"}
-                                </p>
-                                <p><strong>Город:</strong> {profileData.city ?? "Отсутсвует"}</p>
+                                {!!profileData.fullName && <p><strong>Имя:</strong> {profileData.fullName}</p>}
+                                {/*<p><strong>Дата рождения:</strong> {profileData.birthdate ? `${profileData.birthdate.day} ${profileData.birthdate.month} ${profileData.birthdate.year}` : "Отсутсвует"}</p>*/}
                                 <p><strong>Telegram:</strong> <a
                                     href={`https://t.me/${profileData.telegram?.substring(1)}`}
                                     target="_blank" rel="noopener noreferrer"
@@ -144,23 +77,25 @@ const Profile: React.FC = () => {
 
                     {/* Второй блок информации */}
                     <div>
-                        <h4 className="text-xl font-semibold mb-4">Дополнительная информация</h4>
-                        {loading ? <Loader/> :
-                            <div>
-                                <p><strong>GitHub:</strong>
-                                    {profileData.gitLink ??
-                                        <a href={profileData.gitLink}
-                                           target="_blank"
-                                           rel="noopener noreferrer"
-                                           className="text-blue-500 hover:underline">{profileData.gitLink}</a>
+                        {Object.keys(profileData).length > 0 &&
+                        <>
+                            <h4 className="text-xl font-semibold mb-4">Дополнительная информация</h4>
+                            {loading ? <Loader/> :
+                                <div>
+                                    <p><strong>GitHub:</strong>
+                                        {profileData.gitLink ??
+                                            <a href={profileData.gitLink}
+                                               target="_blank"
+                                               rel="noopener noreferrer"
+                                               className="text-blue-500 hover:underline">{profileData.gitLink}</a>
+                                        }
+                                    </p>
+                                    {!!profileData.os &&
+                                        <p><strong>Операционная система:</strong> {profileData.os.name ?? "Отсутсвует"}</p>
                                     }
-                                </p>
-                                <p><strong>Операционная система:</strong> {profileData.os ?? "Отсутсвует"}</p>
-                                <p><strong>Место работы:</strong> {profileData.work ?? "Отсутсвует"}</p>
-                                <p><strong>Место учебы:</strong> {profileData.university ?? "Отсутсвует"}</p>
-                                <p><strong>Навыки:</strong> {profileData.skills?.join(", ")}</p>
-                                <p><strong>Хобби:</strong> {profileData.hobbies?.join(", ")}</p>
-                            </div>
+                                </div>
+                            }
+                        </>
                         }
                         <Chat/>
                     </div>
