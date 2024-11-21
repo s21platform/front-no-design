@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import axios from "axios";
 import {ProfileProps} from "../types";
 import {useNavigate} from "react-router-dom";
@@ -8,12 +8,14 @@ interface ProfileDataI {
 }
 
 const EditProfile = ({profileData}: ProfileDataI) => {
+    const navigate = useNavigate();
     const[data, setData] = useState<ProfileProps>(profileData)
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, field: string) => {
         let value = e.target.value;
-        if (field === "birthDate") {
-            value = new Date(e.target.value).toISOString()
-        }
+        // if (field === "birthdate") {
+        //     value = new Date(e.target.value).toISOString()
+        // }
+        console.log(data)
         setData({
             ...data,
             [field]: value,
@@ -29,12 +31,19 @@ const EditProfile = ({profileData}: ProfileDataI) => {
     };
 
     const handleSaveProfile = () => {
-        // Логика сохранения профиля
-        axios.put("/api/profile", data, {
+        const sendData = data
+        if (data.birthdate) {
+            sendData.birthdate = new Date(data.birthdate ?? "").toISOString()
+        }
+        axios.put("/api/profile", sendData, {
             headers: {
                 "Content-Type": "application/json",
             }
-        }).then(data => console.log(data.data))
+        }).then(data => {
+            if (data.status === 200 && data.data.status) {
+                navigate("/profile");
+            }
+        })
             .catch(err => console.log(err));
     };
 
@@ -57,8 +66,8 @@ const EditProfile = ({profileData}: ProfileDataI) => {
                     <label className="block text-gray-600">Имя:</label>
                     <input
                         type="text"
-                        value={profileData.fullName}
-                        onChange={(e) => handleInputChange(e, "fullName")}
+                        value={data.name}
+                        onChange={(e) => handleInputChange(e, "name")}
                         className="w-full p-2 border border-gray-300 rounded"
                     />
                 </div>
@@ -66,8 +75,8 @@ const EditProfile = ({profileData}: ProfileDataI) => {
                     <label className="block text-gray-600">Дата рождения:</label>
                     <input
                         type="date"
-                        value={profileData.birthDate}
-                        onChange={(e) => handleInputChange(e, "birthDate")}
+                        value={data.birthdate}
+                        onChange={(e) => handleInputChange(e, "birthdate")}
                         className="w-full p-2 border border-gray-300 rounded"
                     />
                 </div>
@@ -75,7 +84,7 @@ const EditProfile = ({profileData}: ProfileDataI) => {
                     <label className="block text-gray-600">Telegram:</label>
                     <input
                         type="text"
-                        value={profileData.telegram}
+                        value={data.telegram}
                         onChange={(e) => handleInputChange(e, "telegram")}
                         className="w-full p-2 border border-gray-300 rounded"
                     />
@@ -89,20 +98,20 @@ const EditProfile = ({profileData}: ProfileDataI) => {
                     <label className="block text-gray-600">GitHub:</label>
                     <input
                         type="text"
-                        value={profileData.gitLink}
+                        value={data.git}
                         onChange={(e) => handleInputChange(e, "gitLink")}
                         className="w-full p-2 border border-gray-300 rounded"
                     />
                 </div>
-                <div className="mb-2">
-                    <label className="block text-gray-600">Операционная система:</label>
-                    <input
-                        type="text"
-                        value={"Mac OS"}
-                        onChange={(e) => handleInputChange(e, "operatingSystem")}
-                        className="w-full p-2 border border-gray-300 rounded"
-                    />
-                </div>
+                {/*<div className="mb-2">*/}
+                {/*    <label className="block text-gray-600">Операционная система:</label>*/}
+                {/*    <input*/}
+                {/*        type="text"*/}
+                {/*        value={"Mac OS"}*/}
+                {/*        onChange={(e) => handleInputChange(e, "operatingSystem")}*/}
+                {/*        className="w-full p-2 border border-gray-300 rounded"*/}
+                {/*    />*/}
+                {/*</div>*/}
             </div>
         </div>
     )

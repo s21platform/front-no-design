@@ -19,8 +19,16 @@ const Profile: React.FC = () => {
         axios.get("/api/profile", {
             withCredentials: true,
         }).then(data => {
+            console.log(data.data)
+            if (data.data.birthdate) {
+                const birthdayFull = new Date(data.data.birthdate)
+                const day = String(birthdayFull.getDate()).padStart(2, "0");
+                const month = String(birthdayFull.getMonth() + 1).padStart(2, "0");
+                const year = birthdayFull.getFullYear();
+                const birthday = `${day}.${month}.${year}`;
+                data.data = {...data.data, birthdate: birthday};
+            }
             setProfileData(data.data)
-            console.log(data);
             setLoading(false);
         }).catch(err => {
             if (err.status === 401) {
@@ -64,9 +72,9 @@ const Profile: React.FC = () => {
                         <h4 className="text-xl font-semibold mb-4">Основная информация</h4>
                         {loading ? <Loader/> :
                             <div>
-                                {!!profileData.fullName && <p><strong>Имя:</strong> {profileData.fullName}</p>}
-                                {/*<p><strong>Дата рождения:</strong> {profileData.birthdate ? `${profileData.birthdate.day} ${profileData.birthdate.month} ${profileData.birthdate.year}` : "Отсутсвует"}</p>*/}
-                                <p><strong>Telegram:</strong> <a
+                                {!!profileData.name && <p><strong>Имя:</strong> {profileData.name}</p>}
+                                {!!profileData.birthdate && <p><strong>Дата рождения:</strong> {profileData.birthdate}</p>}
+                                    <p><strong>Telegram:</strong> <a
                                     href={`https://t.me/${profileData.telegram?.substring(1)}`}
                                     target="_blank" rel="noopener noreferrer"
                                     className="text-blue-500 hover:underline">{profileData.telegram}</a>
@@ -82,16 +90,17 @@ const Profile: React.FC = () => {
                             <h4 className="text-xl font-semibold mb-4">Дополнительная информация</h4>
                             {loading ? <Loader/> :
                                 <div>
-                                    <p><strong>GitHub:</strong>
-                                        {profileData.gitLink ??
-                                            <a href={profileData.gitLink}
+                                    {!!profileData.git &&
+                                        <p><strong>GitHub: </strong>
+                                            <a href={`https://github.com/${profileData.git}`}
                                                target="_blank"
                                                rel="noopener noreferrer"
-                                               className="text-blue-500 hover:underline">{profileData.gitLink}</a>
-                                        }
-                                    </p>
+                                               className="text-blue-500 hover:underline">{profileData.git}</a>
+                                        </p>
+                                    }
                                     {!!profileData.os &&
-                                        <p><strong>Операционная система:</strong> {profileData.os.name ?? "Отсутсвует"}</p>
+                                        <p><strong>Операционная система:</strong> {profileData.os.name ?? "Отсутсвует"}
+                                        </p>
                                     }
                                 </div>
                             }
