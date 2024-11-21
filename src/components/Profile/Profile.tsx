@@ -13,6 +13,7 @@ const Profile: React.FC = () => {
     const [profileData, setProfileData] = useState<ProfileProps>({
         avatar: "https://i.pravatar.cc/150?img=3",
     })
+    const [avatar, setAvatar] = useState("https://i.pravatar.cc/150?img=3")
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
@@ -28,6 +29,7 @@ const Profile: React.FC = () => {
                 const birthday = `${day}.${month}.${year}`;
                 data.data = {...data.data, birthdate: birthday};
             }
+            setAvatar(data.data.avatar)
             setProfileData(data.data)
             setLoading(false);
         }).catch(err => {
@@ -44,13 +46,14 @@ const Profile: React.FC = () => {
 
     const avatarChange = (newUrl: string) => {
         setProfileData({...profileData, avatar: newUrl});
+        setAvatar(newUrl);
     }
 
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
             <div className="bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-4xl flex">
                 {/* Левая колонка с фото и кнопками */}
-                <SideProfile avatarUrl={profileData.avatar} avatarChange={avatarChange}/>
+                <SideProfile avatarUrl={avatar} avatarChange={avatarChange}/>
                 {/* Центральная колонка с информацией */}
                 <div className="w-3/4 p-6 relative">
                     {/* Кнопка редактирования профиля */}
@@ -74,11 +77,11 @@ const Profile: React.FC = () => {
                             <div>
                                 {!!profileData.name && <p><strong>Имя:</strong> {profileData.name}</p>}
                                 {!!profileData.birthdate && <p><strong>Дата рождения:</strong> {profileData.birthdate}</p>}
-                                    <p><strong>Telegram:</strong> <a
+                                {!!profileData.telegram && <p><strong>Telegram:</strong> <a
                                     href={`https://t.me/${profileData.telegram?.substring(1)}`}
                                     target="_blank" rel="noopener noreferrer"
                                     className="text-blue-500 hover:underline">{profileData.telegram}</a>
-                                </p>
+                                </p>}
                             </div>
                         }
                     </div>

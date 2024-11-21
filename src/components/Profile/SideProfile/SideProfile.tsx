@@ -10,11 +10,16 @@ interface Props {
 }
 
 export const SideProfile = ({avatarUrl, avatarChange}: Props) => {
+    const [avatar, setAvatar] = useState(avatarUrl);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [friendsCount, setFriendsCount] = useState<SubscriptionCount>({
         followersCount: 0,
         followingCount: 0
     });
+
+    useEffect(() => {
+        setAvatar(avatarUrl);
+    }, [avatarUrl]);
 
     useEffect(() => {
         axios.get("/api/friends/counts", {
@@ -33,7 +38,7 @@ export const SideProfile = ({avatarUrl, avatarChange}: Props) => {
     return (
         <div className="w-1/4 bg-gray-50 p-6 flex flex-col items-center">
             {/*{isLoading ? <Loader/> : */}
-                <Avatar initialAvatarUrl={avatarUrl} onAvatarChange={avatarChange}/>
+                <Avatar initialAvatarUrl={avatar} onAvatarChange={avatarChange}/>
             {/*}*/}
             <div className="flex space-x-4 mt-4">
                 <div className="text-center">
