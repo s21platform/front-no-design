@@ -18,6 +18,7 @@ export const SideProfile = ({avatarUrl, avatarChange}: Props) => {
     });
 
     useEffect(() => {
+        console.log(avatarUrl)
         setAvatar(avatarUrl);
     }, [avatarUrl]);
 
