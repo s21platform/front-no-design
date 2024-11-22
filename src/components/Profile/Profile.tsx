@@ -19,7 +19,6 @@ const Profile: React.FC = () => {
         axios.get("/api/profile", {
             withCredentials: true,
         }).then(data => {
-            console.log(data.data)
             if (data.data.birthdate) {
                 const birthdayFull = new Date(data.data.birthdate)
                 const day = String(birthdayFull.getDate()).padStart(2, "0");

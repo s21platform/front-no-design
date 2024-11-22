@@ -21,7 +21,6 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
     const [currentAvatarIndex, setCurrentAvatarIndex] = useState<number>(0);
 
     useEffect(() => {
-        console.log(initialAvatarUrl);
         setAvatarUrl(initialAvatarUrl);
     }, [initialAvatarUrl]);
 
@@ -48,14 +47,12 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
             const newAvatarUrl = response.data.link;
             setAvatarUrl(newAvatarUrl);
             if (onAvatarChange) {
-                console.log('Avatar change', newAvatarUrl);
                 onAvatarChange(newAvatarUrl);
             }
         } catch (error) {
             console.error('Ошибка при загрузке аватарки', error);
         } finally {
             setLoading(false);
-            console.log("finally", avatarUrl)
         }
     };
 
@@ -64,7 +61,6 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
         setLoadingAll(true)
         try {
             const response = await axios.get('/api/avatar');
-            console.log(response.data.avatar_list)
             setAllAvatars(response.data.avatar_list);
             setCurrentAvatarIndex(response.data.avatars.findIndex((url: string) => url === avatarUrl));
         } catch (error) {
@@ -98,7 +94,6 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
                 },
                 withCredentials: true,
             }).then(data => {
-                console.log(data);
                 setAllAvatars(allAvatars.filter(ava => ava.id !== data.data.id))
                 setCurrentAvatarIndex((prevIndex) => (prevIndex + 1) % allAvatars.length-1);
             }).catch(err => {
