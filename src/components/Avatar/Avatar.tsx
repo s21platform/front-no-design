@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import Loader from "../Loader/Loader";
 
@@ -19,6 +19,10 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
     const [allAvatars, setAllAvatars] = useState<AvatarUploaderState[]>([]);
     const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
     const [currentAvatarIndex, setCurrentAvatarIndex] = useState<number>(0);
+
+    useEffect(() => {
+        setAvatarUrl(initialAvatarUrl);
+    }, [initialAvatarUrl]);
 
     const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -43,14 +47,12 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
             const newAvatarUrl = response.data.link;
             setAvatarUrl(newAvatarUrl);
             if (onAvatarChange) {
-                console.log('Avatar change', newAvatarUrl);
                 onAvatarChange(newAvatarUrl);
             }
         } catch (error) {
             console.error('Ошибка при загрузке аватарки', error);
         } finally {
             setLoading(false);
-            console.log("finally", avatarUrl)
         }
     };
 
@@ -59,7 +61,6 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
         setLoadingAll(true)
         try {
             const response = await axios.get('/api/avatar');
-            console.log(response.data.avatar_list)
             setAllAvatars(response.data.avatar_list);
             setCurrentAvatarIndex(response.data.avatars.findIndex((url: string) => url === avatarUrl));
         } catch (error) {
@@ -93,7 +94,6 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
                 },
                 withCredentials: true,
             }).then(data => {
-                console.log(data);
                 setAllAvatars(allAvatars.filter(ava => ava.id !== data.data.id))
                 setCurrentAvatarIndex((prevIndex) => (prevIndex + 1) % allAvatars.length-1);
             }).catch(err => {
@@ -105,12 +105,14 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
 
     return (
         <div className="flex flex-col items-center">
-            <img
-                src={avatarUrl}
-                alt="Avatar"
-                onClick={openPopup}
-                className="w-32 h-32 rounded-full mb-4 object-cover"
-            />
+            {avatarUrl === "" ? <Loader/> :
+                <img
+                    src={avatarUrl}
+                    alt="Avatar"
+                    onClick={openPopup}
+                    className="w-32 h-32 rounded-full mb-4 object-cover"
+                />
+            }
             <label className="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded">
                 {loading ? 'Загрузка...' : 'Загрузить фото'}
                 <input
