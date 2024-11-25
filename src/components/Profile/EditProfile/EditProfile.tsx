@@ -2,6 +2,12 @@ import React, {useState} from "react";
 import axios from "axios";
 import {ProfileProps} from "../types";
 import {useNavigate} from "react-router-dom";
+import {FormControl, Grid2, Input, InputAdornment, TextField} from "@mui/material";
+import {AlternateEmail, Pets, PetsTwoTone} from "@mui/icons-material";
+import ProfileSkeleton from "../../Skeletons/ProfileSkeleton/ProfileSkeleton";
+import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import {ru} from "date-fns/locale";
 
 interface ProfileDataI {
     profileData: ProfileProps;
@@ -9,12 +15,9 @@ interface ProfileDataI {
 
 const EditProfile = ({profileData}: ProfileDataI) => {
     const navigate = useNavigate();
-    const[data, setData] = useState<ProfileProps>(profileData)
+    const [data, setData] = useState<ProfileProps>(profileData)
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, field: string) => {
         let value = e.target.value;
-        // if (field === "birthdate") {
-        //     value = new Date(e.target.value).toISOString()
-        // }
         console.log(data)
         setData({
             ...data,
@@ -44,7 +47,7 @@ const EditProfile = ({profileData}: ProfileDataI) => {
                 navigate("/profile");
             }
         })
-            .catch(err => console.log(err));
+            .catch(err => console.log(err))
     };
 
 
@@ -62,34 +65,36 @@ const EditProfile = ({profileData}: ProfileDataI) => {
             {/* Первый блок редактируемой информации */}
             <div className="mb-6">
                 <h4 className="text-xl font-semibold mb-4">Основная информация</h4>
-                <div className="mb-2">
-                    <label className="block text-gray-600">Имя:</label>
-                    <input
-                        type="text"
-                        value={data.name}
-                        onChange={(e) => handleInputChange(e, "name")}
-                        className="w-full p-2 border border-gray-300 rounded"
-                    />
-                </div>
-                <div className="mb-2">
-                    <label className="block text-gray-600">Дата рождения:</label>
-                    <input
-                        type="date"
-                        value={data.birthdate}
-                        onChange={(e) => handleInputChange(e, "birthdate")}
-                        className="w-full p-2 border border-gray-300 rounded"
-                    />
-                </div>
-                <div className="mb-2">
-                    <label className="block text-gray-600">Telegram:</label>
-                    <input
-                        type="text"
-                        value={data.telegram}
-                        onChange={(e) => handleInputChange(e, "telegram")}
-                        className="w-full p-2 border border-gray-300 rounded"
-                    />
-                </div>
+                <Grid2 container spacing={2}>
+                    <Grid2 size={12}>
+                        <TextField type="text" label={"Имя"} value={data.name}
+                                   onChange={(e) => handleInputChange(e, "name")}/>
+                    </Grid2>
+                    <Grid2 size={12}>
+                        <TextField type={"date"} label={"Дата рождения"} value={data.birthdate}
+                                   onChange={(e) => handleInputChange(e, "birthdate")} placeholder={""}/>
+                    </Grid2>
+                    <Grid2 size={12}>
+                        <TextField
+                            type="text"
+                            label={"Telegram"}
+                            value={data.telegram}
+                            onChange={(e) => handleInputChange(e, "telegram")}
+                            slotProps={{
+                                input: {
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <AlternateEmail/>
+                                        </InputAdornment>
+                                    ),
+                                }
+                            }}
+                        />
+                    </Grid2>
+                </Grid2>
             </div>
+
+
 
             {/* Второй блок редактируемой информации */}
             <div>
@@ -103,16 +108,9 @@ const EditProfile = ({profileData}: ProfileDataI) => {
                         className="w-full p-2 border border-gray-300 rounded"
                     />
                 </div>
-                {/*<div className="mb-2">*/}
-                {/*    <label className="block text-gray-600">Операционная система:</label>*/}
-                {/*    <input*/}
-                {/*        type="text"*/}
-                {/*        value={"Mac OS"}*/}
-                {/*        onChange={(e) => handleInputChange(e, "operatingSystem")}*/}
-                {/*        className="w-full p-2 border border-gray-300 rounded"*/}
-                {/*    />*/}
-                {/*</div>*/}
             </div>
+
+
         </div>
     )
 }

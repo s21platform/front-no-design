@@ -6,6 +6,8 @@ import NotificationWidget from "../Widgets/NotificationWidget/NotificationWidget
 import Chat from "../Chat/Chat";
 import {ProfileProps} from "./types";
 import SideProfile from "./SideProfile/SideProfile";
+import ProfileSkeleton from "../Skeletons/ProfileSkeleton/ProfileSkeleton";
+import {Skeleton} from "@mui/material";
 
 
 const Profile: React.FC = () => {
@@ -66,47 +68,52 @@ const Profile: React.FC = () => {
                     </div>
 
                     {/* Первый блок информации */}
-
-                    <div className="mb-6">
-                        <h4 className="text-xl font-semibold mb-4">Основная информация</h4>
-                        {loading ? <Loader/> :
+                    {loading ? <ProfileSkeleton/>
+                        : <div className="mb-6">
+                            <h4 className="text-xl font-semibold mb-4">Основная информация</h4>
                             <div>
                                 {!!profileData.name && <p><strong>Имя:</strong> {profileData.name}</p>}
-                                {!!profileData.birthdate && <p><strong>Дата рождения:</strong> {profileData.birthdate}</p>}
+                                {!!profileData.birthdate &&
+                                    <p><strong>Дата рождения:</strong> {profileData.birthdate}</p>}
                                 {!!profileData.telegram && <p><strong>Telegram:</strong> <a
                                     href={`https://t.me/${profileData.telegram?.substring(1)}`}
                                     target="_blank" rel="noopener noreferrer"
                                     className="text-blue-500 hover:underline">{profileData.telegram}</a>
                                 </p>}
                             </div>
-                        }
-                    </div>
+                        </div>
+                    }
+
 
                     {/* Второй блок информации */}
-                    <div>
-                        {Object.keys(profileData).length > 0 &&
-                        <>
-                            <h4 className="text-xl font-semibold mb-4">Дополнительная информация</h4>
-                            {loading ? <Loader/> :
-                                <div>
-                                    {!!profileData.git &&
-                                        <p><strong>GitHub: </strong>
-                                            <a href={`https://github.com/${profileData.git}`}
-                                               target="_blank"
-                                               rel="noopener noreferrer"
-                                               className="text-blue-500 hover:underline">{profileData.git}</a>
-                                        </p>
+                    {loading ? <ProfileSkeleton/>
+                        : <div>
+                            {Object.keys(profileData).length > 0 &&
+                                <>
+                                    <h4 className="text-xl font-semibold mb-4">Дополнительная информация</h4>
+                                    {loading ? <Loader/> :
+                                        <div>
+                                            {!!profileData.git &&
+                                                <p><strong>GitHub: </strong>
+                                                    <a href={`https://github.com/${profileData.git}`}
+                                                       target="_blank"
+                                                       rel="noopener noreferrer"
+                                                       className="text-blue-500 hover:underline">{profileData.git}</a>
+                                                </p>
+                                            }
+                                            {!!profileData.os &&
+                                                <p><strong>Операционная
+                                                    система:</strong> {profileData.os.name ?? "Отсутсвует"}
+                                                </p>
+                                            }
+                                        </div>
                                     }
-                                    {!!profileData.os &&
-                                        <p><strong>Операционная система:</strong> {profileData.os.name ?? "Отсутсвует"}
-                                        </p>
-                                    }
-                                </div>
+                                </>
                             }
-                        </>
-                        }
-                        <Chat/>
-                    </div>
+                            <Chat/>
+                        </div>
+                    }
+
                 </div>
             </div>
         </div>

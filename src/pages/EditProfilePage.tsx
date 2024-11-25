@@ -5,6 +5,7 @@ import {ProfileProps} from "../components/Profile/types";
 import SideProfile from "../components/Profile/SideProfile/SideProfile";
 import EditProfile from "../components/Profile/EditProfile/EditProfile";
 import Loader from "../components/Loader/Loader";
+import ProfileSkeleton from "../components/Skeletons/ProfileSkeleton/ProfileSkeleton";
 
 
 const EditProfilePage: React.FC = () => {
@@ -44,7 +45,10 @@ const EditProfilePage: React.FC = () => {
                 <SideProfile avatarUrl={profileData.avatar} avatarChange={avatarChangeHandler}/>
 
                 {/* Центральная колонка с полями для редактирования */}
-                {profileLoading ? <Loader/> : <EditProfile profileData={JSON.parse(JSON.stringify(profileData))} />}
+                {profileLoading ? <div className="w-3/4 p-6 relative"><ProfileSkeleton/></div>
+                : <EditProfile profileData={profileData}/>
+                }
+
 
             </div>
         </div>
