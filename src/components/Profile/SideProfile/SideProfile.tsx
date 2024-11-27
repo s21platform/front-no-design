@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import Avatar from "../../Avatar/Avatar";
 import axios from "axios";
 import {SubscriptionCount} from "../types";
+import {Link} from "react-router-dom";
 
 interface Props {
     avatarUrl: string;
@@ -52,6 +53,11 @@ export const SideProfile = ({avatarUrl, avatarChange}: Props) => {
             >
                 Поиск людей
             </button>
+            <Link to="/new-society"
+                className="mt-6 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600"
+            >
+                Поиск сообществ
+            </Link>
         </div>
     )
 }
