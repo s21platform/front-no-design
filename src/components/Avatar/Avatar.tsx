@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import Loader from "../Loader/Loader";
+import AvatarSkeleton from "../Skeletons/AvatarSkeleton/AvatarSkeleton";
 
 interface AvatarUploaderProps {
     initialAvatarUrl: string;
@@ -105,15 +106,15 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
 
     return (
         <div className="flex flex-col items-center">
-            {avatarUrl === "" ? <Loader/> :
+            {avatarUrl === "" ? <AvatarSkeleton/> :
                 <img
                     src={avatarUrl}
                     alt="Avatar"
                     onClick={openPopup}
-                    className="w-32 h-32 rounded-full mb-4 object-cover"
+                    className="w-32 h-32 rounded-full object-cover"
                 />
             }
-            <label className="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded">
+            <label className="cursor-pointer bg-blue-500 text-white mt-4 px-4 py-2 rounded">
                 {loading ? 'Загрузка...' : 'Загрузить фото'}
                 <input
                     type="file"
