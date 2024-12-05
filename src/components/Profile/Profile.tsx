@@ -34,11 +34,14 @@ const Profile: React.FC = () => {
     })
     const [loading, setLoading] = useState<boolean>(true);
     const [isOpen, setIsOpen] = useState<boolean>(false);
+    // FIXME официальный кринж
+    const [update, setUpdate] = useState<boolean>(false);
 
     useEffect(() => {
         axios.get("/api/profile", {
             withCredentials: true,
         }).then(data => {
+            setEditProfile(data.data)
             if (data.data.birthdate) {
                 const birthdayFull = new Date(data.data.birthdate)
                 const day = String(birthdayFull.getDate()).padStart(2, "0");
@@ -48,7 +51,6 @@ const Profile: React.FC = () => {
                 data.data = {...data.data, birthdate: birthday};
             }
             setProfileData(data.data)
-            setEditProfile(data.data)
             setLoading(false);
         }).catch(err => {
             if (err.status === 401) {
@@ -58,7 +60,7 @@ const Profile: React.FC = () => {
             }
             console.warn(err)
         })
-    }, []);
+    }, [update]);
 
 
 
@@ -67,6 +69,10 @@ const Profile: React.FC = () => {
     }
 
     const handleOptionChange = (selectedOption: SelectorOption | null) => {
+        setEditProfile({
+            ...editProfile,
+            "os": selectedOption
+        })
         console.log("Выбранное значение:", selectedOption);
     };
 
@@ -80,7 +86,7 @@ const Profile: React.FC = () => {
     };
 
     const handleSaveProfile = () => {
-        const sendData = editProfile
+        const sendData = {...editProfile}
         if (sendData.birthdate) {
             sendData.birthdate = new Date(sendData.birthdate ?? "").toISOString()
         }
@@ -90,7 +96,9 @@ const Profile: React.FC = () => {
             }
         }).then(data => {
             if (data.status === 200 && data.data.status) {
-                navigate("/profile");
+                setUpdate(!update)
+                setIsOpen(false);
+                console.log(editProfile)
             }
         })
             .catch(err => console.log(err))
@@ -152,20 +160,11 @@ const Profile: React.FC = () => {
                                             }
                                             {!!profileData.os &&
                                                 <p><strong>Операционная
-                                                    система:</strong> {profileData.os.name ?? "Отсутсвует"}
+                                                    система:</strong> {profileData.os.label ?? "Отсутсвует"}
                                                 </p>
                                             }
                                         </div>
                                     }
-                                    <SelectorWithSearch
-                                        url="api/option/os"
-                                        onChange={handleOptionChange}
-                                        // TODO: подставлять value с сервера
-                                        value={{
-                                            "id": 2,
-                                            "label": "windows"
-                                        }}
-                                        />
                                 </>
                             }
                             <Chat/>
@@ -178,7 +177,7 @@ const Profile: React.FC = () => {
                 <DialogTitle>Редактирование</DialogTitle>
                 <DialogContent>
                     <Box>
-                        <FormControl>
+                        <FormControl style={{gap: "10px"}}>
                             {/*<InputLabel>Имя и Фамилия</InputLabel>*/}
                             <TextField
                                 onChange={(e) => handleInputChange(e, "name")}
@@ -189,9 +188,15 @@ const Profile: React.FC = () => {
                                 fullWidth
                             />
                             <TextField
+                                type={"date"}
+                                label={"Дата рождения"}
+                                value={editProfile.birthdate}
+                                // value={"2022-09-16"}
+                                onChange={(e) => handleInputChange(e, "birthdate")}/>
+                            <TextField
                                 type="text"
                                 label={"Telegram"}
-                                value={profileData.telegram}
+                                value={editProfile.telegram}
                                 onChange={(e) => handleInputChange(e, "telegram")}
                                 slotProps={{
                                     input: {
@@ -204,10 +209,22 @@ const Profile: React.FC = () => {
                                 }}
                             />
                             <TextField
-                                type={"date"}
-                                label={"Дата рождения"}
-                                value={editProfile.birthdate}
-                                onChange={(e) => handleInputChange(e, "birthdate")} placeholder={""}/>
+                                onChange={(e) => handleInputChange(e, "git")}
+                                value={editProfile.git}
+                                variant="outlined"
+                                label={"Github"}
+                                margin="dense"
+                                fullWidth
+                            />
+                            <SelectorWithSearch
+                                url="api/option/os"
+                                onChange={handleOptionChange}
+                                // TODO: подставлять value с сервера
+                                value={profileData.os ?? {
+                                    id: 0,
+                                    label: ""
+                                }}
+                            />
                         </FormControl>
                     </Box>
                 </DialogContent>
