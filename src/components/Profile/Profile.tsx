@@ -5,7 +5,6 @@ import Loader from "../Loader/Loader";
 import NotificationWidget from "../Widgets/NotificationWidget/NotificationWidget";
 import Chat from "../Chat/Chat";
 import {ProfileProps} from "./types";
-import SideProfile from "./SideProfile/SideProfile";
 import ProfileSkeleton from "../Skeletons/ProfileSkeleton/ProfileSkeleton";
 import {
     Box,
@@ -13,7 +12,7 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogTitle, FormControl, FormControlLabel,
+    DialogTitle, FormControl,
     IconButton, Input, InputAdornment, InputLabel,
     Paper,
     Skeleton, TextField
@@ -22,6 +21,7 @@ import ProfileMenu from "../ProfileMenu/ProfileMenu";
 import AvatarBlock from "../Avatar/AvatarBlock";
 import {AlternateEmail, Edit} from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
+import { SelectorOption, SelectorWithSearch } from "../SelectorWithSearch/SelectorWithSearch";
 
 
 const Profile: React.FC = () => {
@@ -65,6 +65,10 @@ const Profile: React.FC = () => {
     const avatarChange = (newUrl: string) => {
         setProfileData({...profileData, avatar: newUrl});
     }
+
+    const handleOptionChange = (selectedOption: SelectorOption | null) => {
+        console.log("Выбранное значение:", selectedOption);
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, field: string) => {
         let value = e.target.value;
@@ -153,6 +157,15 @@ const Profile: React.FC = () => {
                                             }
                                         </div>
                                     }
+                                    <SelectorWithSearch
+                                        url="api/option/os"
+                                        onChange={handleOptionChange}
+                                        // TODO: подставлять value с сервера
+                                        value={{
+                                            "id": 2,
+                                            "label": "windows"
+                                        }}
+                                        />
                                 </>
                             }
                             <Chat/>
