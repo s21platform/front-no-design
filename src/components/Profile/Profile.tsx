@@ -8,6 +8,7 @@ import {ProfileProps} from "./types";
 import SideProfile from "./SideProfile/SideProfile";
 import ProfileSkeleton from "../Skeletons/ProfileSkeleton/ProfileSkeleton";
 import {Skeleton} from "@mui/material";
+import { SelectorOption, SelectorWithSearch } from "../SelectorWithSearch/SelectorWithSearch";
 
 
 const Profile: React.FC = () => {
@@ -46,6 +47,10 @@ const Profile: React.FC = () => {
     const avatarChange = (newUrl: string) => {
         setProfileData({...profileData, avatar: newUrl});
     }
+
+    const handleOptionChange = (selectedOption: SelectorOption | null) => {
+        console.log("Выбранное значение:", selectedOption);
+    };
 
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
@@ -102,12 +107,21 @@ const Profile: React.FC = () => {
                                                 </p>
                                             }
                                             {!!profileData.os &&
-                                                <p><strong>Операционная
-                                                    система:</strong> {profileData.os.name ?? "Отсутсвует"}
+                                                <p className="mb-4"><strong>Операционная
+                                                    система:</strong> 
+                                                    {/* {profileData.os.name ?? "Отсутсвует"} */}
                                                 </p>
                                             }
                                         </div>
                                     }
+                                    <SelectorWithSearch 
+                                        url="api/option/os"
+                                        onChange={handleOptionChange}
+                                        value={{
+                                            "id": 2,
+                                            "label": "windows"
+                                        }}
+                                        />
                                 </>
                             }
                             <Chat/>
