@@ -38,6 +38,8 @@ const EditProfile = ({profileData}: ProfileDataI) => {
         if (data.birthdate) {
             sendData.birthdate = new Date(data.birthdate ?? "").toISOString()
         }
+        // @ts-ignore
+        sendData.os = data.os?.id
         axios.put("/api/profile", sendData, {
             headers: {
                 "Content-Type": "application/json",
