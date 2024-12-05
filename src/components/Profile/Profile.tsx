@@ -117,6 +117,7 @@ const Profile: React.FC = () => {
                                     <SelectorWithSearch 
                                         url="api/option/os"
                                         onChange={handleOptionChange}
+                                        // TODO: подставлять value с сервера
                                         value={{
                                             "id": 2,
                                             "label": "windows"
