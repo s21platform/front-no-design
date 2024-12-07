@@ -6,8 +6,8 @@ export type ProfileProps = {
     git?: string;
     os?: {
         id: number;
-        name: string;
-    };
+        label: string;
+    } | null;
 }
 
 export type SubscriptionCount = {

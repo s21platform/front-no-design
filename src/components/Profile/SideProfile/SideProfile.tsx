@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import Avatar from "../../Avatar/Avatar";
+import AvatarBlock from "../../Avatar/AvatarBlock";
 import axios from "axios";
 import {SubscriptionCount} from "../types";
 import {Link} from "react-router-dom";
@@ -36,7 +36,7 @@ export const SideProfile = ({avatarUrl, avatarChange}: Props) => {
 
     return (
         <div className="w-1/4 bg-gray-50 p-6 flex flex-col items-center">
-            <Avatar initialAvatarUrl={avatar} onAvatarChange={avatarChange}/>
+            <AvatarBlock initialAvatarUrl={avatar} onAvatarChange={avatarChange}/>
             <div className="flex space-x-4 mt-4">
                 <div className="text-center">
                     <span className="font-bold">{friendsCount.followersCount ?? "Отсутсвует"}</span>
