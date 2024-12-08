@@ -2,6 +2,10 @@ import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import Loader from "../Loader/Loader";
 import AvatarSkeleton from "../Skeletons/AvatarSkeleton/AvatarSkeleton";
+import Avatar from "@mui/material/Avatar"
+import {Button} from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
+import EditIcon from '@mui/icons-material/Edit';
 
 interface AvatarUploaderProps {
     initialAvatarUrl: string;
@@ -13,7 +17,7 @@ interface AvatarUploaderState {
     link: string;
 }
 
-const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChange }) => {
+const AvatarBlock: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChange }) => {
     const [avatarUrl, setAvatarUrl] = useState<string>(initialAvatarUrl);
     const [loading, setLoading] = useState<boolean>(false);
     const [loadingAll, setLoadingAll] = useState<boolean>(false);
@@ -105,17 +109,18 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
     }
 
     return (
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center p-2">
             {avatarUrl === "" ? <AvatarSkeleton/> :
-                <img
-                    src={avatarUrl}
-                    alt="Avatar"
-                    onClick={openPopup}
-                    className="w-32 h-32 rounded-full object-cover"
-                />
+                <Avatar src={avatarUrl} sx={{ width: 120, height: 120 }} onClick={openPopup} className={"mb-2"} />
+                // <img
+                //     src={avatarUrl}
+                //     alt="Avatar"
+                //     onClick={openPopup}
+                //     className="w-32 h-32 rounded-full object-cover"
+                // />
             }
-            <label className="cursor-pointer bg-blue-500 text-white mt-4 px-4 py-2 rounded">
-                {loading ? 'Загрузка...' : 'Загрузить фото'}
+            <LoadingButton loading={loading} onClick={closePopup} className="mt-4" component="label" variant="contained">
+                Загрузить
                 <input
                     type="file"
                     accept="image/*"
@@ -123,7 +128,17 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
                     onChange={handleAvatarChange}
                     disabled={loading}
                 />
-            </label>
+            </LoadingButton>
+            {/*<label className="cursor-pointer bg-blue-500 text-white mt-4 px-4 py-2 rounded">*/}
+            {/*    {loading ? 'Загрузка...' : 'Загрузить фото'}*/}
+            {/*    <input*/}
+            {/*        type="file"*/}
+            {/*        accept="image/*"*/}
+            {/*        className="hidden"*/}
+            {/*        onChange={handleAvatarChange}*/}
+            {/*        disabled={loading}*/}
+            {/*    />*/}
+            {/*</label>*/}
 
             {/* Popup для просмотра и перелистывания аватарок */}
             {isPopupOpen && (
@@ -180,4 +195,4 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
     );
 };
 
-export default Avatar;
+export default AvatarBlock;
