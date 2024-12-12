@@ -105,7 +105,7 @@ const Avatar: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatarChang
 
     return (
         <div className="flex flex-col items-center">
-            {avatarUrl === "" ? <Loader/> :
+            {avatarUrl === "" ? <div className="mb-4"><Loader/></div> :
                 <img
                     src={avatarUrl}
                     alt="Avatar"

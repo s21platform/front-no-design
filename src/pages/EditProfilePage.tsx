@@ -12,7 +12,7 @@ const EditProfilePage: React.FC = () => {
 
     const [profileLoading, setProfileLoading] = useState(true);
     const [profileData, setProfileData] = useState<ProfileProps>({
-        avatar: "https://i.pravatar.cc/150?img=3",
+        avatar: "",
     });
 
     useEffect(() => {
