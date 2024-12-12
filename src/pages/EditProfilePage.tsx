@@ -4,7 +4,6 @@ import axios from "axios";
 import {ProfileProps} from "../components/Profile/types";
 import SideProfile from "../components/Profile/SideProfile/SideProfile";
 import EditProfile from "../components/Profile/EditProfile/EditProfile";
-import Loader from "../components/Loader/Loader";
 
 
 const EditProfilePage: React.FC = () => {
@@ -44,7 +43,7 @@ const EditProfilePage: React.FC = () => {
                 <SideProfile avatarUrl={profileData.avatar} avatarChange={avatarChangeHandler}/>
 
                 {/* Центральная колонка с полями для редактирования */}
-                {profileLoading ? <Loader/> : <EditProfile profileData={JSON.parse(JSON.stringify(profileData))} />}
+                <EditProfile isLoading={profileLoading} profileData={JSON.parse(JSON.stringify(profileData))} />
 
             </div>
         </div>
