@@ -1,7 +1,6 @@
 import {Route, Routes} from 'react-router-dom';
 import MainPage from "./pages/Main";
 import ProfilePage from "./pages/Profile";
-import EditProfilePage from "./pages/EditProfilePage";
 import SocietyAddingPage from './pages/SocietyAddingPage';
 import PeerPage from "./components/PeerPage/PeerPage";
 
@@ -10,7 +9,6 @@ function App() {
         <Routes>
             <Route path="/" element={<MainPage/>}/>
             <Route path="/profile" element={<ProfilePage/>}/>
-            <Route path="/edit" element={<EditProfilePage/>}/>
             <Route path="/new-society" element={<SocietyAddingPage />} />
             <Route path="/peer/:uuid" element={<PeerPage/>} />
 
