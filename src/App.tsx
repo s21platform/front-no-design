@@ -2,6 +2,7 @@ import {Route, Routes} from 'react-router-dom';
 import MainPage from "./pages/Main";
 import ProfilePage from "./pages/Profile";
 import SocietyAddingPage from './pages/SocietyAddingPage';
+import PeerPage from "./components/PeerPage/PeerPage";
 
 function App() {
     return (
@@ -9,6 +10,7 @@ function App() {
             <Route path="/" element={<MainPage/>}/>
             <Route path="/profile" element={<ProfilePage/>}/>
             <Route path="/new-society" element={<SocietyAddingPage />} />
+            <Route path="/peer/:uuid" element={<PeerPage/>} />
 
             {/*/!* Fallback для всех несуществующих роутов *!/*/}
             {/*<Route path="*" element={<div>Not Found Page</div>}/>*/}
