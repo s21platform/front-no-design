@@ -5,7 +5,7 @@ export const ProfileMenu = () => {
     const navigate = useNavigate();
     return (
         <div className={"w-1/4 bg-gray-50 p-6 flex flex-col items-stretch gap-2"}>
-            <Button variant="contained" onClick={() => window.alert("В разработке!")}>Друзья</Button>
+            <Button variant="contained" onClick={() => navigate('/peer-search')}>Поиск пиров</Button>
             <Button variant="contained" onClick={() => window.alert("В разработке!")}>Сообщества</Button>
         </div>
     )
