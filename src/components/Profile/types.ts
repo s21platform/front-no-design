@@ -1,6 +1,9 @@
 export type ProfileProps = {
     avatar: string;
+    nickname?: string;
     name?: string;
+    university?: string;
+    work?: string;
     birthdate?: string;
     telegram?: string;
     git?: string;
