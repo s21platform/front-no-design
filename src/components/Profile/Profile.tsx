@@ -4,7 +4,7 @@ import axios from "axios";
 import Loader from "../Loader/Loader";
 import NotificationWidget from "../Widgets/NotificationWidget/NotificationWidget";
 import Chat from "../Chat/Chat";
-import {ProfileProps} from "./types";
+import {ProfileProps, SubscriptionCount} from "./types";
 import ProfileSkeleton from "../Skeletons/ProfileSkeleton/ProfileSkeleton";
 import {
     Box,
@@ -13,13 +13,12 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle, FormControl,
-    IconButton, Input, InputAdornment, InputLabel,
-    Paper,
+    IconButton, InputAdornment,
     Skeleton, TextField
 } from "@mui/material";
 import ProfileMenu from "../ProfileMenu/ProfileMenu";
 import AvatarBlock from "../Avatar/AvatarBlock";
-import {AlternateEmail, Edit} from "@mui/icons-material";
+import {AlternateEmail} from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
 import { SelectorOption, SelectorWithSearch } from "../SelectorWithSearch/SelectorWithSearch";
 
@@ -32,10 +31,18 @@ const Profile: React.FC = () => {
     const [editProfile, setEditProfile] = useState<ProfileProps>({
         avatar: "",
     })
+    const [friendsCount, setFriendsCount] = useState<SubscriptionCount>({
+        followersCount: 0,
+        followingCount: 0
+    });
+
     const [loading, setLoading] = useState<boolean>(true);
+    const [loadingSubscribe, setLoadingSubscribe] = useState<boolean>(true);
+
     const [isOpen, setIsOpen] = useState<boolean>(false);
     // FIXME официальный кринж
     const [update, setUpdate] = useState<boolean>(false);
+
 
     useEffect(() => {
         axios.get("/api/profile", {
@@ -62,11 +69,20 @@ const Profile: React.FC = () => {
         })
     }, [update]);
 
-
-
-    const avatarChange = (newUrl: string) => {
-        setProfileData({...profileData, avatar: newUrl});
-    }
+    useEffect(() => {
+        axios.get("/api/friends/counts", {
+            withCredentials: true
+        }).then(data => {
+            setFriendsCount({
+                followersCount: data.data.subscribers ?? 0,
+                followingCount: data.data.subscription ?? 0,
+            })
+        }).catch(err => {
+            console.warn(err)
+        }).finally(() => {
+            setLoadingSubscribe(false);
+        })
+    }, [])
 
     const handleOptionChange = (selectedOption: SelectorOption | null) => {
         setEditProfile({
@@ -117,7 +133,7 @@ const Profile: React.FC = () => {
                         <IconButton
                             onClick={() => setIsOpen(true)}
                         >
-                            <EditIcon />
+                            <EditIcon/>
                         </IconButton>
                         <div>
                             <NotificationWidget/>
@@ -170,7 +186,18 @@ const Profile: React.FC = () => {
                             <Chat/>
                         </div>
                     }
-
+                    {loadingSubscribe ? <Skeleton/>
+                        : <div className="flex space-x-4 mt-4">
+                            <div className="text-center">
+                                <span className="font-bold">{friendsCount.followersCount ?? "Отсутсвует"}</span>
+                                <p className="text-sm text-gray-600">Подписчиков</p>
+                            </div>
+                            <div className="text-center">
+                                <span className="font-bold">{friendsCount.followingCount ?? "Отсутсвует"}</span>
+                                <p className="text-sm text-gray-600">Подписок</p>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
             <Dialog open={isOpen} maxWidth={"sm"}>
