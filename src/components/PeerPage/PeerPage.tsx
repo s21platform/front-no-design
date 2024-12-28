@@ -7,19 +7,20 @@ import ProfileSkeleton from "../Skeletons/ProfileSkeleton/ProfileSkeleton";
 import Loader from "../Loader/Loader";
 import Chat from "../Chat/Chat";
 import AvatarPeerBlock from "../Avatar/AvatarPeerBlock";
-import { Button } from "@mui/material";
-import ButtonSkeleton from "../Skeletons/ButtonSkeleton/ButtonSkeleton";
 import Header from "../Header/Header";
+import PeerSubscriptionButton from "../PeerSubscriptionButton/PeerSubscriptionButton";
+import { Box } from "@mui/material";
 
 export const PeerPage = () => {
     const navigate = useNavigate();
-    const pathParams = useParams()
+    const pathParams = useParams();
     const [profileData, setProfileData] = useState<ProfileProps>({
         avatar: "",
     })
     const [loading, setLoading] = useState<boolean>(true);
+
     const [loadingSubscription, setLoadingSubscription] = useState<boolean>(true);
-    const [isSubscribed, setIsSubscribed] = useState<boolean>(true);
+    const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
 
     useEffect(() => {
         axios.get(`/api/peer/${pathParams.uuid}`, {
@@ -43,6 +44,7 @@ export const PeerPage = () => {
             }
             console.warn(err)
         })
+
         axios.get(`/api/friends/check?peer=${pathParams.uuid}`, {
             withCredentials: true,
         }).then(data => {
@@ -53,37 +55,6 @@ export const PeerPage = () => {
         })
     }, []);
 
-    const subscribe = () => {
-        setLoadingSubscription(true)
-        axios.post(`/api/friends`, {
-            peer: pathParams.uuid,
-        }, {
-            withCredentials: true
-        })
-            .then(data => {
-                if (data.data.success) {
-                    setIsSubscribed(true)
-                }
-            })
-            .finally(() => {
-                setLoadingSubscription(false)
-            })
-    }
-
-    const unsubscribe = () => {
-        setLoadingSubscription(true)
-        axios.delete(`/api/friends?peer=${pathParams.uuid}`, {
-            withCredentials: true
-        })
-            .then(data => {
-                if (data.data.success) {
-                    setIsSubscribed(false)
-                }
-            })
-            .finally(() => {
-                setLoadingSubscription(false)
-            })
-    }
 
 
     return (
@@ -102,6 +73,7 @@ export const PeerPage = () => {
                                 <AvatarPeerBlock initialAvatarUrl={profileData.avatar} />
                                 {/*<h4 className="text-xl font-semibold mb-4">Основная информация</h4>*/}
                                 <div className="ml-2">
+                                    {!!profileData.nickname && <p><strong>Ник:</strong> {profileData.nickname}</p>}
                                     {!!profileData.name && <p><strong>Имя:</strong> {profileData.name}</p>}
                                     {!!profileData.birthdate &&
                                         <p><strong>Дата рождения:</strong> {profileData.birthdate}</p>}
@@ -110,26 +82,13 @@ export const PeerPage = () => {
                                         target="_blank" rel="noopener noreferrer"
                                         className="text-blue-500 hover:underline">{profileData.telegram}</a>
                                     </p>}
-                                    {loadingSubscription ? <ButtonSkeleton />
-                                        : <div className="flex flex-row mt-4">
-                                            {isSubscribed
-                                                ? <Button
-                                                    variant="outlined"
-                                                    className="mt-4 flex flex-row items-center"
-                                                    onClick={() => unsubscribe()}
-                                                >
-                                                    Отписаться
-                                                </Button>
-                                                : <Button
-                                                    variant="contained"
-                                                    className="mt-4 flex flex-row items-center"
-                                                    onClick={() => subscribe()}
-                                                >
-                                                    Подписаться
-                                                </Button>
-                                            }
-                                        </div>
-                                    }
+
+                                    <Box mt={2}>
+                                        {
+                                            !loadingSubscription && pathParams.uuid &&
+                                            <PeerSubscriptionButton isActive={isSubscribed} peerId={pathParams.uuid} />
+                                        }
+                                    </Box>
                                 </div>
                             </div>
                         }

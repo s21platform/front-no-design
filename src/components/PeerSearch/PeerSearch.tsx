@@ -1,60 +1,81 @@
 
-import { Box, Grid2, TextField } from "@mui/material";
+import { Box, Grid2, TextField, Typography } from "@mui/material";
 import Header from "../Header/Header";
 import PeerCard from "../PeerCard/PeerCard";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 
 export interface PeerData {
     uuid: string,
-    login: string,
-    fullname: string | null,
+    nickname: string,
+    name: string,
+    surname: string,
     avatar_link: string,
+    is_friend: boolean,
 }
 
 export const PeerSearch = () => {
-    const [peers, setPeers] = useState<PeerData[]>([{
-        uuid: "3e705253-852d-47e9-8e08-f0feecd05954",
-        login: "doloresl",
-        fullname: "Ольга Шашкова",
-        avatar_link: ""
-    },
-    {
-        uuid: "9eb9bfb4-d051-4952-99e9-95de0fa2a10d",
-        login: "hakonoze",
-        fullname: "Александр Балин",
-        avatar_link: ""
-    },
-    {
-        uuid: "3c4c29d1-fa2d-4736-b820-c0e69ac4e6be",
-        login: "alcairem",
-        fullname: "Даниил Лоскутов",
-        avatar_link: ""
-    },
-    {
-        uuid: "9831d05b-968a-4d11-a7dd-6369d9203671",
-        login: "tangleto",
-        fullname: "Егор Смоленов",
-        avatar_link: ""
-    },
-    {
-        uuid: "b5c64cdf-9f82-4a87-a830-c334ab350f07",
-        login: "snapehas",
-        fullname: "Георгий Канайкин",
-        avatar_link: ""
-    }]);
+    // TODO: доделать подгрузку данных (пагинация / бесконечный скролл)
+    const [peers, setPeers] = useState<PeerData[]>([]);
+    const [searchText, setSearchText] = useState<string>("");
+    const [debouncedText, setDebouncedText] = useState<string>("");
+    const [isEmpty, setIsEmpty] = useState(false);
 
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchText(event.target.value);
+    };
+
+    // Дебаунс на ввод
     useEffect(() => {
-        // TODO: запрос рандомных пиров
-        axios.get("/api/", {
-            withCredentials: true,
-        }).then(data => {
-            console.log(data);
-            setPeers(data.data)
-        }).catch(err => {
-            console.warn(err)
-        })
-    }, []);
+        const handler = setTimeout(() => {
+            setDebouncedText(searchText);
+        }, 300);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [searchText]);
+
+    // Функция для получения данных пиров
+    const fetchPeers = useCallback(
+        async (nickname: string = "") => {
+            try {
+                const response = await axios.get(`/api/search`, {
+                    params: {
+                        type: "peer",
+                        offset: 0,
+                        limit: 10,
+                        nickname,
+                    },
+                    withCredentials: true,
+                });
+
+                if (response.data.users.length) {
+                    setPeers(response.data.users);
+                    setIsEmpty(false);
+                } else {
+                    setIsEmpty(true);
+                }
+            } catch (error) {
+                console.warn("Ошибка при загрузке данных: ", error);
+            }
+        },
+        []
+    );
+
+    // Запрос на сервер после дебаунса
+    useEffect(() => {
+        if (debouncedText.trim() !== "") {
+            fetchPeers(debouncedText);
+        } else {
+            fetchPeers();
+        }
+    }, [debouncedText, fetchPeers]);
+
+    // Дефолтный запрос при загрузке страницы
+    useEffect(() => {
+        fetchPeers();
+    }, [fetchPeers]);
 
     return (
         <div>
@@ -62,20 +83,18 @@ export const PeerSearch = () => {
 
             <div className="min-h-screen bg-gray-100 flex flex-col items-center  p-6">
                 <Box maxWidth={900} width={"100%"} >
-                    <TextField fullWidth label="Поиск пиров" id="fullWidth" placeholder="Введите текст" margin="normal" />
+                    <TextField fullWidth label="Поиск пиров" id="fullWidth" placeholder="Введите текст" margin="normal" onInput={handleSearchChange} />
 
-                    <Grid2 container spacing={3} mt={3}>
-                        {/* цикл */}
-                        {peers.map(peer => (
-                            <Grid2 key={peer.uuid} size={6}>
-                                <PeerCard {...peer} />
-                            </Grid2>
-                        ))}
-                    </Grid2>
-
+                    {isEmpty ? <Typography mt={2} mb={2}>Никто не нашёлся по указанному запросу :(</Typography> :
+                        <Grid2 container spacing={3} mt={3}>
+                            {peers.map(peer => (
+                                <Grid2 key={peer.uuid} size={6} display={"flex"}>
+                                    <PeerCard {...peer} />
+                                </Grid2>
+                            ))}
+                        </Grid2>
+                    }
                 </Box>
-
-
             </div>
         </div>
     );
