@@ -7,7 +7,7 @@ import PeerSubscriptionButton from "../PeerSubscriptionButton/PeerSubscriptionBu
 
 interface PeerCardProps extends PeerData { }
 
-export const PeerCard = ({ uuid, nickname, name, surname, avatar_link, is_friend }: PeerCardProps) => {
+export const PeerCard = ({ uuid, nickname, name, surname, avatar_link, isFriend }: PeerCardProps) => {
     return (
         <Box style={{ backgroundColor: "white", display: "flex", flexGrow: 1, padding: "15px", borderRadius: "5px" }}>
             <Box display={"flex"} width={"100%"}>
@@ -22,7 +22,7 @@ export const PeerCard = ({ uuid, nickname, name, surname, avatar_link, is_friend
                 <Box ml={"auto"} display={"flex"} flexDirection={"column"} justifyContent={"flex-end"} gap={1}>
                     <Button style={{ minWidth: '140px', minHeight: '32px' }} variant="contained" size="small" onClick={() => window.alert("В разработке!")} disabled>Написать</Button>
 
-                    <PeerSubscriptionButton isActive={is_friend} peerId={uuid} />
+                    <PeerSubscriptionButton isActive={isFriend} peerId={uuid} />
                 </Box>
             </Box>
         </Box>
