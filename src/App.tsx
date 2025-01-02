@@ -3,6 +3,7 @@ import MainPage from "./pages/Main";
 import ProfilePage from "./pages/Profile";
 import SocietyAddingPage from './pages/SocietyAddingPage';
 import PeerPage from "./components/PeerPage/PeerPage";
+import PeerSearch from './components/PeerSearch/PeerSearch';
 
 function App() {
     return (
@@ -10,6 +11,7 @@ function App() {
             <Route path="/" element={<MainPage/>}/>
             <Route path="/profile" element={<ProfilePage/>}/>
             <Route path="/new-society" element={<SocietyAddingPage />} />
+            <Route path="/peer-search" element={<PeerSearch/>} />
             <Route path="/peer/:uuid" element={<PeerPage/>} />
 
             {/*/!* Fallback для всех несуществующих роутов *!/*/}
