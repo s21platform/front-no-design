@@ -11,7 +11,7 @@ export interface PeerData {
     name: string,
     surname: string,
     avatar_link: string,
-    is_friend: boolean,
+    isFriend: boolean,
 }
 
 export const PeerSearch = () => {
