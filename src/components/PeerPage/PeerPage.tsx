@@ -10,6 +10,7 @@ import AvatarPeerBlock from "../Avatar/AvatarPeerBlock";
 import Header from "../Header/Header";
 import PeerSubscriptionButton from "../PeerSubscriptionButton/PeerSubscriptionButton";
 import { Box } from "@mui/material";
+import { ApiRoutes, AppRoutes } from "../../lib";
 
 export const PeerPage = () => {
     const navigate = useNavigate();
@@ -23,7 +24,7 @@ export const PeerPage = () => {
     const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
 
     useEffect(() => {
-        axios.get(`/api/peer/${pathParams.uuid}`, {
+        axios.get(ApiRoutes.peer(pathParams.uuid), {
             withCredentials: true,
         }).then(data => {
             if (data.data.birthdate) {
@@ -40,12 +41,15 @@ export const PeerPage = () => {
             if (err.status === 401) {
                 console.log("remove expiry")
                 localStorage.removeItem("expiry");
-                navigate("/profile")
+                navigate(AppRoutes.profile())
             }
             console.warn(err)
         })
 
-        axios.get(`/api/friends/check?peer=${pathParams.uuid}`, {
+        axios.get(ApiRoutes.checkFriendship(), {
+            params: {
+                peer: pathParams.uuid,
+            },
             withCredentials: true,
         }).then(data => {
             setIsSubscribed(data.data.exist)

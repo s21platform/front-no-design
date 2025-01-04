@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import { Button, CircularProgress } from "@mui/material";
+import { ApiRoutes } from "../../lib";
 
 interface PeerSubscriptionButtonProps {
 	isActive: boolean;
@@ -14,7 +15,7 @@ const PeerSubscriptionButton = ({ isActive, peerId }: PeerSubscriptionButtonProp
 
 	const subscribe = () => {
 		setLoadingSubscription(true)
-		axios.post(`/api/friends`, {
+		axios.post(ApiRoutes.friends(), {
 			peer: peerId,
 		}, {
 			withCredentials: true
@@ -31,7 +32,10 @@ const PeerSubscriptionButton = ({ isActive, peerId }: PeerSubscriptionButtonProp
 
 	const unsubscribe = () => {
 		setLoadingSubscription(true)
-		axios.delete(`/api/friends?peer=${peerId}`, {
+		axios.delete(ApiRoutes.friends(), {
+			params: {
+				peer: peerId,
+			},
 			withCredentials: true
 		})
 			.then(data => {

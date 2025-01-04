@@ -1,6 +1,7 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import Notification from "../Notification/Notification";
+import { ApiRoutes } from "../../lib";
 
 interface ILoginForm {
     setIsLoggedIn: (isLoggedIn: boolean) => void;
@@ -10,10 +11,10 @@ const FormLogin = ({ setIsLoggedIn }: ILoginForm) => {
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
 
-    const [notification, setNotification] = useState<{ message: string; type: "error" | "success"} | null>(null);
+    const [notification, setNotification] = useState<{ message: string; type: "error" | "success" } | null>(null);
 
     const handleLogin = () => {
-        axios.post("/auth/login", {
+        axios.post(ApiRoutes.login(), {
             username: username,
             password: password,
         }, {

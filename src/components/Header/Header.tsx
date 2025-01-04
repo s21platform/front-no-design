@@ -1,4 +1,5 @@
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
+import { AppRoutes } from "../../lib";
 
 const Header = () => {
     return (
@@ -6,7 +7,7 @@ const Header = () => {
             <div className="container mx-auto flex justify-between items-center">
                 {/* Логотип или название */}
                 <h1 className="text-2xl font-bold">
-                    <Link to="/">Space 21</Link>
+                    <Link to={AppRoutes.main()}>Space 21</Link>
                 </h1>
 
                 {/* Навигационные ссылки */}
@@ -14,7 +15,7 @@ const Header = () => {
                     <ul className="flex space-x-6">
                         <li>
                             <Link
-                                to="/"
+                                to={AppRoutes.main()}
                                 className="hover:text-gray-300"
                             >
                                 Главная
@@ -22,7 +23,7 @@ const Header = () => {
                         </li>
                         <li>
                             <Link
-                                to="/profile"
+                                to={AppRoutes.profile()}
                                 className="hover:text-gray-300"
                             >
                                 Профиль

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Notification from "../Notification/Notification";
 import { useNavigate } from "react-router-dom";
+import { ApiRoutes, AppRoutes } from "../../lib";
 
 
 const FormSociety = () => {
@@ -14,20 +15,20 @@ const FormSociety = () => {
     const [notification, setNotification] = useState<{ message: string; type: "error" | "success" } | null>(null);
 
     useEffect(() => {
-        axios.get("/api/profile", {
+        axios.get(ApiRoutes.profile(), {
             withCredentials: true,
         }).catch(err => {
             if (err.status === 401) {
                 console.log("remove expiry")
                 localStorage.removeItem("expiry");
-                navigate("/profile")
+                navigate(AppRoutes.profile())
             }
             console.warn(err)
         });
     }, []);
 
     const handleSubmit = () => {
-        axios.post(" /api/society ", {
+        axios.post(ApiRoutes.society(), {
             name: name,
             description: description,
             is_private: isPrivate,
@@ -39,7 +40,7 @@ const FormSociety = () => {
             }
         }).then(res => {
             if (res.status === 201) {
-                navigate("/profile"); // TODO: перенаправление на страницу сообщества по society_id
+                navigate(AppRoutes.profile()); // TODO: перенаправление на страницу сообщества по society_id
             }
         }).catch(err => {
             let mess = err.message
