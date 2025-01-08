@@ -21,11 +21,13 @@ import AvatarBlock from "../Avatar/AvatarBlock";
 import { AlternateEmail } from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
 import { SelectorOption, SelectorWithSearch } from "../SelectorWithSearch/SelectorWithSearch";
-import { ApiRoutes, AppRoutes } from "../../lib";
+import { ApiRoutes, AppRoutes, useAuth } from "../../lib/routes";
 
 
 const Profile: React.FC = () => {
     const navigate = useNavigate();
+    const { setAuth } = useAuth();
+
     const [profileData, setProfileData] = useState<ProfileProps>({
         avatar: "",
     })
@@ -62,8 +64,7 @@ const Profile: React.FC = () => {
             setLoading(false);
         }).catch(err => {
             if (err.status === 401) {
-                console.log("remove expiry")
-                localStorage.removeItem("expiry");
+                setAuth(false);
                 navigate(AppRoutes.profile())
             }
             console.warn(err)
@@ -94,7 +95,7 @@ const Profile: React.FC = () => {
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, field: string) => {
-        let value = e.target.value;
+        const value = e.target.value;
         setEditProfile({
             ...editProfile,
             [field]: value,

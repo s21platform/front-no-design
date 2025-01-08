@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import Notification from "../Notification/Notification";
-import { ApiRoutes } from "../../lib";
+import { ApiRoutes } from "../../lib/routes";
 
 interface ILoginForm {
     setIsLoggedIn: (isLoggedIn: boolean) => void;

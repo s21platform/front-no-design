@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { AppRoutes } from "../../lib";
+import { AppRoutes } from "../../lib/routes";
 
 const Header = () => {
     return (

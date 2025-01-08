@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Autocomplete, TextField, CircularProgress } from "@mui/material";
+import { Autocomplete, TextField } from "@mui/material";
 
 export interface SelectorOption {
   id: number;
@@ -17,7 +17,7 @@ export const SelectorWithSearch: React.FC<SelectorWithSearchProps> = ({
   value = null,
   onChange,
 }) => {
-  const [currentValue, setCurrentValue] = useState(value); 
+  const [currentValue, setCurrentValue] = useState(value);
   const [defaultOptions, setDefaultOptions] = useState<SelectorOption[]>([]);
   const [options, setOptions] = useState<SelectorOption[]>([]);
   const [loading, setLoading] = useState(false);
@@ -26,7 +26,7 @@ export const SelectorWithSearch: React.FC<SelectorWithSearchProps> = ({
   const currentRequestId = useRef(0); // уникальный идентификатор запроса
 
   const fetchData = useCallback(
-    async (query: string = "") => {
+    async (query = "") => {
       const requestId = ++currentRequestId.current; // уникальный id запроса
       try {
         setLoading(true);
@@ -63,7 +63,7 @@ export const SelectorWithSearch: React.FC<SelectorWithSearchProps> = ({
       }
     };
 
-		// Загрузка дефолтных опций при первом рендере
+    // Загрузка дефолтных опций при первом рендере
     if (!initialLoadComplete.current) {
       loadDefaultOptions();
     }
@@ -74,7 +74,7 @@ export const SelectorWithSearch: React.FC<SelectorWithSearchProps> = ({
       setCurrentValue(newValue);
       onChange(newValue);
 
-			// если пусто - показываем  дефолтный набор опций
+      // если пусто - показываем  дефолтный набор опций
       if (!newValue) {
         setOptions(defaultOptions);
       }
@@ -92,7 +92,7 @@ export const SelectorWithSearch: React.FC<SelectorWithSearchProps> = ({
       return;
     }
 
-		// запрос только в случае ввода больше 3 символов
+    // запрос только в случае ввода больше 3 символов
     if (newInputValue.length >= 3) {
       fetchData(newInputValue);
     } else {

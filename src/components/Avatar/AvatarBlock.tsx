@@ -3,10 +3,8 @@ import axios from 'axios';
 import Loader from "../Loader/Loader";
 import AvatarSkeleton from "../Skeletons/AvatarSkeleton/AvatarSkeleton";
 import Avatar from "@mui/material/Avatar"
-import { Button } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
-import EditIcon from '@mui/icons-material/Edit';
-import { ApiRoutes } from '../../lib';
+import { ApiRoutes } from '../../lib/routes';
 
 interface AvatarUploaderProps {
     initialAvatarUrl: string;

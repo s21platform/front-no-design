@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import { Button, CircularProgress } from "@mui/material";
-import { ApiRoutes } from "../../lib";
+import { ApiRoutes } from "../../lib/routes";
 
 interface PeerSubscriptionButtonProps {
 	isActive: boolean;

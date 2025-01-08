@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Notification from "../Notification/Notification";
 import { useNavigate } from "react-router-dom";
-import { ApiRoutes, AppRoutes } from "../../lib";
+import { ApiRoutes, AppRoutes, useAuth } from "../../lib/routes";
 
 
 const FormSociety = () => {
     const navigate = useNavigate();
+    const { setAuth } = useAuth();
 
     const [name, setName] = useState<string>('');
     const [description, setDescription] = useState<string>('');
@@ -19,9 +20,8 @@ const FormSociety = () => {
             withCredentials: true,
         }).catch(err => {
             if (err.status === 401) {
-                console.log("remove expiry")
-                localStorage.removeItem("expiry");
-                navigate(AppRoutes.profile())
+                setAuth(false);
+                navigate(AppRoutes.profile());
             }
             console.warn(err)
         });

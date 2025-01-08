@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import { ApiRoutes } from '../../../lib';
+import { ApiRoutes } from '../../../lib/routes';
 
 interface Notification {
     id: number;
@@ -29,7 +29,7 @@ const NotificationWidget: React.FC = () => {
     };
 
     // Fetch notifications when dropdown is opened
-    const fetchNotifications = async (newOffset: number = 0) => {
+    const fetchNotifications = async (newOffset = 0) => {
         try {
             const response = await axios.get(ApiRoutes.notification(), {
                 params: { limit, offset: newOffset },

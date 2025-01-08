@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 
 type NotificationProps = {
     message?: string;
@@ -19,9 +19,8 @@ const Notification: React.FC<NotificationProps> = ({ message, type, onClose }) =
 
     return (
         <div
-            className={`fixed bottom-4 right-4 max-w-sm w-full p-4 rounded-lg shadow-lg text-white transition-transform transform ${
-                type === "success" ? "bg-green-500" : "bg-red-500"
-            }`}
+            className={`fixed bottom-4 right-4 max-w-sm w-full p-4 rounded-lg shadow-lg text-white transition-transform transform ${type === "success" ? "bg-green-500" : "bg-red-500"
+                }`}
         >
             <p>{message}</p>
         </div>

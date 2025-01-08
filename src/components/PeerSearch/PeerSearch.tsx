@@ -4,7 +4,7 @@ import Header from "../Header/Header";
 import PeerCard from "../PeerCard/PeerCard";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
-import { ApiRoutes } from "../../lib";
+import { ApiRoutes } from "../../lib/routes";
 
 export interface PeerData {
     uuid: string,
@@ -39,7 +39,7 @@ export const PeerSearch = () => {
 
     // Функция для получения данных пиров
     const fetchPeers = useCallback(
-        async (nickname: string = "") => {
+        async (nickname = "") => {
             try {
                 const response = await axios.get(ApiRoutes.search(), {
                     params: {
