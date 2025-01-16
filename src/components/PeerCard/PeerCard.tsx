@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { PeerData } from "../PeerSearch/PeerSearch";
 import PeerSubscriptionButton from "../PeerSubscriptionButton/PeerSubscriptionButton";
 
-interface PeerCardProps extends PeerData { }
+type PeerCardProps = PeerData;
 
 export const PeerCard = ({ uuid, nickname, name, surname, avatar_link, is_friend }: PeerCardProps) => {
     return (

@@ -1,10 +1,10 @@
-import React, {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Loader from "../Loader/Loader";
 import NotificationWidget from "../Widgets/NotificationWidget/NotificationWidget";
 import Chat from "../Chat/Chat";
-import {ProfileProps, SubscriptionCount} from "./types";
+import { ProfileProps, SubscriptionCount } from "./types";
 import ProfileSkeleton from "../Skeletons/ProfileSkeleton/ProfileSkeleton";
 import {
     Box,
@@ -18,13 +18,16 @@ import {
 } from "@mui/material";
 import ProfileMenu from "../ProfileMenu/ProfileMenu";
 import AvatarBlock from "../Avatar/AvatarBlock";
-import {AlternateEmail} from "@mui/icons-material";
+import { AlternateEmail } from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
 import { SelectorOption, SelectorWithSearch } from "../SelectorWithSearch/SelectorWithSearch";
+import { ApiRoutes, AppRoutes, useAuth } from "../../lib/routes";
 
 
 const Profile: React.FC = () => {
     const navigate = useNavigate();
+    const { setAuth } = useAuth();
+
     const [profileData, setProfileData] = useState<ProfileProps>({
         avatar: "",
     })
@@ -45,7 +48,7 @@ const Profile: React.FC = () => {
 
 
     useEffect(() => {
-        axios.get("/api/profile", {
+        axios.get(ApiRoutes.profile(), {
             withCredentials: true,
         }).then(data => {
             setEditProfile(data.data)
@@ -55,22 +58,21 @@ const Profile: React.FC = () => {
                 const month = String(birthdayFull.getMonth() + 1).padStart(2, "0");
                 const year = birthdayFull.getFullYear();
                 const birthday = `${day}.${month}.${year}`;
-                data.data = {...data.data, birthdate: birthday};
+                data.data = { ...data.data, birthdate: birthday };
             }
             setProfileData(data.data)
             setLoading(false);
         }).catch(err => {
             if (err.status === 401) {
-                console.log("remove expiry")
-                localStorage.removeItem("expiry");
-                navigate("/profile")
+                setAuth(false);
+                navigate(AppRoutes.profile())
             }
             console.warn(err)
         })
     }, [update]);
 
     useEffect(() => {
-        axios.get("/api/friends/counts", {
+        axios.get(ApiRoutes.friendsCount(), {
             withCredentials: true
         }).then(data => {
             setFriendsCount({
@@ -93,7 +95,7 @@ const Profile: React.FC = () => {
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, field: string) => {
-        let value = e.target.value;
+        const value = e.target.value;
         setEditProfile({
             ...editProfile,
             [field]: value,
@@ -102,11 +104,11 @@ const Profile: React.FC = () => {
     };
 
     const handleSaveProfile = () => {
-        const sendData = {...editProfile}
+        const sendData = { ...editProfile }
         if (sendData.birthdate) {
             sendData.birthdate = new Date(sendData.birthdate ?? "").toISOString()
         }
-        axios.put("/api/profile", sendData, {
+        axios.put(ApiRoutes.profile(), sendData, {
             headers: {
                 "Content-Type": "application/json",
             }
@@ -133,16 +135,16 @@ const Profile: React.FC = () => {
                         <IconButton
                             onClick={() => setIsOpen(true)}
                         >
-                            <EditIcon/>
+                            <EditIcon />
                         </IconButton>
                         <div>
-                            <NotificationWidget/>
+                            <NotificationWidget />
                         </div>
                     </div>
                     {/* Первый блок информации */}
-                    {loading ? <ProfileSkeleton/>
+                    {loading ? <ProfileSkeleton />
                         : <div className="mb-6 flex flex-row items-center justify-start">
-                            <AvatarBlock initialAvatarUrl={profileData.avatar}/>
+                            <AvatarBlock initialAvatarUrl={profileData.avatar} />
                             {/*<h4 className="text-xl font-semibold mb-4">Основная информация</h4>*/}
                             <div className="ml-2">
                                 {!!profileData.name && <p><strong>Имя:</strong> {profileData.name}</p>}
@@ -159,19 +161,19 @@ const Profile: React.FC = () => {
 
 
                     {/* Второй блок информации */}
-                    {loading ? <ProfileSkeleton/>
+                    {loading ? <ProfileSkeleton />
                         : <div>
                             {Object.keys(profileData).length > 0 &&
                                 <>
                                     <h4 className="text-xl font-semibold mb-4">Дополнительная информация</h4>
-                                    {loading ? <Loader/> :
+                                    {loading ? <Loader /> :
                                         <div>
                                             {!!profileData.git &&
                                                 <p><strong>GitHub: </strong>
                                                     <a href={`https://github.com/${profileData.git}`}
-                                                       target="_blank"
-                                                       rel="noopener noreferrer"
-                                                       className="text-blue-500 hover:underline">{profileData.git}</a>
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue-500 hover:underline">{profileData.git}</a>
                                                 </p>
                                             }
                                             {!!profileData.os &&
@@ -183,10 +185,10 @@ const Profile: React.FC = () => {
                                     }
                                 </>
                             }
-                            <Chat/>
+                            <Chat />
                         </div>
                     }
-                    {loadingSubscribe ? <Skeleton/>
+                    {loadingSubscribe ? <Skeleton />
                         : <div className="flex space-x-4 mt-4">
                             <div className="text-center">
                                 <span className="font-bold">{friendsCount.followersCount ?? "Отсутсвует"}</span>
@@ -204,7 +206,7 @@ const Profile: React.FC = () => {
                 <DialogTitle>Редактирование</DialogTitle>
                 <DialogContent>
                     <Box>
-                        <FormControl style={{gap: "10px"}}>
+                        <FormControl style={{ gap: "10px" }}>
                             {/*<InputLabel>Имя и Фамилия</InputLabel>*/}
                             <TextField
                                 onChange={(e) => handleInputChange(e, "name")}
@@ -219,7 +221,7 @@ const Profile: React.FC = () => {
                                 label={"Дата рождения"}
                                 value={editProfile.birthdate}
                                 // value={"2022-09-16"}
-                                onChange={(e) => handleInputChange(e, "birthdate")}/>
+                                onChange={(e) => handleInputChange(e, "birthdate")} />
                             <TextField
                                 type="text"
                                 label={"Telegram"}
@@ -229,7 +231,7 @@ const Profile: React.FC = () => {
                                     input: {
                                         startAdornment: (
                                             <InputAdornment position="start">
-                                                <AlternateEmail/>
+                                                <AlternateEmail />
                                             </InputAdornment>
                                         ),
                                     }
@@ -244,7 +246,7 @@ const Profile: React.FC = () => {
                                 fullWidth
                             />
                             <SelectorWithSearch
-                                url="api/option/os"
+                                url={ApiRoutes.optionOs()}
                                 onChange={handleOptionChange}
                                 // TODO: подставлять value с сервера
                                 value={profileData.os ?? {

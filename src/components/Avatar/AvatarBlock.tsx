@@ -1,11 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Loader from "../Loader/Loader";
 import AvatarSkeleton from "../Skeletons/AvatarSkeleton/AvatarSkeleton";
 import Avatar from "@mui/material/Avatar"
-import {Button} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
-import EditIcon from '@mui/icons-material/Edit';
+import { ApiRoutes } from '../../lib/routes';
 
 interface AvatarUploaderProps {
     initialAvatarUrl: string;
@@ -43,7 +42,7 @@ const AvatarBlock: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatar
         setLoading(true);
 
         try {
-            const response = await axios.post('/api/avatar', formData, {
+            const response = await axios.post(ApiRoutes.avatar(), formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -65,7 +64,7 @@ const AvatarBlock: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatar
         setIsPopupOpen(true);
         setLoadingAll(true)
         try {
-            const response = await axios.get('/api/avatar');
+            const response = await axios.get(ApiRoutes.avatar());
             setAllAvatars(response.data.avatar_list);
             setCurrentAvatarIndex(response.data.avatars.findIndex((url: string) => url === avatarUrl));
         } catch (error) {
@@ -93,14 +92,14 @@ const AvatarBlock: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatar
 
     const deleteAvatar = () => {
         if (window.confirm("Удалить аватар?")) {
-            axios.delete("/api/avatar", {
+            axios.delete(ApiRoutes.avatar(), {
                 data: {
                     id: allAvatars[currentAvatarIndex].id,
                 },
                 withCredentials: true,
             }).then(data => {
                 setAllAvatars(allAvatars.filter(ava => ava.id !== data.data.id))
-                setCurrentAvatarIndex((prevIndex) => (prevIndex + 1) % allAvatars.length-1);
+                setCurrentAvatarIndex((prevIndex) => (prevIndex + 1) % allAvatars.length - 1);
             }).catch(err => {
                 alert("Не удалось")
                 console.error(err)
@@ -110,7 +109,7 @@ const AvatarBlock: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatar
 
     return (
         <div className="flex flex-col items-center p-2">
-            {avatarUrl === "" ? <AvatarSkeleton/> :
+            {avatarUrl === "" ? <AvatarSkeleton /> :
                 <Avatar src={avatarUrl} sx={{ width: 120, height: 120 }} onClick={openPopup} className={"mb-2"} />
                 // <img
                 //     src={avatarUrl}
@@ -143,7 +142,7 @@ const AvatarBlock: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatar
             {/* Popup для просмотра и перелистывания аватарок */}
             {isPopupOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
-                    {loadingAll ? <Loader/>
+                    {loadingAll ? <Loader />
                         : <div className="bg-white p-4 rounded-lg max-w-sm w-full relative flex items-center">
                             {/* Закрыть popup */}
                             <button

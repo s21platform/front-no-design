@@ -1,6 +1,8 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import Notification from "../Notification/Notification";
+import { ApiRoutes } from "../../lib/routes";
+import { Box, CircularProgress } from "@mui/material";
 
 interface ILoginForm {
     setIsLoggedIn: (isLoggedIn: boolean) => void;
@@ -9,11 +11,13 @@ interface ILoginForm {
 const FormLogin = ({ setIsLoggedIn }: ILoginForm) => {
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+    const [loading, setLoading] = useState<boolean>(false);
 
-    const [notification, setNotification] = useState<{ message: string; type: "error" | "success"} | null>(null);
+    const [notification, setNotification] = useState<{ message: string; type: "error" | "success" } | null>(null);
 
     const handleLogin = () => {
-        axios.post("/auth/login", {
+        setLoading(true);
+        axios.post(ApiRoutes.login(), {
             username: username,
             password: password,
         }, {
@@ -42,6 +46,8 @@ const FormLogin = ({ setIsLoggedIn }: ILoginForm) => {
                 type: "error"
             })
             console.log(err);
+        }).finally(() => {
+            setLoading(false);
         })
     }
 
@@ -86,14 +92,22 @@ const FormLogin = ({ setIsLoggedIn }: ILoginForm) => {
                             <button
                                 type="submit"
                                 className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                style={{
+                                    display: 'flex', alignItems: 'center', justifyContent: "center",
+                                    opacity: loading ? 0.4 : 1,
+                                    cursor: loading ? 'not-allowed' : 'pointer',
+                                }}
                                 onClick={handleLogin}
+                                disabled={loading}
                             >
                                 Войти
+
+                                {loading && <Box ml={1} display={"inline-block"}><CircularProgress size={15} color="inherit" /></Box>}
                             </button>
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
             {notification &&
                 <Notification
                     message={notification?.message}

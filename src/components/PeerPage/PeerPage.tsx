@@ -10,9 +10,12 @@ import AvatarPeerBlock from "../Avatar/AvatarPeerBlock";
 import Header from "../Header/Header";
 import PeerSubscriptionButton from "../PeerSubscriptionButton/PeerSubscriptionButton";
 import { Box } from "@mui/material";
+import { ApiRoutes, AppRoutes, useAuth } from "../../lib/routes";
 
 export const PeerPage = () => {
     const navigate = useNavigate();
+    const { setAuth } = useAuth();
+
     const pathParams = useParams();
     const [profileData, setProfileData] = useState<ProfileProps>({
         avatar: "",
@@ -23,29 +26,23 @@ export const PeerPage = () => {
     const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
 
     useEffect(() => {
-        axios.get(`/api/peer/${pathParams.uuid}`, {
+        axios.get(ApiRoutes.peer(pathParams.uuid), {
             withCredentials: true,
         }).then(data => {
-            if (data.data.birthdate) {
-                const birthdayFull = new Date(data.data.birthdate)
-                const day = String(birthdayFull.getDate()).padStart(2, "0");
-                const month = String(birthdayFull.getMonth() + 1).padStart(2, "0");
-                const year = birthdayFull.getFullYear();
-                const birthday = `${day}.${month}.${year}`;
-                data.data = { ...data.data, birthdate: birthday };
-            }
             setProfileData(data.data)
             setLoading(false);
         }).catch(err => {
             if (err.status === 401) {
-                console.log("remove expiry")
-                localStorage.removeItem("expiry");
-                navigate("/profile")
+                setAuth(false);
+                navigate(AppRoutes.profile());
             }
             console.warn(err)
         })
 
-        axios.get(`/api/friends/check?peer=${pathParams.uuid}`, {
+        axios.get(ApiRoutes.checkFriendship(), {
+            params: {
+                peer: pathParams.uuid,
+            },
             withCredentials: true,
         }).then(data => {
             setIsSubscribed(data.data.exist)

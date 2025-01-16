@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
+import { ApiRoutes } from '../../../lib/routes';
 
 interface Notification {
     id: number;
@@ -20,7 +21,7 @@ const NotificationWidget: React.FC = () => {
     // Fetch unread notification count
     const fetchUnreadCount = async () => {
         try {
-            const response = await axios.get('/api/notification/count');
+            const response = await axios.get(ApiRoutes.notificationCount());
             setUnreadCount(Math.min(response.data.count, 9)); // Show 9+ if more than 9
         } catch (error) {
             console.error('Error fetching unread count', error);
@@ -28,9 +29,9 @@ const NotificationWidget: React.FC = () => {
     };
 
     // Fetch notifications when dropdown is opened
-    const fetchNotifications = async (newOffset: number = 0) => {
+    const fetchNotifications = async (newOffset = 0) => {
         try {
-            const response = await axios.get('/api/notification', {
+            const response = await axios.get(ApiRoutes.notification(), {
                 params: { limit, offset: newOffset },
             });
             const newNotifications: Notification[] = response.data.notifications;
@@ -51,7 +52,7 @@ const NotificationWidget: React.FC = () => {
                 .map((notification) => notification.id);
 
             if (unreadNotificationIds.length > 0) {
-                await axios.delete('/api/notification', { data: { ids: unreadNotificationIds } });
+                await axios.delete(ApiRoutes.notification(), { data: { ids: unreadNotificationIds } });
                 setNotifications((prev) =>
                     prev.map((notification) => ({ ...notification, isRead: true }))
                 );
@@ -103,9 +104,9 @@ const NotificationWidget: React.FC = () => {
                 onClick={toggleDropdown}
                 style={{ position: 'relative', cursor: 'pointer' }}
             >
-        <span role="img" aria-label="notifications" style={{ fontSize: '24px' }}>
-          🔔
-        </span>
+                <span role="img" aria-label="notifications" style={{ fontSize: '24px' }}>
+                    🔔
+                </span>
                 {unreadCount > 0 && (
                     <span
                         className="notification-count"
@@ -120,8 +121,8 @@ const NotificationWidget: React.FC = () => {
                             fontSize: '12px',
                         }}
                     >
-            {unreadCount === 9 ? '9+' : unreadCount}
-          </span>
+                        {unreadCount === 9 ? '9+' : unreadCount}
+                    </span>
                 )}
             </div>
 
