@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { ApiRoutes } from './const/apiRoutes';
+import Loader from '../../components/Loader/Loader';
+import { Box } from '@mui/material';
 
 interface AuthContextProps {
 	isAuth: boolean | null;
@@ -9,8 +11,10 @@ interface AuthContextProps {
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const [isAuth, setIsAuth] = useState<boolean | null>(null);
+	const [loading, setLoading] = useState(true);
+
 
 	useEffect(() => {
 		axios
@@ -20,8 +24,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 				if (err.response?.status === 401) {
 					setIsAuth(false);
 				}
-			});
+			})
+			.finally(() => setLoading(false));;
 	}, []);
+
+	if (loading) {
+		return (
+			<Box display={"flex"} height={"100vh"} justifyContent={"center"}>
+				<Loader />
+			</Box>
+		);
+	}
 
 	return (
 		<AuthContext.Provider value={{ isAuth, setAuth: setIsAuth }}>

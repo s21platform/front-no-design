@@ -4,7 +4,7 @@ import { useAuth } from './AuthContext';
 import Loader from '../../components/Loader/Loader';
 import { AppRoutes } from './const/appRoutes';
 
-const PrivateRoute: React.FC = () => {
+const PrivateRoute = () => {
 	const { isAuth } = useAuth();
 
 	if (isAuth === null) {

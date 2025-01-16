@@ -9,8 +9,9 @@ export const ApiRoutes = {
 	notification: () => '/api/notification',
 	notificationCount: () => '/api/notification/count',
 	avatar: () => '/api/avatar',
-	optionOs: () => 'api/option/os',
+	optionOs: () => '/api/option/os',
 
 	checkAuth: () => '/auth/check-auth',
 	login: () => '/auth/login',
+	logout: () => '/auth/logout',
 }

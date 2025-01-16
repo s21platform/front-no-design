@@ -9,7 +9,6 @@ import { AppRoutes, AuthProvider, PrivateRoute } from './lib/routes';
 function App() {
     return (
         <AuthProvider>
-
             <Routes>
                 <Route path={AppRoutes.main()} element={<MainPage />} />
                 <Route path={AppRoutes.profile()} element={<ProfilePage />} />
