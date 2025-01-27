@@ -8,7 +8,7 @@ export const ApiRoutes = {
 	checkFriendship: () => '/api/friends/check',
 	notification: () => '/api/notification',
 	notificationCount: () => '/api/notification/count',
-	avatar: () => '/api/avatar',
+	avatar: () => '/api/avatar/user',
 	optionOs: () => '/api/option/os',
 
 	checkAuth: () => '/auth/check-auth',
