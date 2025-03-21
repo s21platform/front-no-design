@@ -22,6 +22,40 @@ interface NewSociety {
     is_search: boolean;
 }
 
+const POST_PERMISSIONS = [
+    {
+        value: 1,
+        label: "Модераторы • комментарии выкл."
+    },
+    {
+        value: 2,
+        label: "Все • комментарии выкл."
+    },
+    {
+        value: 3,
+        label: "Модераторы • комментарии вкл."
+    },
+    {
+        value: 4,
+        label: "Все • комментарии вкл."
+    }
+];
+
+const SOCIETY_FORMATS = [
+    {
+        value: 1,
+        label: "Открытое"
+    },
+    {
+        value: 2,
+        label: "Закрытое"
+    },
+    {
+        value: 3,
+        label: "Платное"
+    }
+];
+
 export const SocietySearch = () => {
     const navigate = useNavigate();
     const [societies, setSocieties] = useState<SocietyData[]>([]);
@@ -31,8 +65,8 @@ export const SocietySearch = () => {
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
     const [newSociety, setNewSociety] = useState<NewSociety>({
         name: "",
-        format_id: 0,
-        post_permission_id: 0,
+        format_id: 1,
+        post_permission_id: 1,
         is_search: false
     });
     const [notification, setNotification] = useState<{ message: string; type: "error" | "success" } | null>(null);
@@ -130,11 +164,10 @@ export const SocietySearch = () => {
     // Добавим функцию для обработки закрытия
     const handleClose = () => {
         setIsDialogOpen(false);
-        // Опционально: очистка формы при закрытии
         setNewSociety({
             name: "",
-            format_id: 0,
-            post_permission_id: 0,
+            format_id: 1,
+            post_permission_id: 1,
             is_search: false
         });
     };
@@ -219,8 +252,11 @@ export const SocietySearch = () => {
                                 fullWidth
                                 margin="dense"
                             >
-                                <MenuItem value={0}>Открытый</MenuItem>
-                                <MenuItem value={1}>Закрытый</MenuItem>
+                                {SOCIETY_FORMATS.map(format => (
+                                    <MenuItem key={format.value} value={format.value}>
+                                        {format.label}
+                                    </MenuItem>
+                                ))}
                             </TextField>
                             <TextField
                                 select
@@ -230,8 +266,11 @@ export const SocietySearch = () => {
                                 fullWidth
                                 margin="dense"
                             >
-                                <MenuItem value={0}>Все могут постить</MenuItem>
-                                <MenuItem value={1}>Только администраторы</MenuItem>
+                                {POST_PERMISSIONS.map(permission => (
+                                    <MenuItem key={permission.value} value={permission.value}>
+                                        {permission.label}
+                                    </MenuItem>
+                                ))}
                             </TextField>
                         </FormControl>
                     </Box>
