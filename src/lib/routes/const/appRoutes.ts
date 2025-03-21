@@ -6,4 +6,6 @@ export const AppRoutes = {
 	societySearch: () => '/society-search',
 	peer: () => '/peer/:uuid',
 	society: (uuid?: string) => uuid ? `/society/${uuid}` : '/society/:uuid',
+	advertSearch: () => '/adverts',
+	advert: (uuid?: string) => uuid ? `/advert/${uuid}` : '/advert/:uuid',
 }

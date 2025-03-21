@@ -11,6 +11,7 @@ export const ApiRoutes = {
 	notificationCount: () => '/api/notification/count',
 	avatar: () => '/api/avatar',
 	optionOs: () => '/api/option/os',
+	advert: () => '/api/advert',
 
 	checkAuth: () => '/auth/check-auth',
 	login: () => '/auth/login',
