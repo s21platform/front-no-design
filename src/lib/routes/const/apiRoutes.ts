@@ -1,6 +1,7 @@
 export const ApiRoutes = {
 	profile: () => '/api/profile',
 	society: () => '/api/society',
+	societySearch: () => 'api/societies/search',
 	search: () => '/api/search',
 	peer: (id?: string) => `/api/peer/${id}`,
 	friends: () => '/api/friends',
