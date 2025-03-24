@@ -7,6 +7,8 @@ import { ApiRoutes } from "../../lib/routes";
 import { useNavigate } from "react-router-dom";
 import { SocietyCard } from "../SocietyCard/SocietyCard";
 import Notification from "../Notification/Notification";
+import { AppRoutes } from "../../lib/routes/const/appRoutes";
+import { POST_PERMISSIONS, SOCIETY_FORMATS } from "../../lib/consts/society";
 
 interface SocietyData {
     uuid: string;
@@ -21,40 +23,6 @@ interface NewSociety {
     post_permission_id: number;
     is_search: boolean;
 }
-
-const POST_PERMISSIONS = [
-    {
-        value: 1,
-        label: "Модераторы • комментарии выкл."
-    },
-    {
-        value: 2,
-        label: "Все • комментарии выкл."
-    },
-    {
-        value: 3,
-        label: "Модераторы • комментарии вкл."
-    },
-    {
-        value: 4,
-        label: "Все • комментарии вкл."
-    }
-];
-
-const SOCIETY_FORMATS = [
-    {
-        value: 1,
-        label: "Открытое"
-    },
-    {
-        value: 2,
-        label: "Закрытое"
-    },
-    {
-        value: 3,
-        label: "Платное"
-    }
-];
 
 export const SocietySearch = () => {
     const navigate = useNavigate();
@@ -146,6 +114,7 @@ export const SocietySearch = () => {
                         message: "Сообщество успешно создано",
                         type: "success"
                     });
+                    navigate(AppRoutes.society(response.data.societyUUID));
                 }
             })
             .catch(error => {
@@ -252,7 +221,7 @@ export const SocietySearch = () => {
                                 fullWidth
                                 margin="dense"
                             >
-                                {SOCIETY_FORMATS.map(format => (
+                                {SOCIETY_FORMATS.map((format: { value: number; label: string }) => (
                                     <MenuItem key={format.value} value={format.value}>
                                         {format.label}
                                     </MenuItem>
@@ -266,7 +235,7 @@ export const SocietySearch = () => {
                                 fullWidth
                                 margin="dense"
                             >
-                                {POST_PERMISSIONS.map(permission => (
+                                {POST_PERMISSIONS.map((permission: { value: number; label: string }) => (
                                     <MenuItem key={permission.value} value={permission.value}>
                                         {permission.label}
                                     </MenuItem>
