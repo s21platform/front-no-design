@@ -7,6 +7,7 @@ import PeerSearch from './components/PeerSearch/PeerSearch';
 import { AppRoutes, AuthProvider, PrivateRoute } from './lib/routes';
 import { SocietySearch } from './components/SocietySearch/SocietySearch';
 import { SocietyPage } from './components/SocietyPage/SocietyPage';
+import { AdvertSearch } from './components/AdvertSearch/AdvertSearch';
 
 function App() {
     return (
@@ -21,6 +22,7 @@ function App() {
                     <Route path={AppRoutes.peer()} element={<PeerPage />} />
                     <Route path={AppRoutes.societySearch()} element={<SocietySearch />} />
                     <Route path={AppRoutes.society()} element={<SocietyPage />} />
+                    <Route path={AppRoutes.advertSearch()} element={<AdvertSearch />} />
                 </Route>
 
 
