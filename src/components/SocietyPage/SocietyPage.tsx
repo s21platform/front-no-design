@@ -53,6 +53,19 @@ export const SocietyPage = () => {
                     params: { society_id: uuid },
                     withCredentials: true
                 });
+
+                const societyData = response.data;
+                const avatarRes = await axios.get(ApiRoutes.societyAvatar(), {
+                    params: { societyUUID: uuid },
+                    withCredentials: true
+                });
+
+                const avatars = avatarRes.data?.avatar_list;
+
+                if (Array.isArray(avatars) && avatars.length > 0) {
+                    societyData.photo_url = avatars[0].link;
+                }
+
                 setSociety(response.data);
             } catch (error) {
                 console.error("Ошибка при загрузке данных сообщества:", error);
