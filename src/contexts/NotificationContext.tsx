@@ -33,11 +33,11 @@ export const useNotifications = () => {
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [notifications, setNotifications] = useState<Notification[]>([]);
-    const [unreadCount, setUnreadCount] = useState<number>(0);
-    const [offset, setOffset] = useState<number>(0);
-    const [hasMore, setHasMore] = useState<boolean>(true);
-    const [isInitialLoad, setIsInitialLoad] = useState<boolean>(true);
-    const [lastCheckedCount, setLastCheckedCount] = useState<number>(0);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const [offset, setOffset] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
+    const [lastCheckedCount, setLastCheckedCount] = useState(0);
     const limit = 10;
 
     const fetchUnreadCount = useCallback(async () => {
@@ -69,7 +69,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
     };
 
-    const loadMoreNotifications = async (offsetAdjustment: number = 0) => {
+    const loadMoreNotifications = async (offsetAdjustment = 0) => {
         if (!hasMore || isInitialLoad) return;
 
         try {

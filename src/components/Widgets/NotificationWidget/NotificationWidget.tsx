@@ -12,7 +12,6 @@ import {
     Fade,
     ClickAwayListener,
     styled,
-    Divider,
     Tooltip,
 } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';

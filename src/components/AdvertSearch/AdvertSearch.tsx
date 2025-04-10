@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Box, TextField, Typography, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, MenuItem, Checkbox, ListItemText } from "@mui/material";
-import { Grid } from "@mui/material";
 import axios from "axios";
 import Header from "../Header/Header";
 import { ApiRoutes } from "../../lib/routes";
@@ -63,8 +62,12 @@ export const AdvertSearch = () => {
                 handleClose();
             }
         })
-        .catch(error => {
-            console.error(error);
+        .catch((error: unknown) => {
+            if (error instanceof Error) {
+                console.error('Error:', error.message);
+            } else {
+                console.error('An unknown error occurred');
+            }
             setNotification({
                 message: "Ошибка при создании рекламной кампании",
                 type: "error"  
