@@ -3,6 +3,7 @@ export const ApiRoutes = {
 	society: () => '/api/society',
 	societyAvatar: () => '/api/avatar/society',
 	societySearch: () => 'api/societies/search',
+	societyJoin: (uuid: string) => `/api/society/${uuid}/join`,
 	search: () => '/api/search',
 	peer: (id?: string) => `/api/peer/${id}`,
 	friends: () => '/api/friends',
