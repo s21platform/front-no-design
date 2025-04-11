@@ -3,6 +3,7 @@ export const ApiRoutes = {
 	society: () => '/api/society',
 	societyAvatar: () => '/api/avatar/society',
 	societySearch: () => 'api/societies/search',
+	societyJoin: (uuid: string) => `/api/society/${uuid}/join`,
 	search: () => '/api/search',
 	peer: (id?: string) => `/api/peer/${id}`,
 	friends: () => '/api/friends',
@@ -13,6 +14,7 @@ export const ApiRoutes = {
 	avatar: () => '/api/avatar/user',
 	optionOs: () => '/api/option/os',
 	advert: () => '/api/advert',
+	chatIntegration: (type: string) => `/api/chat-integration/${type}`,
 
 	checkAuth: () => '/auth/check-auth',
 	login: () => '/auth/login',

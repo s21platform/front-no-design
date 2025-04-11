@@ -11,9 +11,20 @@ export type ProfileProps = {
         id: number;
         label: string;
     } | null;
+    rocketChatIntegration?: {
+        username: string;
+        password: string;
+        isConnected: boolean;
+    };
+    telegramIntegration?: {
+        token: string;
+        isConnected: boolean;
+    };
 }
 
 export type SubscriptionCount = {
     followersCount: number,
     followingCount: number,
 }
+
+export type ChatIntegrationType = 'rocket' | 'telegram';
