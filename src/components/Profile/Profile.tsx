@@ -4,7 +4,7 @@ import axios from "axios";
 import Loader from "../Loader/Loader";
 import NotificationWidget from "../Widgets/NotificationWidget/NotificationWidget";
 import Chat from "../Chat/Chat";
-import { ProfileProps, SubscriptionCount } from "./types";
+import { ChatIntegrationType, ProfileProps, SubscriptionCount } from "./types";
 import ProfileSkeleton from "../Skeletons/ProfileSkeleton/ProfileSkeleton";
 import {
     Box,
@@ -13,13 +13,14 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle, FormControl,
-    IconButton, InputAdornment,
-    Skeleton, TextField
+    IconButton, InputAdornment, List, ListItem, ListItemText,
+    Skeleton, TextField, Tooltip, Typography
 } from "@mui/material";
 import ProfileMenu from "../ProfileMenu/ProfileMenu";
 import AvatarBlock from "../Avatar/AvatarBlock";
 import { AlternateEmail } from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
+import ChatIcon from "@mui/icons-material/Chat";
 import { SelectorOption, SelectorWithSearch } from "../SelectorWithSearch/SelectorWithSearch";
 import { ApiRoutes, AppRoutes, useAuth } from "../../lib/routes";
 
@@ -43,8 +44,23 @@ const Profile: React.FC = () => {
     const [loadingSubscribe, setLoadingSubscribe] = useState<boolean>(true);
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [isChatIntegrationOpen, setIsChatIntegrationOpen] = useState<boolean>(false);
     // FIXME официальный кринж
     const [update, setUpdate] = useState<boolean>(false);
+    
+    const [chatIntegrationType, setChatIntegrationType] = useState<ChatIntegrationType>('rocket');
+    const [rocketChatCredentials, setRocketChatCredentials] = useState({
+        username: '',
+        password: ''
+    });
+    
+    const [rocketChatAuthData, setRocketChatAuthData] = useState<{
+        userId: string;
+        authToken: string;
+    } | null>(null);
+    const [rocketChatRooms, setRocketChatRooms] = useState<any[]>([]);
+    const [rocketChatLoading, setRocketChatLoading] = useState<boolean>(false);
+    const [rocketChatError, setRocketChatError] = useState<string | null>(null);
 
 
     useEffect(() => {
@@ -122,6 +138,79 @@ const Profile: React.FC = () => {
             .catch(err => console.log(err))
     };
 
+    const handleIntegrationDialogOpen = () => {
+        setIsChatIntegrationOpen(true);
+        setRocketChatRooms([]);
+        setRocketChatError(null);
+    };
+
+    const handleRocketChatInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, field: string) => {
+        setRocketChatCredentials({
+            ...rocketChatCredentials,
+            [field]: e.target.value
+        });
+    };
+
+    const handleConnectToRocketChat = async () => {
+        try {
+            setRocketChatLoading(true);
+            setRocketChatError(null);
+            
+            // 1. Авторизация через REST API
+            const response = await axios.post(
+                'https://rocketchat-student.21-school.ru/api/v1/login', 
+                {
+                    user: rocketChatCredentials.username,
+                    password: rocketChatCredentials.password
+                }
+            );
+            
+            if (response.data.status === 'success') {
+                const { userId, authToken } = response.data.data;
+                setRocketChatAuthData({ userId, authToken });
+                
+                // 2. Получение списка комнат
+                const roomsResponse = await axios.get(
+                    'https://rocketchat-student.21-school.ru/api/v1/rooms.get',
+                    {
+                        headers: {
+                            'X-Auth-Token': authToken,
+                            'X-User-Id': userId
+                        }
+                    }
+                );
+                
+                setRocketChatRooms(roomsResponse.data.update || []);
+            } else {
+                setRocketChatError('Ошибка авторизации');
+            }
+        } catch (error: any) {
+            console.error('Ошибка при подключении к RocketChat:', error);
+            setRocketChatError(error.response?.data?.message || 'Ошибка подключения к серверу');
+        } finally {
+            setRocketChatLoading(false);
+        }
+    };
+
+    const handleSaveChatIntegration = async () => {
+        try {
+            await axios.post(ApiRoutes.chatIntegration(chatIntegrationType), {
+                ...rocketChatCredentials,
+                serverUrl: 'rocketchat-student.21-school.ru'
+            }, {
+                withCredentials: true,
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            });
+            
+            setIsChatIntegrationOpen(false);
+            setUpdate(!update);
+        } catch (error) {
+            console.error('Ошибка при настройке интеграции:', error);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
             <div className="bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-4xl flex">
@@ -137,6 +226,13 @@ const Profile: React.FC = () => {
                         >
                             <EditIcon />
                         </IconButton>
+                        <Tooltip title="Интеграция с чатами">
+                            <IconButton
+                                onClick={handleIntegrationDialogOpen}
+                            >
+                                <ChatIcon />
+                            </IconButton>
+                        </Tooltip>
                         <div>
                             <NotificationWidget />
                         </div>
@@ -264,6 +360,75 @@ const Profile: React.FC = () => {
                     <Button onClick={() => handleSaveProfile()}>
                         Сохранить
                     </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Диалог интеграции с чатами */}
+            <Dialog open={isChatIntegrationOpen} maxWidth={"sm"} fullWidth>
+                <DialogTitle>Интеграция с RocketChat</DialogTitle>
+                <DialogContent>
+                    <Box>
+                        <p className="mb-4">Настройка подключения к серверу: rocketchat-student.21-school.ru</p>
+                        <FormControl style={{ gap: "10px" }} fullWidth>
+                            <TextField
+                                onChange={(e) => handleRocketChatInputChange(e, "username")}
+                                value={rocketChatCredentials.username}
+                                variant="outlined"
+                                label={"Имя пользователя"}
+                                margin="dense"
+                                fullWidth
+                            />
+                            <TextField
+                                type="password"
+                                onChange={(e) => handleRocketChatInputChange(e, "password")}
+                                value={rocketChatCredentials.password}
+                                variant="outlined"
+                                label={"Пароль"}
+                                margin="dense"
+                                fullWidth
+                            />
+                            
+                            {rocketChatError && (
+                                <Typography color="error" variant="body2" className="mt-2">
+                                    {rocketChatError}
+                                </Typography>
+                            )}
+                            
+                            {rocketChatLoading && <Loader />}
+                            
+                            {rocketChatRooms.length > 0 && (
+                                <Box className="mt-4">
+                                    <Typography variant="subtitle1" fontWeight="bold">
+                                        Ваши чаты:
+                                    </Typography>
+                                    <List>
+                                        {rocketChatRooms.map((room) => (
+                                            <ListItem key={room._id}>
+                                                <ListItemText 
+                                                    primary={room.name || room.fname || 'Без названия'} 
+                                                    secondary={room.t === 'd' ? 'Личное сообщение' : 'Канал'} 
+                                                />
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                </Box>
+                            )}
+                        </FormControl>
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setIsChatIntegrationOpen(false)}>
+                        Отмена
+                    </Button>
+                    {rocketChatRooms.length === 0 ? (
+                        <Button onClick={handleConnectToRocketChat} disabled={rocketChatLoading}>
+                            Подключиться
+                        </Button>
+                    ) : (
+                        <Button onClick={handleSaveChatIntegration}>
+                            Сохранить
+                        </Button>
+                    )}
                 </DialogActions>
             </Dialog>
         </div>

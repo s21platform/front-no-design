@@ -14,6 +14,7 @@ export const ApiRoutes = {
 	avatar: () => '/api/avatar/user',
 	optionOs: () => '/api/option/os',
 	advert: () => '/api/advert',
+	chatIntegration: (type: string) => `/api/chat-integration/${type}`,
 
 	checkAuth: () => '/auth/check-auth',
 	login: () => '/auth/login',
