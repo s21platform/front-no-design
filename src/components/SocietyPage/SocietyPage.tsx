@@ -26,6 +26,7 @@ const Tags = [{
 }];
 
 export interface SocietyDetails {
+    uuid: string;
     name: string;
     photo_url: string;
     format_id: number;
@@ -135,6 +136,31 @@ export const SocietyPage = () => {
             });
     };
 
+    const handleJoinSociety = async () => {
+        if (!uuid) {
+            console.error('Society UUID is not available');
+            return;
+        }
+        
+        setLoadingSubscription(true);
+        try {
+            await axios.post(ApiRoutes.societyJoin(uuid));
+            // Обновляем данные сообщества после успешного присоединения
+            const response = await axios.get(ApiRoutes.society(), {
+                params: { society_id: uuid },
+                withCredentials: true
+            });
+            setSociety(response.data);
+        } catch (error) {
+            if (error instanceof Error) {
+                console.error('Error:', error.message);
+            } else {
+                console.error('An unknown error occurred');
+            }
+        } finally {
+            setLoadingSubscription(false);
+        }
+    };
 
     if (loading) {
         return (
