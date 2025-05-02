@@ -77,7 +77,8 @@ const UserCard: React.FC<{
     );
 };
 
-// Основные функции платформы
+// Оригинальный функционал платформы (закомментирован на время разработки)
+/*
 const features = [
     {
         title: "Нетворкинг",
@@ -108,6 +109,41 @@ const features = [
         title: "Вакансии",
         icon: "💼",
         description: "Находите новые возможности и связывайтесь с компаниями, ищущими специалистов с вашими навыками."
+    }
+];
+*/
+
+// Моковые данные для блоков функционала (на время разработки)
+const features = [
+    {
+        title: "Функционал 1",
+        icon: "🔧",
+        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris."
+    },
+    {
+        title: "Функционал 2",
+        icon: "⚙️",
+        description: "Fusce auctor, mi et pulvinar tristique, nulla massa dignissim turpis, vel egestas sem nunc eget ex."
+    },
+    {
+        title: "Функционал 3",
+        icon: "🛠️",
+        description: "Sed tempor quam in nulla scelerisque, in bibendum eros pellentesque. Vivamus sagittis."
+    },
+    {
+        title: "Функционал 4",
+        icon: "📊",
+        description: "Etiam vitae justo et enim fringilla convallis. Maecenas efficitur purus non faucibus gravida."
+    },
+    {
+        title: "Функционал 5",
+        icon: "📱",
+        description: "Proin sed dui in lorem lobortis pharetra. Vestibulum ante ipsum primis in faucibus."
+    },
+    {
+        title: "Функционал 6",
+        icon: "💻",
+        description: "Curabitur consequat mollis dolor, a lobortis arcu viverra in. Donec a magna fermentum."
     }
 ];
 
@@ -162,8 +198,7 @@ const Home: React.FC = () => {
                     </Typography>
                     
                     <Typography variant="h6" color="rgba(255,255,255,0.7)" sx={{ maxWidth: 600, mx: 'auto', mb: 4 }}>
-                        Уникальная платформа для ИТ-профессионалов, где можно общаться, 
-                        развивать навыки и находить развлечения для технарей.
+                        Тестовая площадка для общения и обмена опытом между разработчиками
                     </Typography>
                     
                     <Stack 
@@ -212,7 +247,7 @@ const Home: React.FC = () => {
                         fontWeight="bold" 
                         gutterBottom
                     >
-                        Возможности платформы
+                        Ключевые возможности
                     </Typography>
                     
                     <Typography 
@@ -221,7 +256,7 @@ const Home: React.FC = () => {
                         textAlign="center" 
                         sx={{ maxWidth: 700, mx: 'auto', mb: 6 }}
                     >
-                        Всё необходимое для развития карьеры и приятного времяпровождения
+                        Набор инструментов, необходимых для комфортной работы на платформе
                     </Typography>
                     
                     <Grid container spacing={3}>
