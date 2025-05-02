@@ -9,9 +9,10 @@ import { SocietySearch } from './components/SocietySearch/SocietySearch';
 import { SocietyPage } from './components/SocietyPage/SocietyPage';
 import { AdvertSearch } from './components/AdvertSearch/AdvertSearch';
 import { NotificationProvider } from './contexts/NotificationContext';
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import { ThemeProvider, createTheme, CssBaseline, Box } from '@mui/material';
 import AuthLayout from './components/layouts/AuthLayout';
 import Header from './components/Header/Header';
+import { Outlet } from 'react-router-dom';
 
 // Создание темы Material-UI
 const theme = createTheme({
@@ -75,6 +76,18 @@ const theme = createTheme({
   },
 });
 
+// Компонент Layout для публичных страниц
+const PublicLayout = () => {
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
+      <Header />
+      <Box sx={{ flex: 1 }}>
+        <Outlet />
+      </Box>
+    </Box>
+  );
+};
+
 function App() {
     return (
         <ThemeProvider theme={theme}>
@@ -83,15 +96,9 @@ function App() {
                 <NotificationProvider>
                     <Routes>
                         {/* Публичные маршруты */}
-                        <Route 
-                            path={AppRoutes.main()} 
-                            element={
-                                <>
-                                    <Header />
-                                    <MainPage />
-                                </>
-                            } 
-                        />
+                        <Route element={<PublicLayout />}>
+                            <Route path={AppRoutes.main()} element={<MainPage />} />
+                        </Route>
 
                         {/* Маршруты, требующие авторизации */}
                         <Route element={<PrivateRoute />}>

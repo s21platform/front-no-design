@@ -4,7 +4,6 @@ import { ProfileProps } from "../Profile/types";
 import axios from "axios";
 import ProfileSkeleton from "../Skeletons/ProfileSkeleton/ProfileSkeleton";
 import Loader from "../Loader/Loader";
-import Chat from "../Chat/Chat";
 import AvatarPeerBlock from "../Avatar/AvatarPeerBlock";
 import PeerSubscriptionButton from "../PeerSubscriptionButton/PeerSubscriptionButton";
 import { ApiRoutes, AppRoutes, useAuth } from "../../lib/routes";
@@ -175,10 +174,6 @@ export const PeerPage = () => {
                                 </Box>
                             </>
                         )}
-                        
-                        <Box sx={{ mt: 3 }}>
-                            <Chat />
-                        </Box>
                     </Box>
                 )}
             </CardContent>

@@ -1,5 +1,5 @@
-import Header from "../components/Header/Header";
 import Home from "../components/Home/Home";
+import { Box } from "@mui/material";
 
 const MainPage = () => {
     // const [isRegistered, setIsRegistered] = useState<boolean>(false)
@@ -26,8 +26,7 @@ const MainPage = () => {
     // }
 
     return (
-        <div>
-            <Header />
+        <Box>
             <Home />
             {/*{!isRegistered && <button onClick={registration}>Do Auth</button>}*/}
             {/*{!isRegistered && (*/}
@@ -44,7 +43,7 @@ const MainPage = () => {
 
             {/*)}*/}
             {/*{isRegistered ? <div>Auth</div> : <div>Not Auth</div>}*/}
-        </div>
+        </Box>
     )
 }
 

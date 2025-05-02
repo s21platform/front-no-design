@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Loader from "../Loader/Loader";
 import NotificationWidget from "../Widgets/NotificationWidget/NotificationWidget";
-import Chat from "../Chat/Chat";
 import { ProfileProps, SubscriptionCount } from "./types";
 import ProfileSkeleton from "../Skeletons/ProfileSkeleton/ProfileSkeleton";
 import {
@@ -246,10 +245,6 @@ const Profile: React.FC = () => {
                                 </Box>
                             </>
                         )}
-                        
-                        <Box sx={{ mt: 3 }}>
-                            <Chat />
-                        </Box>
                     </Box>
                 )}
 

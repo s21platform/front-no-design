@@ -132,7 +132,7 @@ const Home: React.FC = () => {
             {/* Hero Section */}
             <Box 
                 sx={{ 
-                    bgcolor: 'black', 
+                    background: 'linear-gradient(180deg, #000000 0%, rgba(79, 70, 229, 0.3) 50%, #1e1e1e 100%)',
                     color: 'white', 
                     pt: 8, 
                     pb: 12,
