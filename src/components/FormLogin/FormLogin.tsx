@@ -27,7 +27,19 @@ const FormLogin = ({ setIsLoggedIn }: ILoginForm) => {
 
     const [notification, setNotification] = useState<{ message: string; type: "error" | "success" } | null>(null);
 
-    const handleLogin = () => {
+    const handleLogin = (event?: React.FormEvent) => {
+        if (event) {
+            event.preventDefault();
+        }
+        
+        if (!username || !password) {
+            setNotification({
+                message: "Введите имя пользователя и пароль",
+                type: "error"
+            });
+            return;
+        }
+        
         setLoading(true);
         axios.post(ApiRoutes.login(), {
             username: username,
@@ -71,6 +83,12 @@ const FormLogin = ({ setIsLoggedIn }: ILoginForm) => {
         event.preventDefault();
     };
 
+    const handleKeyDown = (event: React.KeyboardEvent) => {
+        if (event.key === 'Enter') {
+            handleLogin();
+        }
+    };
+
     return (
         <>
             <Box 
@@ -100,65 +118,70 @@ const FormLogin = ({ setIsLoggedIn }: ILoginForm) => {
                         >
                             Войти
                         </Typography>
-                        <Box sx={{ mt: 3 }}>
-                            {/* Поле для username */}
-                            <TextField
-                                id="username"
-                                label="Имя пользователя"
-                                variant="outlined"
-                                fullWidth
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                margin="normal"
-                                required
-                            />
+                        <form onSubmit={handleLogin}>
+                            <Box sx={{ mt: 3 }}>
+                                {/* Поле для username */}
+                                <TextField
+                                    id="username"
+                                    label="Имя пользователя"
+                                    variant="outlined"
+                                    fullWidth
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    margin="normal"
+                                    required
+                                    onKeyDown={handleKeyDown}
+                                />
 
-                            {/* Поле для password */}
-                            <TextField
-                                id="password"
-                                label="Пароль"
-                                type={showPassword ? 'text' : 'password'}
-                                variant="outlined"
-                                fullWidth
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                margin="normal"
-                                required
-                                InputProps={{
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                aria-label="toggle password visibility"
-                                                onClick={handleClickShowPassword}
-                                                onMouseDown={handleMouseDownPassword}
-                                                edge="end"
-                                            >
-                                                {showPassword ? <VisibilityOff /> : <Visibility />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    )
-                                }}
-                            />
+                                {/* Поле для password */}
+                                <TextField
+                                    id="password"
+                                    label="Пароль"
+                                    type={showPassword ? 'text' : 'password'}
+                                    variant="outlined"
+                                    fullWidth
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    margin="normal"
+                                    required
+                                    onKeyDown={handleKeyDown}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label="toggle password visibility"
+                                                    onClick={handleClickShowPassword}
+                                                    onMouseDown={handleMouseDownPassword}
+                                                    edge="end"
+                                                >
+                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )
+                                    }}
+                                />
 
-                            {/* Кнопка Submit */}
-                            <Button
-                                variant="contained"
-                                fullWidth
-                                size="large"
-                                disabled={loading}
-                                onClick={handleLogin}
-                                sx={{ mt: 3 }}
-                            >
-                                {loading ? (
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        Загрузка
-                                        <CircularProgress size={20} color="inherit" sx={{ ml: 1 }} />
-                                    </Box>
-                                ) : (
-                                    'Войти'
-                                )}
-                            </Button>
-                        </Box>
+                                {/* Кнопка Submit */}
+                                <Button
+                                    variant="contained"
+                                    fullWidth
+                                    size="large"
+                                    disabled={loading}
+                                    onClick={handleLogin}
+                                    type="submit"
+                                    sx={{ mt: 3 }}
+                                >
+                                    {loading ? (
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            Загрузка
+                                            <CircularProgress size={20} color="inherit" sx={{ ml: 1 }} />
+                                        </Box>
+                                    ) : (
+                                        'Войти'
+                                    )}
+                                </Button>
+                            </Box>
+                        </form>
                     </Paper>
                 </Container>
             </Box>
