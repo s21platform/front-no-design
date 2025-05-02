@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ApiRoutes, AppRoutes, useAuth } from "../../lib/routes";
 import axios from "axios";
+import { AppBar, Toolbar, Typography, Button, Box, Container } from '@mui/material';
 
 const Header = () => {
     const { isAuth, setAuth } = useAuth();
@@ -21,50 +22,46 @@ const Header = () => {
             });
     }
     return (
-        <header className="bg-indigo-600 text-white p-4 shadow-md">
-            <div className="container mx-auto flex justify-between items-center">
-                {/* Логотип или название */}
-                <h1 className="text-2xl font-bold">
-                    <Link to={AppRoutes.main()}>Space 21</Link>
-                </h1>
+        <AppBar position="static">
+            <Container>
+                <Toolbar sx={{ justifyContent: 'space-between' }}>
+                    {/* Логотип или название */}
+                    <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+                        <Link to={AppRoutes.main()} style={{ textDecoration: 'none', color: 'white' }}>
+                            Space 21
+                        </Link>
+                    </Typography>
 
-                {/* Навигационные ссылки */}
-                <nav>
-                    <ul className="flex space-x-6">
-                        {location.pathname !== AppRoutes.main() &&
-                            <li>
-                                <Link
-                                    to={AppRoutes.main()}
-                                    className="hover:text-gray-300"
-                                >
-                                    Главная
-                                </Link>
-                            </li>
-                        }
-                        <li>
-                            <Link
-                                to={AppRoutes.profile()}
-                                className="hover:text-gray-300"
+                    {/* Навигационные ссылки */}
+                    <Box>
+                        {location.pathname !== AppRoutes.main() && (
+                            <Button 
+                                color="inherit" 
+                                component={Link} 
+                                to={AppRoutes.main()}
                             >
-                                Профиль
-                            </Link>
-                        </li>
-                        {isAuth &&
-                            <li>
-                                <a
-                                    onClick={logout}
-                                    className="hover:text-gray-300"
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    Выход
-                                </a>
-                            </li>
-                        }
-
-                    </ul>
-                </nav>
-            </div>
-        </header>
+                                Главная
+                            </Button>
+                        )}
+                        <Button 
+                            color="inherit" 
+                            component={Link} 
+                            to={AppRoutes.profile()}
+                        >
+                            Профиль
+                        </Button>
+                        {isAuth && (
+                            <Button 
+                                color="inherit" 
+                                onClick={logout}
+                            >
+                                Выход
+                            </Button>
+                        )}
+                    </Box>
+                </Toolbar>
+            </Container>
+        </AppBar>
     )
 }
 

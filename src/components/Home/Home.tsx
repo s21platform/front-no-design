@@ -1,4 +1,17 @@
 import React from "react";
+import { 
+  Box, 
+  Container, 
+  Typography, 
+  Card, 
+  Button, 
+  Grid, 
+  Avatar, 
+  Stack,
+  Paper,
+  useTheme
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
 
 // Моковые данные пользователей и проектов
 const mockUsers = [
@@ -37,87 +50,227 @@ const UserCard: React.FC<{
     projects: string[];
 }> = ({ name, jobTitle, avatar, description, projects }) => {
     return (
-        <div className="bg-white p-4 rounded-lg shadow-md flex items-center space-x-4">
-            <img className="w-16 h-16 rounded-full" src={avatar} alt={name} />
-            <div>
-                <h2 className="text-lg font-semibold">{name}</h2>
-                <p className="text-sm text-gray-500">{jobTitle}</p>
-                <p className="mt-2 text-sm">{description}</p>
-                <div className="mt-3">
-                    <h3 className="text-sm font-bold">Проекты:</h3>
-                    <ul className="list-disc list-inside">
+        <Card sx={{ display: 'flex', p: 2, height: '100%', bgcolor: 'background.paper' }}>
+            <Avatar 
+                src={avatar} 
+                alt={name} 
+                sx={{ width: 64, height: 64, mr: 2 }} 
+            />
+            <Box>
+                <Typography variant="h6" component="div">{name}</Typography>
+                <Typography variant="body2" color="text.secondary">{jobTitle}</Typography>
+                <Typography variant="body2" mt={1}>{description}</Typography>
+                <Box mt={1}>
+                    <Typography variant="body2" fontWeight="bold">Проекты:</Typography>
+                    <ul style={{ marginLeft: '16px', paddingLeft: 0 }}>
                         {projects.map((project, index) => (
-                            <li key={index} className="text-sm text-gray-600">
-                                {project}
+                            <li key={index}>
+                                <Typography variant="body2" color="text.secondary">
+                                    {project}
+                                </Typography>
                             </li>
                         ))}
                     </ul>
-                </div>
-            </div>
-        </div>
+                </Box>
+            </Box>
+        </Card>
     );
 };
 
+// Основные функции платформы
+const features = [
+    {
+        title: "Нетворкинг",
+        icon: "👥",
+        description: "Общайтесь с ИТ-профессионалами, присоединяйтесь к сообществам и расширяйте свою профессиональную сеть."
+    },
+    {
+        title: "Обучение",
+        icon: "📚",
+        description: "Получите доступ к курсам, руководствам и ресурсам для улучшения навыков и актуальным технологиям."
+    },
+    {
+        title: "Отдых",
+        icon: "🎮",
+        description: "Наслаждайтесь тематическими развлечениями, играми и активностями, созданными специально для ИТ-специалистов."
+    },
+    {
+        title: "Дискуссии",
+        icon: "💬",
+        description: "Участвуйте в форумах и обсуждениях о новейших технологиях, вызовах и решениях в ИТ-сфере."
+    },
+    {
+        title: "Мероприятия",
+        icon: "🌎",
+        description: "Узнавайте и участвуйте в технологических конференциях, вебинарах и встречах по всему миру."
+    },
+    {
+        title: "Вакансии",
+        icon: "💼",
+        description: "Находите новые возможности и связывайтесь с компаниями, ищущими специалистов с вашими навыками."
+    }
+];
+
+// Стилизованный компонент для предоставления демо-изображения
+const StyledBox = styled(Box)(({ theme }) => ({
+    height: 200,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.palette.background.paper,
+    borderRadius: theme.shape.borderRadius,
+    marginTop: theme.spacing(4),
+    marginBottom: theme.spacing(4),
+    border: `1px solid ${theme.palette.divider}`,
+}));
+
 const Home: React.FC = () => {
+    const theme = useTheme();
+
     return (
-        <div className="bg-gray-100 min-h-screen py-10">
-            <div className="container mx-auto px-4">
-                <h1 className="text-3xl font-bold text-center mb-10">
-                    Добро пожаловать в IT Сообщество
-                </h1>
+        <Box>
+            {/* Hero Section */}
+            <Box 
+                sx={{ 
+                    bgcolor: 'black', 
+                    color: 'white', 
+                    pt: 8, 
+                    pb: 12,
+                    textAlign: 'center'
+                }}
+            >
+                <Container maxWidth="lg">
+                    <Box sx={{ mb: 2 }}>
+                        <Typography 
+                            variant="overline" 
+                            component="div" 
+                            sx={{ 
+                                display: 'inline-block', 
+                                bgcolor: 'rgba(255,255,255,0.1)', 
+                                px: 1.5, 
+                                py: 0.5, 
+                                borderRadius: '16px',
+                                mb: 2
+                            }}
+                        >
+                            Для ИТ-специалистов
+                        </Typography>
+                    </Box>
+                    
+                    <Typography variant="h2" component="h1" gutterBottom fontWeight="bold">
+                        Общение. Обучение. Отдых.
+                    </Typography>
+                    
+                    <Typography variant="h6" color="rgba(255,255,255,0.7)" sx={{ maxWidth: 600, mx: 'auto', mb: 4 }}>
+                        Уникальная платформа для ИТ-профессионалов, где можно общаться, 
+                        развивать навыки и находить развлечения для технарей.
+                    </Typography>
+                    
+                    <Stack 
+                        direction={{ xs: 'column', sm: 'row' }} 
+                        spacing={2} 
+                        justifyContent="center"
+                    >
+                        <Button 
+                            variant="contained" 
+                            size="large" 
+                            sx={{ 
+                                bgcolor: 'white', 
+                                color: 'black',
+                                '&:hover': {
+                                    bgcolor: 'rgba(255,255,255,0.9)'
+                                }
+                            }}
+                        >
+                            Начать
+                        </Button>
+                        <Button 
+                            variant="outlined" 
+                            size="large" 
+                            sx={{ 
+                                borderColor: 'white', 
+                                color: 'white',
+                                '&:hover': {
+                                    borderColor: 'rgba(255,255,255,0.9)',
+                                    bgcolor: 'rgba(255,255,255,0.1)'
+                                }
+                            }}
+                        >
+                            Узнать больше
+                        </Button>
+                    </Stack>
+                </Container>
+            </Box>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {/* Маппинг по пользователям для отображения карточек */}
-                    {mockUsers.map((user) => (
-                        <UserCard
-                            key={user.id}
-                            name={user.name}
-                            jobTitle={user.jobTitle}
-                            avatar={user.avatar}
-                            description={user.description}
-                            projects={user.projects}
-                        />
-                    ))}
-                </div>
-            </div>
-            <div className="flex flex-col items-center justify-center h-screen bg-gray-50">
-                <div className="max-w-5xl mx-auto text-center px-6">
-                    {/* Заголовок */}
-                    <h1 className="text-4xl font-bold mb-4">
-                        Join the Leading Community for IT Professionals
-                    </h1>
-
-                    {/* Подзаголовок */}
-                    <p className="text-lg text-gray-600 mb-8">
-                        Welcome to our vibrant community where IT specialists connect,
-                        collaborate, and grow. Discover opportunities, share knowledge, and
-                        elevate your career in the world of technology.
-                    </p>
-
-                    {/* Кнопки */}
-                    <div className="space-x-4 mb-12">
-                        <button className="bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800">
-                            Button
-                        </button>
-                        <button className="border border-black text-black px-6 py-3 rounded-md hover:bg-gray-100">
-                            Button
-                        </button>
-                    </div>
-
-                    {/*/!* Блок с изображением *!/*/}
-                    {/*<div className="bg-gray-200 h-80 w-full rounded-md">*/}
-                    {/*    <div className="flex items-center justify-center h-full">*/}
-                    {/*        <img*/}
-                    {/*            src="https://media.istockphoto.com/id/1480574526/ru/%D1%84%D0%BE%D1%82%D0%BE/%D1%81%D1%87%D0%B0%D1%81%D1%82%D0%BB%D0%B8%D0%B2%D1%8B%D0%B5-%D0%BB%D1%8E%D0%B4%D0%B8-%D0%B8%D0%B7-%D1%80%D0%B0%D0%B7%D0%BD%D1%8B%D1%85-%D0%BF%D0%BE%D0%BA%D0%BE%D0%BB%D0%B5%D0%BD%D0%B8%D0%B9-%D0%B2%D0%B5%D1%81%D0%B5%D0%BB%D0%BE-%D1%81%D0%B8%D0%B4%D1%8F%D1%82-%D0%BD%D0%B0-%D1%82%D1%80%D0%B0%D0%B2%D0%B5-%D0%B2-%D0%BE%D0%B1%D1%89%D0%B5%D1%81%D1%82%D0%B2%D0%B5%D0%BD%D0%BD%D0%BE%D0%BC-%D0%BF%D0%B0%D1%80%D0%BA%D0%B5.jpg?s=612x612&w=0&k=20&c=m0Q4E6DBS0e9uuJ1tDrChb8Sg96LiiuItJUAJfxohGA="*/}
-                    {/*            alt="Community"*/}
-                    {/*            className="object-cover h-full w-full rounded-md"*/}
-                    {/*        />*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
-                </div>
-            </div>
-        </div>
-
+            {/* Platform Features Section */}
+            <Box sx={{ py: 8, bgcolor: 'background.default' }}>
+                <Container maxWidth="lg">
+                    <Typography 
+                        variant="h3" 
+                        component="h2" 
+                        textAlign="center" 
+                        fontWeight="bold" 
+                        gutterBottom
+                    >
+                        Возможности платформы
+                    </Typography>
+                    
+                    <Typography 
+                        variant="subtitle1" 
+                        color="text.secondary" 
+                        textAlign="center" 
+                        sx={{ maxWidth: 700, mx: 'auto', mb: 6 }}
+                    >
+                        Всё необходимое для развития карьеры и приятного времяпровождения
+                    </Typography>
+                    
+                    <Grid container spacing={3}>
+                        {features.map((feature, index) => (
+                            <Grid item xs={12} sm={6} md={4} key={index}>
+                                <Paper 
+                                    elevation={0} 
+                                    sx={{ 
+                                        p: 3, 
+                                        height: '100%', 
+                                        display: 'flex', 
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        textAlign: 'center',
+                                        borderRadius: 2,
+                                        bgcolor: theme.palette.background.paper,
+                                        border: `1px solid ${theme.palette.divider}`
+                                    }}
+                                >
+                                    <Typography 
+                                        variant="h3" 
+                                        component="div" 
+                                        sx={{ mb: 1 }}
+                                    >
+                                        {feature.icon}
+                                    </Typography>
+                                    <Typography variant="h6" gutterBottom>
+                                        {feature.title}
+                                    </Typography>
+                                    <Typography 
+                                        variant="body2" 
+                                        color="text.secondary"
+                                    >
+                                        {feature.description}
+                                    </Typography>
+                                </Paper>
+                            </Grid>
+                        ))}
+                    </Grid>
+                    
+                    {/* Image Placeholder */}
+                    <StyledBox>
+                        <Typography variant="body1" color="text.secondary">
+                            Место для изображения
+                        </Typography>
+                    </StyledBox>
+                </Container>
+            </Box>
+        </Box>
     );
 };
 
