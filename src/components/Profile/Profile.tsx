@@ -12,14 +12,31 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogTitle, FormControl,
-    IconButton, InputAdornment,
-    Skeleton, TextField
+    DialogTitle, 
+    FormControl,
+    IconButton, 
+    InputAdornment,
+    Skeleton, 
+    TextField,
+    Typography,
+    Grid,
+    Paper,
+    Divider,
+    Container,
+    Card,
+    CardContent,
+    Link,
+    Chip,
+    useTheme
 } from "@mui/material";
-import ProfileMenu from "../ProfileMenu/ProfileMenu";
 import AvatarBlock from "../Avatar/AvatarBlock";
 import { AlternateEmail } from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import TelegramIcon from "@mui/icons-material/Telegram";
+import PersonIcon from "@mui/icons-material/Person";
+import CakeIcon from "@mui/icons-material/Cake";
+import ComputerIcon from "@mui/icons-material/Computer";
 import { SelectorOption, SelectorWithSearch } from "../SelectorWithSearch/SelectorWithSearch";
 import { ApiRoutes, AppRoutes, useAuth } from "../../lib/routes";
 
@@ -27,6 +44,7 @@ import { ApiRoutes, AppRoutes, useAuth } from "../../lib/routes";
 const Profile: React.FC = () => {
     const navigate = useNavigate();
     const { setAuth } = useAuth();
+    const theme = useTheme();
 
     const [profileData, setProfileData] = useState<ProfileProps>({
         avatar: "",
@@ -43,7 +61,6 @@ const Profile: React.FC = () => {
     const [loadingSubscribe, setLoadingSubscribe] = useState<boolean>(true);
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
-    // FIXME официальный кринж
     const [update, setUpdate] = useState<boolean>(false);
 
 
@@ -123,150 +140,293 @@ const Profile: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
-            <div className="bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-4xl flex">
-                {/* Левая колонка с фото и кнопками */}
-                {/*<SideProfile avatarUrl={profileData.avatar} avatarChange={avatarChange}/>*/}
-                <ProfileMenu />
-                {/* Центральная колонка с информацией */}
-                <div className="w-3/4 p-6 relative">
-                    {/* Кнопка редактирования профиля */}
-                    <div className="absolute top-0 right-0 mt-2 mr-4 flex flex-row items-center">
-                        <IconButton
-                            onClick={() => setIsOpen(true)}
-                        >
-                            <EditIcon />
-                        </IconButton>
-                        <div>
-                            <NotificationWidget />
-                        </div>
-                    </div>
-                    {/* Первый блок информации */}
-                    {loading ? <ProfileSkeleton />
-                        : <div className="mb-6 flex flex-row items-center justify-start">
-                            <AvatarBlock initialAvatarUrl={profileData.avatar} />
-                            {/*<h4 className="text-xl font-semibold mb-4">Основная информация</h4>*/}
-                            <div className="ml-2">
-                                {!!profileData.name && <p><strong>Имя:</strong> {profileData.name}</p>}
-                                {!!profileData.birthdate &&
-                                    <p><strong>Дата рождения:</strong> {profileData.birthdate}</p>}
-                                {!!profileData.telegram && <p><strong>Telegram:</strong> <a
-                                    href={`https://t.me/${profileData.telegram?.substring(1)}`}
-                                    target="_blank" rel="noopener noreferrer"
-                                    className="text-blue-500 hover:underline">{profileData.telegram}</a>
-                                </p>}
-                            </div>
-                        </div>
-                    }
+        <Card elevation={2} sx={{ borderRadius: 2, overflow: 'hidden' }}>
+            <CardContent sx={{ p: 3, position: 'relative' }}>
+                {/* Кнопки редактирования и уведомлений */}
+                <Box sx={{ position: 'absolute', top: 16, right: 16, display: 'flex', alignItems: 'center' }}>
+                    <IconButton 
+                        onClick={() => setIsOpen(true)}
+                        sx={{ mr: 1 }}
+                    >
+                        <EditIcon />
+                    </IconButton>
+                    <NotificationWidget />
+                </Box>
 
+                {/* Профиль пользователя */}
+                {loading ? (
+                    <ProfileSkeleton />
+                ) : (
+                    <Box sx={{ mb: 4 }}>
+                        <Grid container spacing={3}>
+                            <Grid item xs={12} sm="auto">
+                                <AvatarBlock initialAvatarUrl={profileData.avatar} />
+                            </Grid>
+                            <Grid item xs={12} sm>
+                                <Box>
+                                    {profileData.name && (
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                            <PersonIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                                            <Typography variant="body1">
+                                                <strong>Имя:</strong> {profileData.name}
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                    
+                                    {profileData.birthdate && (
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                            <CakeIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                                            <Typography variant="body1">
+                                                <strong>Дата рождения:</strong> {profileData.birthdate}
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                    
+                                    {profileData.telegram && (
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                            <TelegramIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                                            <Typography variant="body1">
+                                                <strong>Telegram:</strong>{' '}
+                                                <Link 
+                                                    href={`https://t.me/${profileData.telegram?.substring(1)}`}
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer"
+                                                    color="secondary"
+                                                >
+                                                    {profileData.telegram}
+                                                </Link>
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                </Box>
+                            </Grid>
+                        </Grid>
+                    </Box>
+                )}
 
-                    {/* Второй блок информации */}
-                    {loading ? <ProfileSkeleton />
-                        : <div>
-                            {Object.keys(profileData).length > 0 &&
-                                <>
-                                    <h4 className="text-xl font-semibold mb-4">Дополнительная информация</h4>
-                                    {loading ? <Loader /> :
-                                        <div>
-                                            {!!profileData.git &&
-                                                <p><strong>GitHub: </strong>
-                                                    <a href={`https://github.com/${profileData.git}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="text-blue-500 hover:underline">{profileData.git}</a>
-                                                </p>
-                                            }
-                                            {!!profileData.os &&
-                                                <p><strong>Операционная
-                                                    система:</strong> {profileData.os.label ?? "Отсутсвует"}
-                                                </p>
-                                            }
-                                        </div>
-                                    }
-                                </>
-                            }
+                <Divider sx={{ my: 3 }} />
+
+                {/* Дополнительная информация */}
+                {loading ? (
+                    <ProfileSkeleton />
+                ) : (
+                    <Box sx={{ mb: 4 }}>
+                        {Object.keys(profileData).length > 0 && (
+                            <>
+                                <Typography variant="h6" gutterBottom>
+                                    Дополнительная информация
+                                </Typography>
+                                
+                                <Box sx={{ mb: 3 }}>
+                                    {profileData.git && (
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                            <GitHubIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                                            <Typography variant="body1">
+                                                <strong>GitHub:</strong>{' '}
+                                                <Link 
+                                                    href={`https://github.com/${profileData.git}`}
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer"
+                                                    color="secondary"
+                                                >
+                                                    {profileData.git}
+                                                </Link>
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                    
+                                    {profileData.os && (
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                            <ComputerIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                                            <Typography variant="body1">
+                                                <strong>Операционная система:</strong> {profileData.os.label ?? "Отсутсвует"}
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                </Box>
+                            </>
+                        )}
+                        
+                        <Box sx={{ mt: 3 }}>
                             <Chat />
-                        </div>
-                    }
-                    {loadingSubscribe ? <Skeleton />
-                        : <div className="flex space-x-4 mt-4">
-                            <div className="text-center">
-                                <span className="font-bold">{friendsCount.followersCount ?? "Отсутсвует"}</span>
-                                <p className="text-sm text-gray-600">Подписчиков</p>
-                            </div>
-                            <div className="text-center">
-                                <span className="font-bold">{friendsCount.followingCount ?? "Отсутсвует"}</span>
-                                <p className="text-sm text-gray-600">Подписок</p>
-                            </div>
-                        </div>
-                    }
-                </div>
-            </div>
-            <Dialog open={isOpen} maxWidth={"sm"}>
-                <DialogTitle>Редактирование</DialogTitle>
-                <DialogContent>
-                    <Box>
-                        <FormControl style={{ gap: "10px" }}>
-                            {/*<InputLabel>Имя и Фамилия</InputLabel>*/}
-                            <TextField
-                                onChange={(e) => handleInputChange(e, "name")}
-                                value={editProfile.name}
+                        </Box>
+                    </Box>
+                )}
+
+                {/* Счетчики подписок */}
+                {loadingSubscribe ? (
+                    <Skeleton width={200} height={60} />
+                ) : (
+                    <Grid container spacing={2} sx={{ mt: 2 }}>
+                        <Grid item>
+                            <Chip 
+                                label={
+                                    <Box sx={{ p: 0.5 }}>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Подписчиков
+                                        </Typography>
+                                        <Typography variant="h6" component="div">
+                                            {friendsCount.followersCount}
+                                        </Typography>
+                                    </Box>
+                                }
                                 variant="outlined"
-                                label={"Имя и Фамилия"}
-                                margin="dense"
-                                fullWidth
-                            />
-                            <TextField
-                                type={"date"}
-                                label={"Дата рождения"}
-                                value={editProfile.birthdate}
-                                // value={"2022-09-16"}
-                                onChange={(e) => handleInputChange(e, "birthdate")} />
-                            <TextField
-                                type="text"
-                                label={"Telegram"}
-                                value={editProfile.telegram}
-                                onChange={(e) => handleInputChange(e, "telegram")}
-                                slotProps={{
-                                    input: {
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <AlternateEmail />
-                                            </InputAdornment>
-                                        ),
-                                    }
+                                sx={{ 
+                                    height: 'auto', 
+                                    borderRadius: 2,
+                                    p: 1
                                 }}
                             />
-                            <TextField
-                                onChange={(e) => handleInputChange(e, "git")}
-                                value={editProfile.git}
+                        </Grid>
+                        <Grid item>
+                            <Chip 
+                                label={
+                                    <Box sx={{ p: 0.5 }}>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Подписок
+                                        </Typography>
+                                        <Typography variant="h6" component="div">
+                                            {friendsCount.followingCount}
+                                        </Typography>
+                                    </Box>
+                                }
                                 variant="outlined"
-                                label={"Github"}
+                                sx={{ 
+                                    height: 'auto', 
+                                    borderRadius: 2,
+                                    p: 1
+                                }}
+                            />
+                        </Grid>
+                    </Grid>
+                )}
+            </CardContent>
+            
+            {/* Диалог редактирования профиля */}
+            <Dialog 
+                open={isOpen} 
+                onClose={() => setIsOpen(false)}
+                maxWidth="sm"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        borderRadius: 2,
+                        bgcolor: 'background.paper'
+                    }
+                }}
+            >
+                <DialogTitle>
+                    <Typography variant="h6">Редактирование профиля</Typography>
+                </DialogTitle>
+                
+                <DialogContent dividers>
+                    <Box sx={{ py: 1 }}>
+                        <FormControl fullWidth sx={{ mb: 2 }}>
+                            <TextField
+                                onChange={(e) => handleInputChange(e, "name")}
+                                value={editProfile.name || ''}
+                                variant="outlined"
+                                label="Имя и Фамилия"
                                 margin="dense"
                                 fullWidth
-                            />
-                            <SelectorWithSearch
-                                url={ApiRoutes.optionOs()}
-                                onChange={handleOptionChange}
-                                // TODO: подставлять value с сервера
-                                value={profileData.os ?? {
-                                    id: 0,
-                                    label: ""
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <PersonIcon />
+                                        </InputAdornment>
+                                    ),
                                 }}
                             />
                         </FormControl>
+                        
+                        <FormControl fullWidth sx={{ mb: 2 }}>
+                            <TextField
+                                type="date"
+                                label="Дата рождения"
+                                value={editProfile.birthdate || ''}
+                                onChange={(e) => handleInputChange(e, "birthdate")}
+                                fullWidth
+                                margin="dense"
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <CakeIcon />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </FormControl>
+                        
+                        <FormControl fullWidth sx={{ mb: 2 }}>
+                            <TextField
+                                type="text"
+                                label="Telegram"
+                                value={editProfile.telegram || ''}
+                                onChange={(e) => handleInputChange(e, "telegram")}
+                                fullWidth
+                                margin="dense"
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <TelegramIcon />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </FormControl>
+                        
+                        <FormControl fullWidth sx={{ mb: 2 }}>
+                            <TextField
+                                onChange={(e) => handleInputChange(e, "git")}
+                                value={editProfile.git || ''}
+                                variant="outlined"
+                                label="GitHub"
+                                margin="dense"
+                                fullWidth
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <GitHubIcon />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </FormControl>
+                        
+                        <FormControl fullWidth sx={{ mb: 1 }}>
+                            <SelectorWithSearch
+                                url={ApiRoutes.optionOs()}
+                                onChange={handleOptionChange}
+                                value={editProfile.os}
+                            />
+                            <Typography variant="caption" sx={{ mt: 0.5, ml: 2 }}>
+                                Операционная система
+                            </Typography>
+                        </FormControl>
                     </Box>
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setIsOpen(false)}>
-                        Выйти
+                
+                <DialogActions sx={{ px: 3, py: 2 }}>
+                    <Button 
+                        onClick={() => setIsOpen(false)} 
+                        color="inherit"
+                        variant="outlined"
+                    >
+                        Отмена
                     </Button>
-                    <Button onClick={() => handleSaveProfile()}>
+                    <Button 
+                        onClick={handleSaveProfile} 
+                        color="primary"
+                        variant="contained"
+                    >
                         Сохранить
                     </Button>
                 </DialogActions>
             </Dialog>
-        </div>
+        </Card>
     );
 };
 

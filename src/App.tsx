@@ -10,6 +10,8 @@ import { SocietyPage } from './components/SocietyPage/SocietyPage';
 import { AdvertSearch } from './components/AdvertSearch/AdvertSearch';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import AuthLayout from './components/layouts/AuthLayout';
+import Header from './components/Header/Header';
 
 // Создание темы Material-UI
 const theme = createTheme({
@@ -80,16 +82,28 @@ function App() {
             <AuthProvider>
                 <NotificationProvider>
                     <Routes>
-                        <Route path={AppRoutes.main()} element={<MainPage />} />
-                        <Route path={AppRoutes.profile()} element={<ProfilePage />} />
+                        {/* Публичные маршруты */}
+                        <Route 
+                            path={AppRoutes.main()} 
+                            element={
+                                <>
+                                    <Header />
+                                    <MainPage />
+                                </>
+                            } 
+                        />
 
+                        {/* Маршруты, требующие авторизации */}
                         <Route element={<PrivateRoute />}>
-                            <Route path={AppRoutes.newSociety()} element={<SocietyAddingPage />} />
-                            <Route path={AppRoutes.peerSearch()} element={<PeerSearch />} />
-                            <Route path={AppRoutes.peer()} element={<PeerPage />} />
-                            <Route path={AppRoutes.societySearch()} element={<SocietySearch />} />
-                            <Route path={AppRoutes.society()} element={<SocietyPage />} />
-                            <Route path={AppRoutes.advertSearch()} element={<AdvertSearch />} />
+                            <Route element={<AuthLayout />}>
+                                <Route path={AppRoutes.profile()} element={<ProfilePage />} />
+                                <Route path={AppRoutes.newSociety()} element={<SocietyAddingPage />} />
+                                <Route path={AppRoutes.peerSearch()} element={<PeerSearch />} />
+                                <Route path={AppRoutes.peer()} element={<PeerPage />} />
+                                <Route path={AppRoutes.societySearch()} element={<SocietySearch />} />
+                                <Route path={AppRoutes.society()} element={<SocietyPage />} />
+                                <Route path={AppRoutes.advertSearch()} element={<AdvertSearch />} />
+                            </Route>
                         </Route>
 
                         {/*/!* Fallback для всех несуществующих роутов *!/*/}

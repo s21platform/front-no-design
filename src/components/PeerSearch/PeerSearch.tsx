@@ -1,9 +1,10 @@
-import { Box, Grid2, TextField, Typography, Pagination } from "@mui/material";
-import Header from "../Header/Header";
+import { Box, TextField, Typography, Pagination, Card, Grid, Container, useTheme } from "@mui/material";
 import PeerCard from "../PeerCard/PeerCard";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { ApiRoutes } from "../../lib/routes";
+import SearchIcon from '@mui/icons-material/Search';
+import { InputAdornment } from "@mui/material";
 
 export interface PeerData {
     uuid: string,
@@ -19,6 +20,7 @@ export const PeerSearch = () => {
     const [searchText, setSearchText] = useState<string>("");
     const [debouncedText, setDebouncedText] = useState<string>("");
     const [isEmpty, setIsEmpty] = useState(false);
+    const theme = useTheme();
     
     // Добавляем состояния для пагинации
     const [currentPage, setCurrentPage] = useState(1);
@@ -94,49 +96,61 @@ export const PeerSearch = () => {
     }, [debouncedText, fetchPeers]);
 
     return (
-        <div>
-            <Header />
+        <Card elevation={2} sx={{ borderRadius: 2, p: 3 }}>
+            <Typography variant="h5" gutterBottom fontWeight="bold">
+                Поиск пиров
+            </Typography>
+            
+            <TextField 
+                fullWidth 
+                variant="outlined"
+                label="Найти пира" 
+                placeholder="Введите имя пользователя" 
+                margin="normal" 
+                value={searchText}
+                onChange={handleSearchChange}
+                InputProps={{
+                    startAdornment: (
+                        <InputAdornment position="start">
+                            <SearchIcon color="action" />
+                        </InputAdornment>
+                    ),
+                }}
+            />
 
-            <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
-                <Box maxWidth={900} width={"100%"}>
-                    <TextField 
-                        fullWidth 
-                        label="Поиск пиров" 
-                        id="fullWidth" 
-                        placeholder="Введите текст" 
-                        margin="normal" 
-                        onInput={handleSearchChange} 
-                    />
-
-                    {isEmpty ? (
-                        <Typography mt={2} mb={2}>
-                            Никто не нашёлся по указанному запросу :(
-                        </Typography>
-                    ) : (
-                        <>
-                            <Grid2 container spacing={3} mt={3}>
-                                {peers.map(peer => (
-                                    <Grid2 key={peer.uuid} size={6} display={"flex"}>
-                                        <PeerCard {...peer} />
-                                    </Grid2>
-                                ))}
-                            </Grid2>
-                            
-                            {/* Добавляем компонент пагинации */}
-                            <Box display="flex" justifyContent="center" mt={4} mb={4}>
-                                <Pagination 
-                                    count={totalPages}
-                                    page={currentPage}
-                                    onChange={handlePageChange}
-                                    color="primary"
-                                    size="large"
-                                />
-                            </Box>
-                        </>
-                    )}
+            {isEmpty ? (
+                <Box sx={{ my: 4, textAlign: 'center' }}>
+                    <Typography variant="body1" color="text.secondary">
+                        Никто не нашёлся по указанному запросу :(
+                    </Typography>
                 </Box>
-            </div>
-        </div>
+            ) : (
+                <>
+                    <Grid container spacing={3} sx={{ mt: 1 }}>
+                        {peers.map(peer => (
+                            <Grid item xs={12} sm={6} key={peer.uuid}>
+                                <PeerCard {...peer} />
+                            </Grid>
+                        ))}
+                    </Grid>
+                    
+                    <Box display="flex" justifyContent="center" sx={{ mt: 4, mb: 2 }}>
+                        <Pagination 
+                            count={totalPages}
+                            page={currentPage}
+                            onChange={handlePageChange}
+                            color="secondary"
+                            size="large"
+                            sx={{
+                                '& .MuiPaginationItem-root': {
+                                    color: theme.palette.text.primary,
+                                }
+                            }}
+                        />
+                    </Box>
+                </>
+            )}
+        </Card>
     );
 };
 

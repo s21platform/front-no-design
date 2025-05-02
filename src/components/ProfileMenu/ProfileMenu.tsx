@@ -1,15 +1,101 @@
-import {Button} from "@mui/material";
-import {useNavigate} from "react-router-dom";
+import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Typography, useTheme } from "@mui/material";
+import { useNavigate, useLocation } from "react-router-dom";
+import PersonSearchIcon from '@mui/icons-material/PersonSearch';
+import PeopleIcon from '@mui/icons-material/People';
+import CampaignIcon from '@mui/icons-material/Campaign';
+import PersonIcon from '@mui/icons-material/Person';
 
 export const ProfileMenu = () => {
     const navigate = useNavigate();
-    return (
-        <div className={"w-1/4 bg-gray-50 p-6 flex flex-col items-stretch gap-2"}>
-            <Button variant="contained" onClick={() => navigate('/peer-search')}>Поиск пиров</Button>
-            <Button variant="contained" onClick={() => navigate('/society-search')}>Сообщества</Button>
-            <Button variant="contained" onClick={() => navigate('/adverts')}>Реклама</Button>
-        </div>
-    )
-}
+    const location = useLocation();
+    const theme = useTheme();
 
-export default ProfileMenu
+    const menuItems = [
+        { 
+            title: "Мой профиль", 
+            path: "/profile", 
+            icon: <PersonIcon /> 
+        },
+        { 
+            title: "Поиск пиров", 
+            path: "/peer-search", 
+            icon: <PersonSearchIcon /> 
+        },
+        { 
+            title: "Сообщества", 
+            path: "/society-search", 
+            icon: <PeopleIcon /> 
+        },
+        { 
+            title: "Реклама", 
+            path: "/adverts", 
+            icon: <CampaignIcon /> 
+        }
+    ];
+
+    const isActive = (path: string) => {
+        return location.pathname === path;
+    };
+
+    return (
+        <Paper 
+            sx={{ 
+                height: '100%', 
+                bgcolor: 'background.paper',
+                borderRadius: 0,
+                boxShadow: 'none',
+                borderRight: `1px solid ${theme.palette.divider}`
+            }}
+        >
+            <Box sx={{ p: 2 }}>
+                <Typography 
+                    variant="h6" 
+                    sx={{ 
+                        mb: 2, 
+                        fontWeight: 'bold',
+                        px: 1
+                    }}
+                >
+                    Навигация
+                </Typography>
+                <List sx={{ p: 0 }}>
+                    {menuItems.map((item) => (
+                        <ListItem key={item.path} disablePadding>
+                            <ListItemButton
+                                onClick={() => navigate(item.path)}
+                                sx={{ 
+                                    mb: 1,
+                                    bgcolor: isActive(item.path) ? 'rgba(79, 70, 229, 0.1)' : 'transparent',
+                                    borderRadius: 1,
+                                    '&:hover': {
+                                        bgcolor: isActive(item.path) 
+                                            ? 'rgba(79, 70, 229, 0.2)' 
+                                            : 'rgba(255, 255, 255, 0.05)'
+                                    }
+                                }}
+                            >
+                                <ListItemIcon 
+                                    sx={{ 
+                                        minWidth: '40px',
+                                        color: isActive(item.path) ? 'secondary.main' : 'text.secondary'
+                                    }}
+                                >
+                                    {item.icon}
+                                </ListItemIcon>
+                                <ListItemText 
+                                    primary={item.title} 
+                                    primaryTypographyProps={{
+                                        fontWeight: isActive(item.path) ? 'bold' : 'normal',
+                                        color: isActive(item.path) ? 'secondary.main' : 'text.primary'
+                                    }}
+                                />
+                            </ListItemButton>
+                        </ListItem>
+                    ))}
+                </List>
+            </Box>
+        </Paper>
+    );
+};
+
+export default ProfileMenu;
