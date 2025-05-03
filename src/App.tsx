@@ -13,8 +13,7 @@ import { ThemeProvider, createTheme, CssBaseline, Box } from '@mui/material';
 import AuthLayout from './components/layouts/AuthLayout';
 import Header from './components/Header/Header';
 import { Outlet } from 'react-router-dom';
-import FormLogin from './components/FormLogin/FormLogin';
-import { useAuth } from './lib/routes';
+import LoginPage from './pages/Login';
 
 // Создание темы Material-UI
 const theme = createTheme({
@@ -90,24 +89,6 @@ const PublicLayout = () => {
   );
 };
 
-// Компонент для профиля с условным рендерингом
-const ProfileRoute = () => {
-  const { isAuth, setAuth } = useAuth();
-  
-  if (!isAuth) {
-    return (
-      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
-        <Header />
-        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', p: 4 }}>
-          <FormLogin setIsLoggedIn={setAuth} />
-        </Box>
-      </Box>
-    );
-  }
-  
-  return <Outlet />;
-};
-
 function App() {
     return (
         <ThemeProvider theme={theme}>
@@ -119,17 +100,14 @@ function App() {
                         <Route element={<PublicLayout />}>
                             <Route path={AppRoutes.main()} element={<MainPage />} />
                         </Route>
-
-                        {/* Специальный маршрут для профиля с собственной проверкой авторизации */}
-                        <Route element={<ProfileRoute />}>
-                            <Route element={<AuthLayout />}>
-                                <Route path={AppRoutes.profile()} element={<ProfilePage />} />
-                            </Route>
-                        </Route>
+                        
+                        {/* Страница авторизации */}
+                        <Route path={AppRoutes.login()} element={<LoginPage />} />
 
                         {/* Маршруты, требующие авторизации */}
                         <Route element={<PrivateRoute />}>
                             <Route element={<AuthLayout />}>
+                                <Route path={AppRoutes.profile()} element={<ProfilePage />} />
                                 <Route path={AppRoutes.newSociety()} element={<SocietyAddingPage />} />
                                 <Route path={AppRoutes.peerSearch()} element={<PeerSearch />} />
                                 <Route path={AppRoutes.peer()} element={<PeerPage />} />

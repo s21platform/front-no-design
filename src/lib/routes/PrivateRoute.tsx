@@ -11,7 +11,7 @@ const PrivateRoute = () => {
 		return <Loader />;
 	}
 
-	return isAuth ? <Outlet /> : <Navigate to={AppRoutes.main()} />;
+	return isAuth ? <Outlet /> : <Navigate to={AppRoutes.login()} />;
 };
 
 export default PrivateRoute;

@@ -1,5 +1,6 @@
 export const AppRoutes = {
 	main: () => '/',
+	login: () => '/login',
 	profile: () => '/profile',
 	newSociety: () => '/new-society',
 	peerSearch: () => '/peer-search',
