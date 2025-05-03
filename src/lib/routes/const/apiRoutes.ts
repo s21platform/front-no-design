@@ -1,10 +1,13 @@
 export const ApiRoutes = {
+	checkAuth: () => '/auth/check-auth',
+	login: () => '/auth/login',
+	logout: () => '/auth/logout',
 	profile: () => '/api/profile',
 	society: () => '/api/society',
 	societyAvatar: () => '/api/avatar/society',
-	societySearch: () => 'api/societies/search',
-	societyJoin: (uuid: string) => `/api/society/${uuid}/join`,
 	search: () => '/api/search',
+	societySearch: () => '/api/societies/search',
+	societyJoin: (uuid: string) => `/api/society/${uuid}/join`,
 	peer: (id?: string) => `/api/peer/${id}`,
 	friends: () => '/api/friends',
 	friendsCount: () => '/api/friends/counts',
@@ -14,8 +17,9 @@ export const ApiRoutes = {
 	avatar: () => '/api/avatar/user',
 	optionOs: () => '/api/option/os',
 	advert: () => '/api/advert',
-
-	checkAuth: () => '/auth/check-auth',
-	login: () => '/auth/login',
-	logout: () => '/auth/logout',
+	
+	// Новые эндпоинты для регистрации
+	checkEmail: () => '/auth/check_email',
+	signup: () => '/auth/signup',
+	confirmVerification: () => '/auth/confirm_verification',
 }

@@ -17,9 +17,10 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 interface ILoginForm {
     setIsLoggedIn: (isLoggedIn: boolean) => void;
+    onSwitchToRegister?: () => void;
 }
 
-const FormLogin = ({ setIsLoggedIn }: ILoginForm) => {
+const FormLogin = ({ setIsLoggedIn, onSwitchToRegister }: ILoginForm) => {
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
@@ -128,6 +129,7 @@ const FormLogin = ({ setIsLoggedIn }: ILoginForm) => {
                                     onChange={(e) => setUsername(e.target.value)}
                                     margin="normal"
                                     required
+                                    placeholder="Введите имя пользователя"
                                     onKeyDown={handleKeyDown}
                                 />
 
@@ -142,6 +144,7 @@ const FormLogin = ({ setIsLoggedIn }: ILoginForm) => {
                                     onChange={(e) => setPassword(e.target.value)}
                                     margin="normal"
                                     required
+                                    placeholder="Введите пароль"
                                     onKeyDown={handleKeyDown}
                                     InputProps={{
                                         endAdornment: (
@@ -178,6 +181,25 @@ const FormLogin = ({ setIsLoggedIn }: ILoginForm) => {
                                         'Войти'
                                     )}
                                 </Button>
+                                
+                                {onSwitchToRegister && (
+                                    <Box sx={{ mt: 2, textAlign: 'center' }}>
+                                        <Button 
+                                            variant="text" 
+                                            onClick={onSwitchToRegister}
+                                            sx={{ 
+                                                textTransform: 'none',
+                                                color: 'secondary.main',
+                                                fontWeight: 'medium',
+                                                '&:hover': {
+                                                    backgroundColor: 'rgba(79, 70, 229, 0.08)'
+                                                }
+                                            }}
+                                        >
+                                            Нет аккаунта? Зарегистрироваться
+                                        </Button>
+                                    </Box>
+                                )}
                             </Box>
                         </form>
                     </Paper>
