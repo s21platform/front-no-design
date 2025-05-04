@@ -26,7 +26,9 @@ import {
     CardContent,
     Link,
     Chip,
-    useTheme
+    useTheme,
+    FormControlLabel,
+    Switch
 } from "@mui/material";
 import AvatarBlock from "../Avatar/AvatarBlock";
 import { AlternateEmail } from "@mui/icons-material";
@@ -36,14 +38,18 @@ import TelegramIcon from "@mui/icons-material/Telegram";
 import PersonIcon from "@mui/icons-material/Person";
 import CakeIcon from "@mui/icons-material/Cake";
 import ComputerIcon from "@mui/icons-material/Computer";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import LightModeIcon from "@mui/icons-material/LightMode";
 import { SelectorOption, SelectorWithSearch } from "../SelectorWithSearch/SelectorWithSearch";
 import { ApiRoutes, AppRoutes, useAuth } from "../../lib/routes";
+import { useThemeMode } from "../../App";
 
 
 const Profile: React.FC = () => {
     const navigate = useNavigate();
     const { setAuth } = useAuth();
     const theme = useTheme();
+    const { darkMode, toggleTheme } = useThemeMode();
 
     const [profileData, setProfileData] = useState<ProfileProps>({
         avatar: "",
@@ -401,6 +407,28 @@ const Profile: React.FC = () => {
                                 Операционная система
                             </Typography>
                         </FormControl>
+                        
+                        {/* Переключатель темы */}
+                        <Divider sx={{ my: 2 }} />
+                        
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={darkMode}
+                                    onChange={toggleTheme}
+                                    color="secondary"
+                                />
+                            }
+                            label={
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    {darkMode ? <DarkModeIcon sx={{ mr: 1 }} /> : <LightModeIcon sx={{ mr: 1 }} />}
+                                    <Typography>
+                                        {darkMode ? "Темная тема" : "Светлая тема"}
+                                    </Typography>
+                                </Box>
+                            }
+                            sx={{ ml: 0 }}
+                        />
                     </Box>
                 </DialogContent>
                 

@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мобильные экраны платформы</title>
+    <!-- Подключаем Material UI стили и iOS шрифты -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600&display=swap">
+    <style>
+        :root {
+            /* Темная тема Material UI */
+            --primary-color: #6366f1;
+            --secondary-color: #818cf8;
+            --error-color: #ef4444;
+            --success-color: #10b981;
+            --background-color: #121212;
+            --paper-color: #1e1e1e;
+            --surface-color: #282828;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --border-color: #424242;
+            --divider-color: #424242;
+        }
+        
+        body {
+            font-family: 'SF Pro Display', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #000;
+            margin: 0;
+            padding: 20px;
+            color: var(--text-primary);
+        }
+        
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .screen-title {
+            text-align: center;
+            color: var(--text-primary);
+            margin: 20px 0 40px;
+            font-size: 2rem;
+            font-weight: 500;
+        }
+        
+        .screen {
+            width: 375px;
+            height: 667px;
+            background-color: var(--background-color);
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            border: 8px solid #222;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* iOS-стиль статусбара */
+        .statusbar {
+            height: 44px;
+            background-color: var(--background-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        /* iOS Dynamic Island */
+        .statusbar::before {
+            content: "";
+            position: absolute;
+            width: 120px;
+            height: 30px;
+            background-color: #000;
+            border-radius: 20px;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+        
+        .screen-content {
+            flex: 1;
+            padding: 0; /* Убираем отступ по бокам */
+            overflow-y: auto;
+            background-color: var(--background-color);
+        }
+        
+        /* Убираем бумажную рамку для входных экранов */
+        .fullscreen-form {
+            padding: 20px;
+            background-color: var(--background-color);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .fullscreen-form .form-title {
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+        
+        .form-field {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .form-field label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .form-field input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+            background-color: var(--surface-color);
+            color: var(--text-primary);
+        }
+        
+        .form-field input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        .form-field.with-icon {
+            position: relative;
+        }
+        
+        .form-field.with-icon .icon {
+            position: absolute;
+            right: 10px;
+            top: 32px;
+            color: var(--text-secondary);
+        }
+        
+        .form-field.success input {
+            border-color: var(--success-color);
+        }
+        
+        .form-field.error input {
+            border-color: var(--error-color);
+        }
+        
+        .form-field .helper-text {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .form-field.error .helper-text {
+            color: var(--error-color);
+        }
+        
+        /* iOS-стиль кнопок */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #4f46e5;
+            transform: translateY(-1px);
+        }
+        
+        .btn-text {
+            background-color: transparent;
+            color: var(--primary-color);
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .btn-text:hover {
+            background-color: rgba(79, 70, 229, 0.1);
+        }
+        
+        .divider {
+            height: 1px;
+            background-color: var(--divider-color);
+            margin: 20px 0;
+        }
+        
+        .verification-info {
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        
+        /* Стили для материалов - без боковых отступов */
+        .materials-list {
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+        }
+        
+        .article-card {
+            border-radius: 0;
+            overflow: hidden;
+            margin-bottom: 16px;
+            background-color: var(--paper-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .article-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+        
+        .article-content {
+            padding: 16px;
+        }
+        
+        .article-category {
+            font-size: 12px;
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        
+        .article-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+        
+        .article-excerpt {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+        
+        .article-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .article-author {
+            display: flex;
+            align-items: center;
+        }
+        
+        .article-author-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            margin-right: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        .fab {
+            position: absolute;
+            bottom: 80px;
+            right: 20px;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+        }
+        
+        .chat-bubble {
+            max-width: 80%;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        
+        .chat-bubble.sent {
+            background-color: var(--primary-color);
+            color: white;
+            align-self: flex-end;
+            border-radius: 18px 18px 4px 18px;
+            margin-left: auto;
+        }
+        
+        .chat-bubble.received {
+            background-color: var(--surface-color);
+            color: var(--text-primary);
+            align-self: flex-start;
+            border-radius: 18px 18px 18px 4px;
+        }
+        
+        .chat-time {
+            font-size: 11px;
+            margin-top: 5px;
+            color: var(--text-secondary);
+            text-align: right;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 10px 15px;
+            background-color: var(--surface-color);
+            border-top: 1px solid var(--divider-color);
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            margin-right: 10px;
+            background-color: var(--paper-color);
+            color: var(--text-primary);
+        }
+        
+        .chat-send-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+        }
+        
+        .conversation-list {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* iOS-стиль тени для хедера */
+        .ios-header {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            background-color: var(--background-color);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .ios-header-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .ios-back-button {
+            display: flex;
+            align-items: center;
+            color: var(--primary-color);
+            font-size: 17px;
+            font-weight: 500;
+        }
+        
+        .ios-back-button .material-icons {
+            font-size: 24px;
+            margin-right: 5px;
+        }
+        
+        /* iOS-стиль индикатора внизу экрана */
+        .ios-home-indicator {
+            width: 134px;
+            height: 5px;
+            background-color: var(--text-secondary);
+            border-radius: 3px;
+            margin: 5px auto;
+        }
+        
+        /* Telegram-стиль для списка чатов */
+        .telegram-chat-list {
+            margin: 0 -20px;
+            background-color: var(--background-color);
+        }
+        
+        .telegram-chat-item {
+            display: flex;
+            padding: 12px 16px;
+            align-items: center;
+            border-bottom: 1px solid var(--divider-color);
+            transition: background-color 0.2s;
+        }
+        
+        .telegram-chat-item:active {
+            background-color: var(--surface-color);
+        }
+        
+        .telegram-chat-avatar {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 20px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+        
+        .telegram-chat-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .telegram-chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        
+        .telegram-chat-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-right: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .telegram-chat-time {
+            font-size: 13px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        
+        .telegram-chat-message {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .telegram-chat-preview {
+            font-size: 14px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 85%;
+        }
+        
+        .telegram-chat-preview.unread {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .telegram-chat-badge {
+            min-width: 20px;
+            height: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 0 6px;
+        }
+        
+        .telegram-chat-badge.muted {
+            background-color: var(--divider-color);
+        }
+        
+        .telegram-header {
+            position: sticky;
+            top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--background-color);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--divider-color);
+            z-index: 10;
+        }
+        
+        .telegram-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .telegram-search {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+        }
+        
+        /* Восстанавливаем стили навбара, которые были удалены */
+        .list-item {
+            display: flex;
+            padding: 15px;
+            border-bottom: 1px solid var(--divider-color);
+            align-items: center;
+        }
+        
+        .list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .list-item-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        .list-item-content {
+            flex: 1;
+        }
+        
+        .list-item-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: var(--text-primary);
+        }
+        
+        .list-item-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        /* iOS-стиль нижней навигации */
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            background-color: rgba(30, 30, 30, 0.95);
+            padding: 15px 0;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: 1px solid var(--divider-color);
+            z-index: 100;
+        }
+        
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-secondary);
+        }
+        
+        .bottom-nav-item.active {
+            color: var(--primary-color);
+        }
+        
+        .bottom-nav-item .material-icons {
+            margin-bottom: 4px;
+            font-size: 22px;
+        }
+        
+        .bottom-nav-item span:not(.material-icons) {
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="screen-title">Мобильные экраны платформы</h1>
+    
+    <div class="container">
+        <!-- Экран 1: Авторизация -->
+        <div class="screen">
+            <div class="statusbar">
+                <span>12:30</span>
+                <span>
+                    <i class="material-icons" style="font-size: 14px;">signal_cellular_alt</i>
+                    <i class="material-icons" style="font-size: 14px;">wifi</i>
+                    <i class="material-icons" style="font-size: 14px;">battery_full</i>
+                </span>
+            </div>
+            <div class="screen-content">
+                <div class="fullscreen-form">
+                    <div class="form-title">Вход в систему</div>
+                    
+                    <div class="form-field">
+                        <label>Email</label>
+                        <input type="email" placeholder="Введите имя пользователя" value="user@example.com">
+                    </div>
+                    
+                    <div class="form-field with-icon">
+                        <label>Пароль</label>
+                        <input type="password" placeholder="Введите пароль" value="••••••">
+                        <span class="icon material-icons">visibility</span>
+                    </div>
+                    
+                    <button class="btn btn-primary">Войти</button>
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="btn btn-text">Забыли пароль?</button>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 10px;">
+                        <button class="btn btn-text">Нет аккаунта? Зарегистрироваться</button>
+                    </div>
+                </div>
+            </div>
+            <div class="ios-home-indicator"></div>
+        </div>
+        
+        <!-- Экран 2: Регистрация -->
+        <div class="screen">
+            <div class="statusbar">
+                <span>12:30</span>
+                <span>
+                    <i class="material-icons" style="font-size: 14px;">signal_cellular_alt</i>
+                    <i class="material-icons" style="font-size: 14px;">wifi</i>
+                    <i class="material-icons" style="font-size: 14px;">battery_full</i>
+                </span>
+            </div>
+            <div class="screen-content">
+                <div class="fullscreen-form">
+                    <div class="form-title">Регистрация</div>
+                    
+                    <div class="form-field success with-icon">
+                        <label>Email</label>
+                        <input type="email" placeholder="example@mail.com" value="new@example.com">
+                        <span class="icon material-icons" style="color: var(--success-color);">check_circle</span>
+                    </div>
+                    
+                    <div class="form-field with-icon">
+                        <label>Пароль</label>
+                        <input type="password" placeholder="Минимум 6 символов" value="••••••">
+                        <span class="icon material-icons">visibility</span>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label>Подтвердите пароль</label>
+                        <input type="password" placeholder="Повторите пароль" value="••••••">
+                    </div>
+                    
+                    <button class="btn btn-primary">Продолжить</button>
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="btn btn-text">Уже есть аккаунт? Войти</button>
+                    </div>
+                </div>
+            </div>
+            <div class="ios-home-indicator"></div>
+        </div>
+        
+        <!-- Экран 3: Подтверждение регистрации -->
+        <div class="screen">
+            <div class="statusbar">
+                <span>12:30</span>
+                <span>
+                    <i class="material-icons" style="font-size: 14px;">signal_cellular_alt</i>
+                    <i class="material-icons" style="font-size: 14px;">wifi</i>
+                    <i class="material-icons" style="font-size: 14px;">battery_full</i>
+                </span>
+            </div>
+            <div class="screen-content">
+                <div class="fullscreen-form">
+                    <div class="form-title">Регистрация</div>
+                    
+                    <div class="form-field with-icon" style="opacity: 0.7;">
+                        <label>Email</label>
+                        <input type="email" value="new@example.com" disabled>
+                    </div>
+                    
+                    <div class="form-field with-icon" style="opacity: 0.7;">
+                        <label>Пароль</label>
+                        <input type="password" value="••••••" disabled>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="verification-info">
+                        Мы отправили код подтверждения на <strong>new@example.com</strong>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label>Код подтверждения</label>
+                        <input type="text" placeholder="Введите код из письма" maxlength="6">
+                    </div>
+                    
+                    <button class="btn btn-primary">Зарегистрироваться</button>
+                </div>
+            </div>
+            <div class="ios-home-indicator"></div>
+        </div>
+        
+        <!-- Экран 4: Список материалов (вместо задач) -->
+        <div class="screen">
+            <div class="statusbar">
+                <span>12:30</span>
+                <span>
+                    <i class="material-icons" style="font-size: 14px;">signal_cellular_alt</i>
+                    <i class="material-icons" style="font-size: 14px;">wifi</i>
+                    <i class="material-icons" style="font-size: 14px;">battery_full</i>
+                </span>
+            </div>
+            <div class="screen-content">
+                <div style="padding: 20px; background-color: var(--background-color); color: var(--text-primary);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h2 style="margin: 0; font-size: 24px; font-weight: 600;">Материалы</h2>
+                        <span class="material-icons">search</span>
+                    </div>
+                    <div style="margin-top: 10px; color: var(--text-secondary);">Полезные статьи и руководства</div>
+                </div>
+                
+                <div class="materials-list">
+                    <div class="article-card">
+                        <img src="https://picsum.photos/id/1/600/400" alt="Фото статьи" class="article-img">
+                        <div class="article-content">
+                            <div class="article-category">Руководство</div>
+                            <div class="article-title">Начало работы с платформой: подробный гайд</div>
+                            <div class="article-excerpt">Узнайте, как максимально эффективно использовать возможности платформы для достижения результатов.</div>
+                            <div class="article-meta">
+                                <div class="article-author">
+                                    <div class="article-author-avatar">АП</div>
+                                    <span>Анна Петрова</span>
+                                </div>
+                                <div>15 мин. чтения</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="article-card">
+                        <img src="https://picsum.photos/id/370/600/400" alt="Фото статьи" class="article-img">
+                        <div class="article-content">
+                            <div class="article-category">Обучение</div>
+                            <div class="article-title">5 способов ускорить разработку проекта</div>
+                            <div class="article-excerpt">Практические советы, которые помогут оптимизировать процесс разработки и сократить сроки.</div>
+                            <div class="article-meta">
+                                <div class="article-author">
+                                    <div class="article-author-avatar">ИС</div>
+                                    <span>Иван Смирнов</span>
+                                </div>
+                                <div>8 мин. чтения</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="article-card">
+                        <img src="https://picsum.photos/id/119/600/400" alt="Фото статьи" class="article-img">
+                        <div class="article-content">
+                            <div class="article-category">Новости</div>
+                            <div class="article-title">Обновление платформы: новые функции и улучшения</div>
+                            <div class="article-excerpt">Рассказываем о новейших функциях и инструментах, которые появились в последнем обновлении.</div>
+                            <div class="article-meta">
+                                <div class="article-author">
+                                    <div class="article-author-avatar">МК</div>
+                                    <span>Максим Кузнецов</span>
+                                </div>
+                                <div>5 мин. чтения</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="fab">
+                    <span class="material-icons">bookmark</span>
+                </div>
+            </div>
+            <div class="bottom-nav">
+                <div class="bottom-nav-item">
+                    <span class="material-icons">home</span>
+                    <span>Главная</span>
+                </div>
+                <div class="bottom-nav-item active">
+                    <span class="material-icons">article</span>
+                    <span>Материалы</span>
+                </div>
+                <div class="bottom-nav-item">
+                    <span class="material-icons">chat</span>
+                    <span>Чаты</span>
+                </div>
+                <div class="bottom-nav-item">
+                    <span class="material-icons">person</span>
+                    <span>Профиль</span>
+                </div>
+            </div>
+            <div class="ios-home-indicator"></div>
+        </div>
+        
+        <!-- Экран 5: Список чатов (Telegram style) -->
+        <div class="screen">
+            <div class="statusbar">
+                <span>12:30</span>
+                <span>
+                    <i class="material-icons" style="font-size: 14px;">signal_cellular_alt</i>
+                    <i class="material-icons" style="font-size: 14px;">wifi</i>
+                    <i class="material-icons" style="font-size: 14px;">battery_full</i>
+                </span>
+            </div>
+            <div class="screen-content" style="padding: 0;">
+                <div class="telegram-header">
+                    <div class="telegram-title">Чаты</div>
+                    <div class="telegram-search">
+                        <span class="material-icons">search</span>
+                    </div>
+                </div>
+                
+                <div class="telegram-chat-list">
+                    <div class="telegram-chat-item">
+                        <div class="telegram-chat-avatar" style="background-color: var(--primary-color);">АК</div>
+                        <div class="telegram-chat-content">
+                            <div class="telegram-chat-header">
+                                <div class="telegram-chat-name">Анна Ковалева</div>
+                                <div class="telegram-chat-time">10:30</div>
+                            </div>
+                            <div class="telegram-chat-message">
+                                <div class="telegram-chat-preview unread">Привет! Как продвигается работа над проектом?</div>
+                                <div class="telegram-chat-badge">2</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="telegram-chat-item">
+                        <div class="telegram-chat-avatar" style="background-color: var(--error-color);">ИС</div>
+                        <div class="telegram-chat-content">
+                            <div class="telegram-chat-header">
+                                <div class="telegram-chat-name">Иван Смирнов</div>
+                                <div class="telegram-chat-time">Вчера</div>
+                            </div>
+                            <div class="telegram-chat-message">
+                                <div class="telegram-chat-preview unread">Документация готова, можем обсудить завтра</div>
+                                <div class="telegram-chat-badge">1</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="telegram-chat-item">
+                        <div class="telegram-chat-avatar" style="background-color: var(--success-color);">ЕП</div>
+                        <div class="telegram-chat-content">
+                            <div class="telegram-chat-header">
+                                <div class="telegram-chat-name">Екатерина Петрова</div>
+                                <div class="telegram-chat-time">Вчера</div>
+                            </div>
+                            <div class="telegram-chat-message">
+                                <div class="telegram-chat-preview">Спасибо за информацию!</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="telegram-chat-item">
+                        <div class="telegram-chat-avatar" style="background-color: #ff9800;">МВ</div>
+                        <div class="telegram-chat-content">
+                            <div class="telegram-chat-header">
+                                <div class="telegram-chat-name">Михаил Волков</div>
+                                <div class="telegram-chat-time">25 апр</div>
+                            </div>
+                            <div class="telegram-chat-message">
+                                <div class="telegram-chat-preview">Я отправил тебе макеты на почту</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="telegram-chat-item">
+                        <div class="telegram-chat-avatar" style="background-color: #9c27b0;">ТК</div>
+                        <div class="telegram-chat-content">
+                            <div class="telegram-chat-header">
+                                <div class="telegram-chat-name">Тимур Комаров</div>
+                                <div class="telegram-chat-time">24 апр</div>
+                            </div>
+                            <div class="telegram-chat-message">
+                                <div class="telegram-chat-preview">Созвонимся завтра по вопросу интеграции?</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="telegram-chat-item">
+                        <div class="telegram-chat-avatar" style="background-color: #795548;">ОЛ</div>
+                        <div class="telegram-chat-content">
+                            <div class="telegram-chat-header">
+                                <div class="telegram-chat-name">Ольга Лебедева</div>
+                                <div class="telegram-chat-time">22 апр</div>
+                            </div>
+                            <div class="telegram-chat-message">
+                                <div class="telegram-chat-preview">Посмотрите пожалуйста обновленный дизайн мобильных экранов</div>
+                                <div class="telegram-chat-badge muted">4</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="telegram-chat-item">
+                        <div class="telegram-chat-avatar" style="background-color: #009688;">АВ</div>
+                        <div class="telegram-chat-content">
+                            <div class="telegram-chat-header">
+                                <div class="telegram-chat-name">Алексей Васильев</div>
+                                <div class="telegram-chat-time">21 апр</div>
+                            </div>
+                            <div class="telegram-chat-message">
+                                <div class="telegram-chat-preview">Вы: Хорошо, согласен с вашим предложением</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="telegram-chat-item">
+                        <div class="telegram-chat-avatar" style="background-color: #3f51b5;">ДК</div>
+                        <div class="telegram-chat-content">
+                            <div class="telegram-chat-header">
+                                <div class="telegram-chat-name">Дарья Козлова</div>
+                                <div class="telegram-chat-time">19 апр</div>
+                            </div>
+                            <div class="telegram-chat-message">
+                                <div class="telegram-chat-preview">Вы: Отправил файлы на проверку</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="fab">
+                    <span class="material-icons">chat</span>
+                </div>
+            </div>
+            <div class="bottom-nav">
+                <div class="bottom-nav-item">
+                    <span class="material-icons">home</span>
+                    <span>Главная</span>
+                </div>
+                <div class="bottom-nav-item">
+                    <span class="material-icons">article</span>
+                    <span>Материалы</span>
+                </div>
+                <div class="bottom-nav-item active">
+                    <span class="material-icons">chat</span>
+                    <span>Чаты</span>
+                </div>
+                <div class="bottom-nav-item">
+                    <span class="material-icons">person</span>
+                    <span>Профиль</span>
+                </div>
+            </div>
+            <div class="ios-home-indicator"></div>
+        </div>
+        
+        <!-- Экран 6: Чат с пользователем -->
+        <div class="screen">
+            <div class="statusbar">
+                <span>12:30</span>
+                <span>
+                    <i class="material-icons" style="font-size: 14px;">signal_cellular_alt</i>
+                    <i class="material-icons" style="font-size: 14px;">wifi</i>
+                    <i class="material-icons" style="font-size: 14px;">battery_full</i>
+                </span>
+            </div>
+            <div style="background-color: var(--background-color); color: var(--text-primary); padding: 10px 15px; display: flex; align-items: center;">
+                <div class="ios-back-button">
+                    <span class="material-icons">chevron_left</span>
+                    <span>Чаты</span>
+                </div>
+                <div style="flex: 1; text-align: center; font-weight: 600;">Анна Ковалева</div>
+                <div class="list-item-avatar" style="margin-left: 10px; width: 32px; height: 32px;">АК</div>
+            </div>
+            <div class="screen-content" style="padding: 15px; display: flex; flex-direction: column; background-color: var(--background-color);">
+                <div class="conversation-list">
+                    <div class="chat-bubble received">
+                        Привет! Как продвигается работа над проектом?
+                        <div class="chat-time">10:15</div>
+                    </div>
+                    
+                    <div class="chat-bubble sent">
+                        Привет, Анна! Всё идёт по плану. Дизайн экранов уже готов, сейчас работаю над функционалом регистрации.
+                        <div class="chat-time">10:20</div>
+                    </div>
+                    
+                    <div class="chat-bubble received">
+                        Отлично! Когда сможешь показать промежуточные результаты?
+                        <div class="chat-time">10:23</div>
+                    </div>
+                    
+                    <div class="chat-bubble sent">
+                        Думаю, что к концу дня уже будет готова базовая версия формы регистрации и авторизации
+                        <div class="chat-time">10:25</div>
+                    </div>
+                    
+                    <div class="chat-bubble received">
+                        Супер! Буду ждать. Также хотела уточнить, сможем ли мы добавить возможность входа через социальные сети?
+                        <div class="chat-time">10:28</div>
+                    </div>
+                    
+                    <div class="chat-bubble received">
+                        И еще вопрос по валидации email - будет ли реализована проверка при вводе?
+                        <div class="chat-time">10:30</div>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" placeholder="Введите сообщение...">
+                <button class="chat-send-btn">
+                    <span class="material-icons">send</span>
+                </button>
+            </div>
+            <div class="ios-home-indicator"></div>
+        </div>
+    </div>
+</body>
+</html> 
