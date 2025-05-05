@@ -4,6 +4,8 @@ import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import PeopleIcon from '@mui/icons-material/People';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import PersonIcon from '@mui/icons-material/Person';
+import ArticleIcon from '@mui/icons-material/Article';
+import { AppRoutes } from "../../lib/routes";
 
 export const ProfileMenu = () => {
     const navigate = useNavigate();
@@ -30,6 +32,11 @@ export const ProfileMenu = () => {
             title: "Реклама", 
             path: "/adverts", 
             icon: <CampaignIcon /> 
+        },
+        { 
+            title: "Создать материал", 
+            path: AppRoutes.createMaterial(), 
+            icon: <ArticleIcon /> 
         }
     ];
 

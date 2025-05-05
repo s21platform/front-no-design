@@ -14,6 +14,8 @@ import AuthLayout from './components/layouts/AuthLayout';
 import Header from './components/Header/Header';
 import { Outlet } from 'react-router-dom';
 import LoginPage from './pages/Login';
+import Materials from './pages/Materials';
+import CreateMaterial from './pages/CreateMaterial';
 import { createContext, useState, useMemo, useContext } from 'react';
 
 // Создание контекста темы
@@ -195,6 +197,7 @@ function App() {
                             {/* Публичные маршруты */}
                             <Route element={<PublicLayout />}>
                                 <Route path={AppRoutes.main()} element={<MainPage />} />
+                                <Route path={AppRoutes.materials()} element={<Materials />} />
                             </Route>
                             
                             {/* Страница авторизации */}
@@ -210,6 +213,7 @@ function App() {
                                     <Route path={AppRoutes.societySearch()} element={<SocietySearch />} />
                                     <Route path={AppRoutes.society()} element={<SocietyPage />} />
                                     <Route path={AppRoutes.advertSearch()} element={<AdvertSearch />} />
+                                    <Route path={AppRoutes.createMaterial()} element={<CreateMaterial />} />
                                 </Route>
                             </Route>
 

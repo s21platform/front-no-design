@@ -9,4 +9,6 @@ export const AppRoutes = {
 	society: (uuid?: string) => uuid ? `/society/${uuid}` : '/society/:uuid',
 	advertSearch: () => '/adverts',
 	advert: (uuid?: string) => uuid ? `/advert/${uuid}` : '/advert/:uuid',
+	materials: () => '/materials',
+	createMaterial: () => '/create-material',
 }
