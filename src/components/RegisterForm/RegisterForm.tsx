@@ -63,23 +63,14 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: IRegisterForm) => {
         setEmailCheckLoading(true);
         
         try {
-            // Мок запроса на сервер с задержкой
-            await new Promise(resolve => setTimeout(resolve, 800));
-            
-            // Имитация запроса к API с мок-ответом
-            // Для демонстрации всегда возвращаем успех, если формат email корректный
-            console.log(`Mocked API call to ${ApiRoutes.checkEmail()} with email: ${email}`);
-            
-            // Реальный запрос будет выглядеть примерно так:
-            /*
-            const response = await axios.post(ApiRoutes.checkEmail(), { email });
-            const isAvailable = response.data.available;
+            // Выполняем GET запрос на проверку email с query параметром
+            const response = await axios.get(ApiRoutes.checkEmail(), {
+                params: {
+                    email: email
+                }
+            });
+            const isAvailable = response.data.isAvailable;
             setEmailChecked(isAvailable);
-            */
-            
-            // Для мока просто подтверждаем, что email доступен
-            setEmailChecked(true);
-            
         } catch (error) {
             console.error("Error checking email:", error);
             setNotification({
