@@ -1,15 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
-    Box, Typography, Button, Skeleton, IconButton,
-    Dialog, DialogTitle, DialogContent, DialogActions,
-    FormControl, TextField, FormControlLabel, Switch, MenuItem,
-    CircularProgress
+    Box, 
+    Typography, 
+    Button, 
+    Skeleton, 
+    IconButton,
+    Dialog, 
+    DialogTitle, 
+    DialogContent, 
+    DialogActions,
+    FormControl, 
+    TextField, 
+    FormControlLabel, 
+    Switch, 
+    MenuItem,
+    CircularProgress,
+    Card,
+    CardContent,
+    Paper,
+    Divider,
+    Chip,
+    Grid,
+    useTheme
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import PeopleIcon from '@mui/icons-material/People';
+import LabelIcon from '@mui/icons-material/Label';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import SettingsIcon from '@mui/icons-material/Settings';
 import axios from "axios";
 import { ApiRoutes } from "../../lib/routes/const/apiRoutes";
-import Header from "../Header/Header";
 import { POST_PERMISSIONS, SOCIETY_FORMATS } from "../../lib/consts/society";
 import SocietyAvatar from "../SocietyAvatar/SocietyAvatar";
 
@@ -40,6 +61,7 @@ export interface SocietyDetails {
 
 export const SocietyPage = () => {
     const { uuid } = useParams();
+    const theme = useTheme();
     const [society, setSociety] = useState<SocietyDetails | null>(null);
     const [loading, setLoading] = useState(true);
     const [loadingSubscription, setLoadingSubscription] = useState(false);
@@ -164,27 +186,25 @@ export const SocietyPage = () => {
 
     if (loading) {
         return (
-            <>
-                <Header />
-                <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
-                    <Box maxWidth={900} width="100%" className="bg-white rounded-lg shadow-lg p-6">
-                        <Skeleton variant="rectangular" height={200} />
+            <Card elevation={2} sx={{ borderRadius: 2 }}>
+                <CardContent sx={{ p: 0 }}>
+                    <Skeleton variant="rectangular" height={200} />
+                    <Box sx={{ p: 3 }}>
                         <Skeleton variant="text" height={60} width="50%" />
                         <Skeleton variant="text" height={40} width="30%" />
+                        <Skeleton variant="text" height={20} width="80%" sx={{ mt: 2 }} />
+                        <Skeleton variant="text" height={20} width="70%" />
                     </Box>
-                </div>
-            </>
+                </CardContent>
+            </Card>
         );
     }
 
     if (!society) {
         return (
-            <>
-                <Header />
-                <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
-                    <Typography variant="h5">Сообщество не найдено</Typography>
-                </div>
-            </>
+            <Card elevation={2} sx={{ borderRadius: 2, p: 4, textAlign: 'center' }}>
+                <Typography variant="h5" color="text.primary">Сообщество не найдено</Typography>
+            </Card>
         );
     }
 
@@ -192,81 +212,139 @@ export const SocietyPage = () => {
     const permissionLabel = POST_PERMISSIONS.find(p => p.value === society.post_permission_id)?.label || "Неизвестные разрешения";
 
     return (
-        <>
-            <Header />
-            <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
-                <Box maxWidth={900} width="100%" className="bg-white rounded-lg shadow-lg">
-                    <Box className="relative h-48 bg-gray-200" p={3}>
-                        <SocietyAvatar
-                            societyUUID={uuid!}
-                            currentUrl={society.photo_url}
-                            canEdit={society.can_edit_society}
-                            onChange={(newUrl) => {
-                                setSociety(prev => prev ? { ...prev, photo_url: newUrl } : prev);
+        <Card elevation={2} sx={{ borderRadius: 2, overflow: 'hidden' }}>
+            {/* Область аватара */}
+            <Box 
+                sx={{ 
+                    position: 'relative',
+                    height: 200,
+                    bgcolor: 'background.paper',
+                    backgroundImage: 'linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.1))',
+                    p: 3
+                }}
+            >
+                <SocietyAvatar
+                    societyUUID={uuid!}
+                    currentUrl={society.photo_url}
+                    canEdit={society.can_edit_society}
+                    onChange={(newUrl) => {
+                        setSociety(prev => prev ? { ...prev, photo_url: newUrl } : prev);
+                    }}
+                />
+            </Box>
+
+            <CardContent sx={{ p: 4, position: 'relative' }}>
+                {/* Кнопка редактирования */}
+                {society.can_edit_society && (
+                    <IconButton 
+                        onClick={handleEditOpen}
+                        sx={{ position: 'absolute', top: 16, right: 16 }}
+                    >
+                        <EditIcon />
+                    </IconButton>
+                )}
+                
+                <Grid container spacing={3}>
+                    <Grid item xs={12} md={8}>
+                        {/* Название и информация */}
+                        <Typography variant="h4" fontWeight="bold" gutterBottom>
+                            {society.name}
+                        </Typography>
+                        
+                        <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+                            <Chip
+                                icon={<SettingsIcon fontSize="small" />}
+                                label={formatLabel}
+                                variant="outlined"
+                                size="small"
+                            />
+                            <Chip
+                                icon={<PeopleIcon fontSize="small" />}
+                                label={`${society.count_subscribe} подписчиков`}
+                                variant="outlined"
+                                size="small"
+                            />
+                            {society.is_search && (
+                                <Chip
+                                    icon={<VisibilityIcon fontSize="small" />}
+                                    label="Отображается в поиске"
+                                    variant="outlined"
+                                    size="small"
+                                    color="info"
+                                />
+                            )}
+                        </Box>
+                        
+                        <Divider sx={{ my: 2 }} />
+                        
+                        {/* Описание */}
+                        <Typography variant="body1" paragraph>
+                            {society.description}
+                        </Typography>
+                        
+                        {/* Теги */}
+                        <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                            {Tags.map((tag) => (
+                                <Chip
+                                    key={tag.value}
+                                    icon={<LabelIcon fontSize="small" />}
+                                    label={tag.label}
+                                    size="small"
+                                    color="default"
+                                    sx={{ bgcolor: 'background.paper' }}
+                                />
+                            ))}
+                        </Box>
+                    </Grid>
+                    
+                    <Grid item xs={12} md={4} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
+                        {/* Кнопка подписки */}
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            size="medium"
+                            onClick={handleSubscribe}
+                            disabled={loadingSubscription}
+                            startIcon={!loadingSubscription && <PeopleIcon fontSize="small" />}
+                            sx={{ 
+                                minWidth: 'auto',
+                                px: 2,
+                                py: 1,
+                                borderRadius: 1.5,
+                                fontSize: '0.9rem',
+                                textTransform: 'none',
+                                alignSelf: { xs: 'flex-start', md: 'flex-end' }
                             }}
-                        />
-                    </Box>
+                        >
+                            {loadingSubscription ? (
+                                <CircularProgress size={20} color="inherit" />
+                            ) : (
+                                "Подписаться"
+                            )}
+                        </Button>
+                    </Grid>
+                </Grid>
+            </CardContent>
 
-                    <Box className="p-6 pt-12 relative">
-                        {society.can_edit_society &&
-                            <div className="absolute top-0 right-0 mt-2 mr-4 flex flex-row items-center">
-                                <IconButton onClick={handleEditOpen}>
-                                    <EditIcon />
-                                </IconButton>
-                            </div>
-                        }
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <Typography variant="h4" className="font-bold">
-                                    {society.name}
-                                </Typography>
-                                <Typography variant="body1" color="textSecondary" className="mt-2">
-                                    {formatLabel} • {permissionLabel}
-                                </Typography>
-                                <Typography variant="body2" style={{ marginTop: "10px" }}>
-                                    {society.count_subscribe} подписчиков
-                                </Typography>
-                                <Typography variant="body2" style={{ marginTop: "20px" }}>
-                                    {society.description}
-                                </Typography>
-                                <Typography
-                                    variant="body2"
-
-                                    sx={{ fontStyle: "italic", color: "gray", marginTop: "20px" }}
-                                >
-                                    {Tags.map((tag) => (
-                                        <span key={tag.value}>#{tag.label} </span>
-                                    ))}
-                                </Typography>
-
-                            </div>
-                            <Button
-                                variant="contained"
-                                onClick={handleSubscribe}
-                                disabled={loadingSubscription}
-                                style={{ alignSelf: 'end' }}
-                            >
-                                Подписаться
-                            </Button>
-                        </div>
-
-                        {society.is_search && (
-                            <Box className="mt-4 p-3 bg-blue-50 rounded-lg">
-                                <Typography variant="body2" color="primary">
-                                    Это сообщество можно найти в поиске
-                                </Typography>
-                            </Box>
-                        )}
-                    </Box>
-                </Box>
-            </div>
-
-            <Dialog open={isDialogOpen} maxWidth="sm" fullWidth transitionDuration={0}>
-                <DialogTitle>Редактирование информации</DialogTitle>
-                <DialogContent>
+            {/* Диалог редактирования сообщества */}
+            <Dialog 
+                open={isDialogOpen} 
+                maxWidth="sm" 
+                fullWidth 
+                PaperProps={{
+                    sx: {
+                        borderRadius: 2,
+                        bgcolor: 'background.paper'
+                    }
+                }}
+            >
+                <DialogTitle>
+                    <Typography variant="h6">Редактирование информации</Typography>
+                </DialogTitle>
+                <DialogContent dividers>
                     {editing && (
-                        <Box>
-                            <FormControl style={{ gap: "10px", width: "100%", marginTop: "10px" }}>
+                        <Box sx={{ py: 1 }}>
+                            <FormControl fullWidth sx={{ mb: 2 }}>
                                 <TextField
                                     onChange={(e) => handleInputChange(e, "name")}
                                     value={editing.name}
@@ -276,21 +354,14 @@ export const SocietyPage = () => {
                                     fullWidth
                                     required
                                 />
-                                <FormControlLabel
-                                    control={
-                                        <Switch
-                                            checked={editing.is_search}
-                                            onChange={(e) => setEditing(prev => prev ? { ...prev, isSearch: e.target.checked } : prev)}
-                                        />
-                                    }
-                                    label="Поисковое сообщество"
-                                />
+                            </FormControl>
+                            
+                            <FormControl fullWidth sx={{ mb: 2 }}>
                                 <TextField
                                     select
                                     label="Формат сообщества"
                                     value={editing.format_id}
                                     onChange={(e) => handleInputChange(e, "format_id")}
-                                    fullWidth
                                     margin="dense"
                                 >
                                     {SOCIETY_FORMATS.map(format => (
@@ -299,12 +370,14 @@ export const SocietyPage = () => {
                                         </MenuItem>
                                     ))}
                                 </TextField>
+                            </FormControl>
+                            
+                            <FormControl fullWidth sx={{ mb: 2 }}>
                                 <TextField
                                     select
                                     label="Разрешения на посты"
                                     value={editing.post_permission_id}
                                     onChange={(e) => handleInputChange(e, "post_permission_id")}
-                                    fullWidth
                                     margin="dense"
                                 >
                                     {POST_PERMISSIONS.map(permission => (
@@ -313,13 +386,14 @@ export const SocietyPage = () => {
                                         </MenuItem>
                                     ))}
                                 </TextField>
+                            </FormControl>
+                            
+                            <FormControl fullWidth sx={{ mb: 2 }}>
                                 <TextField
                                     select
-                                    multiline
                                     label="Теги"
                                     value={editing.tags || []}
                                     onChange={(e) => handleInputChange(e, "tags")}
-                                    fullWidth
                                     margin="dense"
                                     SelectProps={{
                                         multiple: true,
@@ -331,26 +405,44 @@ export const SocietyPage = () => {
                                         </MenuItem>
                                     ))}
                                 </TextField>
+                            </FormControl>
 
+                            <FormControl fullWidth sx={{ mb: 2 }}>
                                 <TextField
                                     label="Описание"
                                     value={editing.description}
                                     onChange={(e) => handleInputChange(e, "description")}
-                                    fullWidth
                                     margin="dense"
                                     rows={5}
                                     multiline
-                                >
-                                </TextField>
+                                />
                             </FormControl>
+                            
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={editing.is_search}
+                                        onChange={(e) => setEditing(prev => prev ? { ...prev, is_search: e.target.checked } : prev)}
+                                        color="secondary"
+                                    />
+                                }
+                                label="Отображать в поиске"
+                            />
                         </Box>
                     )}
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Отмена</Button>
+                <DialogActions sx={{ px: 3, py: 2 }}>
+                    <Button 
+                        onClick={handleClose}
+                        color="inherit"
+                        variant="outlined"
+                    >
+                        Отмена
+                    </Button>
                     <Button
                         onClick={handleSaveSociety}
                         variant="contained"
+                        color="secondary"
                         disabled={saving}
                         startIcon={saving && <CircularProgress size={18} color="inherit" />}
                     >
@@ -358,6 +450,6 @@ export const SocietyPage = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </>
+        </Card>
     );
 };

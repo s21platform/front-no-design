@@ -2,20 +2,45 @@ import React, { useState } from "react";
 import axios from "axios";
 import Notification from "../Notification/Notification";
 import { ApiRoutes } from "../../lib/routes";
-import { Box, CircularProgress } from "@mui/material";
+import { 
+  Box, 
+  CircularProgress, 
+  TextField, 
+  Button, 
+  Typography, 
+  Container, 
+  Paper, 
+  InputAdornment, 
+  IconButton 
+} from "@mui/material";
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 interface ILoginForm {
     setIsLoggedIn: (isLoggedIn: boolean) => void;
+    onSwitchToRegister?: () => void;
 }
 
-const FormLogin = ({ setIsLoggedIn }: ILoginForm) => {
+const FormLogin = ({ setIsLoggedIn, onSwitchToRegister }: ILoginForm) => {
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
+    const [showPassword, setShowPassword] = useState<boolean>(false);
 
     const [notification, setNotification] = useState<{ message: string; type: "error" | "success" } | null>(null);
 
-    const handleLogin = () => {
+    const handleLogin = (event?: React.FormEvent) => {
+        if (event) {
+            event.preventDefault();
+        }
+        
+        if (!username || !password) {
+            setNotification({
+                message: "Введите имя пользователя и пароль",
+                type: "error"
+            });
+            return;
+        }
+        
         setLoading(true);
         axios.post(ApiRoutes.login(), {
             username: username,
@@ -32,7 +57,7 @@ const FormLogin = ({ setIsLoggedIn }: ILoginForm) => {
                 localStorage.setItem("expiry", expiryTime.toString());
                 setIsLoggedIn(true);
                 setNotification({
-                    message: "Успех",
+                    message: "Успешная авторизация",
                     type: "success"
                 })
             }
@@ -51,63 +76,135 @@ const FormLogin = ({ setIsLoggedIn }: ILoginForm) => {
         })
     }
 
+    const handleClickShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+    };
+
+    const handleKeyDown = (event: React.KeyboardEvent) => {
+        if (event.key === 'Enter') {
+            handleLogin();
+        }
+    };
+
     return (
         <>
-            <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-                <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-                    <h2 className="text-2xl font-bold text-center mb-6">Войти</h2>
-                    <div className="space-y-6">
-                        {/* Поле для username */}
-                        <div>
-                            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                                Username
-                            </label>
-                            <input
-                                type="text"
-                                id="username"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                required
-                                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            />
-                        </div>
+            <Box 
+                sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center'
+                }}
+            >
+                <Container maxWidth="sm">
+                    <Paper 
+                        elevation={3} 
+                        sx={{ 
+                            p: 4, 
+                            borderRadius: 2,
+                            bgcolor: 'background.paper'
+                        }}
+                    >
+                        <Typography 
+                            variant="h4" 
+                            component="h1" 
+                            align="center" 
+                            fontWeight="bold" 
+                            gutterBottom
+                        >
+                            Войти
+                        </Typography>
+                        <form onSubmit={handleLogin}>
+                            <Box sx={{ mt: 3 }}>
+                                {/* Поле для username */}
+                                <TextField
+                                    id="username"
+                                    label="Имя пользователя"
+                                    variant="outlined"
+                                    fullWidth
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    margin="normal"
+                                    required
+                                    placeholder="Введите имя пользователя"
+                                    onKeyDown={handleKeyDown}
+                                />
 
-                        {/* Поле для password */}
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                Password
-                            </label>
-                            <input
-                                type="password"
-                                id="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            />
-                        </div>
+                                {/* Поле для password */}
+                                <TextField
+                                    id="password"
+                                    label="Пароль"
+                                    type={showPassword ? 'text' : 'password'}
+                                    variant="outlined"
+                                    fullWidth
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    margin="normal"
+                                    required
+                                    placeholder="Введите пароль"
+                                    onKeyDown={handleKeyDown}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label="toggle password visibility"
+                                                    onClick={handleClickShowPassword}
+                                                    onMouseDown={handleMouseDownPassword}
+                                                    edge="end"
+                                                >
+                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )
+                                    }}
+                                />
 
-                        {/* Кнопка Submit */}
-                        <div>
-                            <button
-                                type="submit"
-                                className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                                style={{
-                                    display: 'flex', alignItems: 'center', justifyContent: "center",
-                                    opacity: loading ? 0.4 : 1,
-                                    cursor: loading ? 'not-allowed' : 'pointer',
-                                }}
-                                onClick={handleLogin}
-                                disabled={loading}
-                            >
-                                Войти
-
-                                {loading && <Box ml={1} display={"inline-block"}><CircularProgress size={15} color="inherit" /></Box>}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div >
+                                {/* Кнопка Submit */}
+                                <Button
+                                    variant="contained"
+                                    fullWidth
+                                    size="large"
+                                    disabled={loading}
+                                    onClick={handleLogin}
+                                    type="submit"
+                                    sx={{ mt: 3 }}
+                                >
+                                    {loading ? (
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            Загрузка
+                                            <CircularProgress size={20} color="inherit" sx={{ ml: 1 }} />
+                                        </Box>
+                                    ) : (
+                                        'Войти'
+                                    )}
+                                </Button>
+                                
+                                {onSwitchToRegister && (
+                                    <Box sx={{ mt: 2, textAlign: 'center' }}>
+                                        <Button 
+                                            variant="text" 
+                                            onClick={onSwitchToRegister}
+                                            sx={{ 
+                                                textTransform: 'none',
+                                                color: 'secondary.main',
+                                                fontWeight: 'medium',
+                                                '&:hover': {
+                                                    backgroundColor: 'rgba(79, 70, 229, 0.08)'
+                                                }
+                                            }}
+                                        >
+                                            Нет аккаунта? Зарегистрироваться
+                                        </Button>
+                                    </Box>
+                                )}
+                            </Box>
+                        </form>
+                    </Paper>
+                </Container>
+            </Box>
             {notification &&
                 <Notification
                     message={notification?.message}
@@ -116,7 +213,6 @@ const FormLogin = ({ setIsLoggedIn }: ILoginForm) => {
                 />
             }
         </>
-
     )
 }
 

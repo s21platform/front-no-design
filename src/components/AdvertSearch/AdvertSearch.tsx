@@ -1,10 +1,28 @@
 import React, { useState } from "react";
-import { Box, TextField, Typography, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, MenuItem, Checkbox, ListItemText } from "@mui/material";
+import { 
+    Box, 
+    TextField, 
+    Typography, 
+    Button, 
+    Dialog, 
+    DialogActions, 
+    DialogContent, 
+    DialogTitle, 
+    FormControl, 
+    MenuItem, 
+    Checkbox, 
+    ListItemText,
+    Card,
+    CardContent,
+    useTheme,
+    InputAdornment
+} from "@mui/material";
 import axios from "axios";
-import Header from "../Header/Header";
 import { ApiRoutes } from "../../lib/routes";
 import { OS_TYPES } from "../../lib/consts/advert";
 import Notification from "../Notification/Notification";
+import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search';
 
 interface NewAdvert {
     uuid: string;
@@ -16,6 +34,7 @@ interface NewAdvert {
 }
 
 export const AdvertSearch = () => {
+    const theme = useTheme();
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
     const [newAdvert, setNewAdvert] = useState<NewAdvert>({
         uuid: "",
@@ -88,106 +107,142 @@ export const AdvertSearch = () => {
     };
 
     return (
-        <div>
-            <Header />
-            <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
-                <Box maxWidth={900} width="100%">
-                    <div className="flex justify-between items-center mb-4">
-                        <Typography variant="h4" sx={{ mb: 3 }}>Рекламные кампании</Typography>
-                        <Button 
-                            variant="contained" 
-                            onClick={() => setIsDialogOpen(true)}
-                        >
-                            Создать кампанию
-                        </Button>
-                    </div>
+        <Card elevation={2} sx={{ borderRadius: 2 }}>
+            <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h5" fontWeight="bold">
+                        Рекламные кампании
+                    </Typography>
+                    <Button 
+                        variant="contained" 
+                        onClick={() => setIsDialogOpen(true)}
+                        color="secondary"
+                        startIcon={<AddIcon />}
+                    >
+                        Создать кампанию
+                    </Button>
+                </Box>
 
-                    <TextField 
-                        fullWidth 
-                        label="Поиск кампаний" 
-                        placeholder="Введите текст для поиска" 
-                        margin="normal"
-                    />
+                <TextField 
+                    fullWidth 
+                    variant="outlined"
+                    label="Поиск кампаний" 
+                    placeholder="Введите текст для поиска" 
+                    margin="normal"
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon color="action" />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
 
-                    <Typography mt={2} color="text.secondary">
+                <Box sx={{ my: 4, textAlign: 'center' }}>
+                    <Typography variant="body1" color="text.secondary">
                         Функция поиска находится в разработке
                     </Typography>
                 </Box>
+            </CardContent>
 
-                <Dialog 
-                    open={isDialogOpen} 
-                    maxWidth="sm" 
-                    fullWidth
-                    onClose={handleClose}
-                >
-                    <DialogTitle>Создание рекламной кампании</DialogTitle>
-                    <DialogContent>
-                        <Box sx={{ mt: 2 }}>
-                            <FormControl fullWidth sx={{ gap: 2 }}>
-                                <TextField
-                                    multiline
-                                    rows={4}
-                                    value={newAdvert.text}
-                                    onChange={(e) => handleInputChange('text', e.target.value)}
-                                    label="Текст рекламы"
-                                    required
-                                />
+            <Dialog 
+                open={isDialogOpen} 
+                maxWidth="sm" 
+                fullWidth
+                onClose={handleClose}
+                PaperProps={{
+                    sx: {
+                        borderRadius: 2,
+                        bgcolor: 'background.paper'
+                    }
+                }}
+            >
+                <DialogTitle>
+                    <Typography variant="h6">Создание рекламной кампании</Typography>
+                </DialogTitle>
+                <DialogContent dividers>
+                    <Box sx={{ py: 1 }}>
+                        <FormControl fullWidth sx={{ mb: 2 }}>
+                            <TextField
+                                multiline
+                                rows={4}
+                                value={newAdvert.text}
+                                onChange={(e) => handleInputChange('text', e.target.value)}
+                                label="Текст рекламы"
+                                required
+                                variant="outlined"
+                                margin="dense"
+                            />
+                        </FormControl>
 
-                                <TextField
-                                    select
-                                    label="Целевые ОС"
-                                    value={newAdvert.user.os}
-                                    onChange={(e) => handleInputChange('user.os', typeof e.target.value === 'string' ? e.target.value.split(',').map(Number) : e.target.value)}
-                                    SelectProps={{
-                                        multiple: true,
-                                        renderValue: (selected: unknown) => 
-                                            ((selected as number[])
-                                                .map(value => OS_TYPES.find(os => os.value === value)?.label)
-                                                .join(', '))
-                                    }}
-                                >
-                                    {OS_TYPES.map((os) => (
-                                        <MenuItem key={os.value} value={os.value}>
-                                            <Checkbox checked={newAdvert.user.os.includes(os.value)} />
-                                            <ListItemText primary={os.label} />
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
+                        <FormControl fullWidth sx={{ mb: 2 }}>
+                            <TextField
+                                select
+                                label="Целевые ОС"
+                                value={newAdvert.user.os}
+                                onChange={(e) => handleInputChange('user.os', typeof e.target.value === 'string' ? e.target.value.split(',').map(Number) : e.target.value)}
+                                SelectProps={{
+                                    multiple: true,
+                                    renderValue: (selected: unknown) => 
+                                        ((selected as number[])
+                                            .map(value => OS_TYPES.find(os => os.value === value)?.label)
+                                            .join(', '))
+                                }}
+                                variant="outlined"
+                                margin="dense"
+                            >
+                                {OS_TYPES.map((os) => (
+                                    <MenuItem key={os.value} value={os.value}>
+                                        <Checkbox checked={newAdvert.user.os.includes(os.value)} color="secondary" />
+                                        <ListItemText primary={os.label} />
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </FormControl>
 
-                                <TextField
-                                    type="datetime-local"
-                                    label="Дата окончания"
-                                    value={newAdvert.expires_at}
-                                    onChange={(e) => handleInputChange('expires_at', e.target.value)}
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                />
-                            </FormControl>
-                        </Box>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={handleClose}>
-                            Отмена
-                        </Button>
-                        <Button 
-                            onClick={handleSaveAdvert} 
-                            variant="contained"
-                            disabled={!newAdvert.text || newAdvert.user.os.length === 0}
-                        >
-                            Создать
-                        </Button>
-                    </DialogActions>
-                </Dialog>
+                        <FormControl fullWidth sx={{ mb: 1 }}>
+                            <TextField
+                                type="datetime-local"
+                                label="Дата окончания"
+                                value={newAdvert.expires_at}
+                                onChange={(e) => handleInputChange('expires_at', e.target.value)}
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                                variant="outlined"
+                                margin="dense"
+                            />
+                        </FormControl>
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ px: 3, py: 2 }}>
+                    <Button 
+                        onClick={handleClose} 
+                        color="inherit"
+                        variant="outlined"
+                    >
+                        Отмена
+                    </Button>
+                    <Button 
+                        onClick={handleSaveAdvert} 
+                        variant="contained"
+                        color="secondary"
+                        disabled={!newAdvert.text || newAdvert.user.os.length === 0}
+                    >
+                        Создать
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
-                {notification && (
-                    <Notification
-                        message={notification.message}
-                        type={notification.type}
-                        onClose={() => setNotification(null)}
-                    />
-                )}
-            </div>
-        </div>
+            {notification && (
+                <Notification
+                    message={notification.message}
+                    type={notification.type}
+                    onClose={() => setNotification(null)}
+                />
+            )}
+        </Card>
     );
-}; 
+};
+
+export default AdvertSearch; 

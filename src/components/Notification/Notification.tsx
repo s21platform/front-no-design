@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Alert, Snackbar } from "@mui/material";
 
 type NotificationProps = {
     message?: string;
@@ -18,12 +19,21 @@ const Notification: React.FC<NotificationProps> = ({ message, type, onClose }) =
     }, [onClose]);
 
     return (
-        <div
-            className={`fixed bottom-4 right-4 max-w-sm w-full p-4 rounded-lg shadow-lg text-white transition-transform transform ${type === "success" ? "bg-green-500" : "bg-red-500"
-                }`}
+        <Snackbar
+            open={!!message}
+            autoHideDuration={5000}
+            onClose={onClose}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         >
-            <p>{message}</p>
-        </div>
+            <Alert 
+                onClose={onClose} 
+                severity={type} 
+                variant="filled"
+                sx={{ width: '100%' }}
+            >
+                {message}
+            </Alert>
+        </Snackbar>
     );
 };
 

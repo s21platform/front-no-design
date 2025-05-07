@@ -1,14 +1,32 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Box, TextField, Typography, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, Switch, MenuItem } from "@mui/material";
+import { 
+    Box, 
+    TextField, 
+    Typography, 
+    Button, 
+    Dialog, 
+    DialogActions, 
+    DialogContent, 
+    DialogTitle, 
+    FormControl, 
+    FormControlLabel, 
+    Switch, 
+    MenuItem, 
+    Card,
+    CardContent,
+    InputAdornment,
+    useTheme
+} from "@mui/material";
 import { Grid } from "@mui/material";
 import axios from "axios";
-import Header from "../Header/Header";
 import { ApiRoutes } from "../../lib/routes";
 import { useNavigate } from "react-router-dom";
 import { SocietyCard } from "../SocietyCard/SocietyCard";
 import Notification from "../Notification/Notification";
 import { AppRoutes } from "../../lib/routes/const/appRoutes";
 import { POST_PERMISSIONS, SOCIETY_FORMATS } from "../../lib/consts/society";
+import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search';
 
 interface SocietyData {
     uuid: string;
@@ -26,6 +44,7 @@ interface NewSociety {
 
 export const SocietySearch = () => {
     const navigate = useNavigate();
+    const theme = useTheme();
     const [societies, setSocieties] = useState<SocietyData[]>([]);
     const [searchText, setSearchText] = useState<string>("");
     const [debouncedText, setDebouncedText] = useState<string>("");
@@ -142,56 +161,74 @@ export const SocietySearch = () => {
     };
 
     return (
-        <div>
-            <Header />
+        <Card elevation={2} sx={{ borderRadius: 2 }}>
+            <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h5" fontWeight="bold">
+                        Поиск сообществ
+                    </Typography>
+                    <Button 
+                        variant="contained" 
+                        onClick={() => setIsDialogOpen(true)}
+                        color="secondary"
+                        startIcon={<AddIcon />}
+                    >
+                        Создать сообщество
+                    </Button>
+                </Box>
 
-            <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
-                <Box maxWidth={900} width={"100%"}>
-                    <div className="flex justify-between items-center mb-4">
-                        <h1 className="text-2xl font-bold">Поиск сообществ</h1>
-                        <Button 
-                            variant="contained" 
-                            onClick={() => setIsDialogOpen(true)}
-                        >
-                            Создать сообщество
-                        </Button>
-                    </div>
+                <TextField 
+                    fullWidth 
+                    variant="outlined"
+                    label="Найти сообщество"
+                    placeholder="Введите название сообщества"
+                    margin="normal"
+                    value={searchText}
+                    onChange={handleSearchChange}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon color="action" />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
 
-                    <TextField 
-                        fullWidth 
-                        label="Поиск сообществ" 
-                        id="fullWidth" 
-                        placeholder="Введите название сообщества" 
-                        margin="normal" 
-                        onInput={handleSearchChange} 
-                    />
-
-                    {isEmpty ? (
-                        <Typography mt={2} mb={2}>
+                {isEmpty ? (
+                    <Box sx={{ my: 4, textAlign: 'center' }}>
+                        <Typography variant="body1" color="text.secondary">
                             Сообщества не найдены :(
                         </Typography>
-                    ) : (
-                        <Grid container spacing={3} mt={3}>
-                            {societies.map(society => (
-                                <Grid key={society.uuid} xs={6} display={"flex"}>
-                                    <SocietyCard {...society} />
-                                </Grid>
-                            ))}
-                        </Grid>
-                    )}
-                </Box>
-            </div>
+                    </Box>
+                ) : (
+                    <Grid container spacing={3} sx={{ mt: 1 }}>
+                        {societies.map(society => (
+                            <Grid item xs={12} sm={6} key={society.uuid}>
+                                <SocietyCard {...society} />
+                            </Grid>
+                        ))}
+                    </Grid>
+                )}
+            </CardContent>
 
             <Dialog 
                 open={isDialogOpen} 
                 maxWidth="sm" 
                 fullWidth
                 onClose={handleClose}
+                PaperProps={{
+                    sx: {
+                        borderRadius: 2,
+                        bgcolor: 'background.paper'
+                    }
+                }}
             >
-                <DialogTitle>Создание сообщества</DialogTitle>
-                <DialogContent>
-                    <Box>
-                        <FormControl style={{ gap: "10px", width: "100%", marginTop: "10px" }}>
+                <DialogTitle>
+                    <Typography variant="h6">Создание сообщества</Typography>
+                </DialogTitle>
+                <DialogContent dividers>
+                    <Box sx={{ py: 1 }}>
+                        <FormControl fullWidth sx={{ mb: 2 }}>
                             <TextField
                                 onChange={(e) => handleInputChange(e, "name")}
                                 value={newSociety.name}
@@ -201,54 +238,66 @@ export const SocietySearch = () => {
                                 fullWidth
                                 required
                             />
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        checked={newSociety.is_search}
-                                        onChange={(e) => setNewSociety({
-                                            ...newSociety,
-                                            is_search: e.target.checked
-                                        })}
-                                    />
-                                }
-                                label="Поисковое сообщество"
-                            />
+                        </FormControl>
+
+                        <FormControl fullWidth sx={{ mb: 2 }}>
                             <TextField
                                 select
                                 label="Формат сообщества"
                                 value={newSociety.format_id}
                                 onChange={(e) => handleInputChange(e, "format_id")}
-                                fullWidth
                                 margin="dense"
                             >
-                                {SOCIETY_FORMATS.map((format: { value: number; label: string }) => (
-                                    <MenuItem key={format.value} value={format.value}>
-                                        {format.label}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
-                            <TextField
-                                select
-                                label="Разрешения на посты"
-                                value={newSociety.post_permission_id}
-                                onChange={(e) => handleInputChange(e, "post_permission_id")}
-                                fullWidth
-                                margin="dense"
-                            >
-                                {POST_PERMISSIONS.map((permission: { value: number; label: string }) => (
-                                    <MenuItem key={permission.value} value={permission.value}>
-                                        {permission.label}
+                                {SOCIETY_FORMATS.map((option) => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
                                     </MenuItem>
                                 ))}
                             </TextField>
                         </FormControl>
+
+                        <FormControl fullWidth sx={{ mb: 2 }}>
+                            <TextField
+                                select
+                                label="Права на публикацию"
+                                value={newSociety.post_permission_id}
+                                onChange={(e) => handleInputChange(e, "post_permission_id")}
+                                margin="dense"
+                            >
+                                {POST_PERMISSIONS.map((option) => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </FormControl>
+
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={newSociety.is_search}
+                                    onChange={(e) => setNewSociety({ ...newSociety, is_search: e.target.checked })}
+                                    color="secondary"
+                                />
+                            }
+                            label="Отображать в поиске"
+                        />
                     </Box>
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>
+                <DialogActions sx={{ px: 3, py: 2 }}>
+                    <Button 
+                        onClick={handleClose} 
+                        color="inherit"
+                        variant="outlined"
+                    >
                         Отмена
                     </Button>
-                    <Button onClick={handleSaveSociety} variant="contained">
+                    <Button 
+                        onClick={handleSaveSociety} 
+                        color="secondary" 
+                        variant="contained"
+                        disabled={!newSociety.name}
+                    >
                         Создать
                     </Button>
                 </DialogActions>
@@ -261,6 +310,8 @@ export const SocietySearch = () => {
                     onClose={() => setNotification(null)}
                 />
             )}
-        </div>
+        </Card>
     );
-}; 
+};
+
+export default SocietySearch; 
