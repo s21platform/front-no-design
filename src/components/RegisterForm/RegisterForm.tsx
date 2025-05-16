@@ -27,6 +27,7 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: IRegisterForm) => {
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
     const [verificationCode, setVerificationCode] = useState<string>('');
+    const [registrationUuid, setRegistrationUuid] = useState<string>('');
     
     // Состояния для UI
     const [codeStepVisible, setCodeStepVisible] = useState<boolean>(false);
@@ -69,7 +70,7 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: IRegisterForm) => {
                     email: email
                 }
             });
-            const isAvailable = response.data.isAvailable;
+            const isAvailable = response.data.is_available;
             setEmailChecked(isAvailable);
         } catch (error) {
             console.error("Error checking email:", error);
@@ -96,8 +97,14 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: IRegisterForm) => {
         setLoading(true);
         
         try {
-            // Мок отправки данных для регистрации
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Отправляем запрос на отправку кода подтверждения
+            const response = await axios.post(ApiRoutes.sendCode(), { 
+                email 
+            });
+            
+            // Сохраняем uuid из ответа для последующего использования при подтверждении кода
+            const uuid = response.data.uuid;
+            setRegistrationUuid(uuid);
             
             // Показываем поле для ввода кода
             setCodeStepVisible(true);
@@ -105,17 +112,10 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: IRegisterForm) => {
                 message: "Код подтверждения отправлен на указанный email",
                 type: "success"
             });
-            
-            // Реальный запрос будет выглядеть примерно так:
-            /*
-            await axios.post(ApiRoutes.signup(), { 
-                email, 
-                password 
-            });
-            */
         } catch (error) {
+            console.error("Error sending verification code:", error);
             setNotification({
-                message: "Ошибка при регистрации",
+                message: "Ошибка при отправке кода подтверждения",
                 type: "error"
             });
         } finally {
@@ -150,9 +150,9 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: IRegisterForm) => {
             // Реальный запрос будет выглядеть примерно так:
             /*
             await axios.post(ApiRoutes.confirmVerification(), { 
-                email, 
-                password,
-                verificationCode 
+                uuid: registrationUuid,
+                code: verificationCode,
+                password 
             });
             */
         } catch (error) {

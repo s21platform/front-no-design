@@ -20,6 +20,7 @@ export const ApiRoutes = {
 	
 	// Новые эндпоинты для регистрации
 	checkEmail: () => '/auth/check-email',
+	sendCode: () => '/auth/send-code',
 	signup: () => '/auth/signup',
 	confirmVerification: () => '/auth/confirm_verification',
 }
