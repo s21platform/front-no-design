@@ -16,6 +16,7 @@ import { Outlet } from 'react-router-dom';
 import LoginPage from './pages/Login';
 import { createContext, useState, useMemo, useContext } from 'react';
 import ChatPage from './pages/ChatPage';
+import NotFound from './pages/NotFound';
 
 // Создание контекста темы
 interface ThemeContextType {
@@ -215,8 +216,8 @@ function App() {
                                 </Route>
                             </Route>
 
-                            {/*/!* Fallback для всех несуществующих роутов *!/*/}
-                            {/*<Route path="*" element={<div>Not Found Page</div>}/>*/}
+                            {/* Fallback для всех несуществующих роутов */}
+                            <Route path="*" element={<NotFound />} />
                         </Routes>
                     </NotificationProvider>
                 </AuthProvider>
