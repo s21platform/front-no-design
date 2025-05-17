@@ -1,11 +1,25 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ApiRoutes, AppRoutes, useAuth } from "../../lib/routes";
 import axios from "axios";
+import { AppBar, Toolbar, Typography, Button, Box, Container, IconButton, useMediaQuery, useTheme, Menu, MenuItem } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import { useState } from "react";
 
 const Header = () => {
     const { isAuth, setAuth } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+    const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
 
     const logout = () => {
         axios.get(ApiRoutes.logout(), {
@@ -15,56 +29,101 @@ const Header = () => {
                 setAuth(false);
                 navigate(AppRoutes.main());
             }
+            if (isMobile) {
+                handleClose();
+            }
         })
             .catch(err => {
                 console.warn(err)
             });
     }
-    return (
-        <header className="bg-indigo-600 text-white p-4 shadow-md">
-            <div className="container mx-auto flex justify-between items-center">
-                {/* Логотип или название */}
-                <h1 className="text-2xl font-bold">
-                    <Link to={AppRoutes.main()}>Space 21</Link>
-                </h1>
 
-                {/* Навигационные ссылки */}
-                <nav>
-                    <ul className="flex space-x-6">
-                        {location.pathname !== AppRoutes.main() &&
-                            <li>
-                                <Link
+    const navigateTo = (path: string) => {
+        navigate(path);
+        if (isMobile) {
+            handleClose();
+        }
+    };
+
+    return (
+        <AppBar position="static">
+            <Container maxWidth="xl">
+                <Toolbar sx={{ justifyContent: 'space-between' }}>
+                    {/* Логотип или название */}
+                    <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+                        <Link to={AppRoutes.main()} style={{ textDecoration: 'none', color: 'white' }}>
+                            Space 21
+                        </Link>
+                    </Typography>
+
+                    {/* Мобильное меню */}
+                    {isMobile ? (
+                        <Box>
+                            <IconButton
+                                size="large"
+                                edge="end"
+                                color="inherit"
+                                aria-label="menu"
+                                onClick={handleMenu}
+                            >
+                                <MenuIcon />
+                            </IconButton>
+                            <Menu
+                                id="menu-appbar"
+                                anchorEl={anchorEl}
+                                anchorOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
+                                }}
+                                keepMounted
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
+                                }}
+                                open={Boolean(anchorEl)}
+                                onClose={handleClose}
+                            >
+                                {location.pathname !== AppRoutes.main() && (
+                                    <MenuItem onClick={() => navigateTo(AppRoutes.main())}>Главная</MenuItem>
+                                )}
+                                <MenuItem onClick={() => navigateTo(AppRoutes.profile())}>Профиль</MenuItem>
+                                {isAuth && (
+                                    <MenuItem onClick={logout}>Выход</MenuItem>
+                                )}
+                            </Menu>
+                        </Box>
+                    ) : (
+                        /* Десктопное меню */
+                        <Box>
+                            {location.pathname !== AppRoutes.main() && (
+                                <Button 
+                                    color="inherit" 
+                                    component={Link} 
                                     to={AppRoutes.main()}
-                                    className="hover:text-gray-300"
                                 >
                                     Главная
-                                </Link>
-                            </li>
-                        }
-                        <li>
-                            <Link
+                                </Button>
+                            )}
+                            <Button 
+                                color="inherit" 
+                                component={Link} 
                                 to={AppRoutes.profile()}
-                                className="hover:text-gray-300"
                             >
                                 Профиль
-                            </Link>
-                        </li>
-                        {isAuth &&
-                            <li>
-                                <a
+                            </Button>
+                            {isAuth && (
+                                <Button 
+                                    color="inherit" 
                                     onClick={logout}
-                                    className="hover:text-gray-300"
-                                    style={{ cursor: 'pointer' }}
                                 >
                                     Выход
-                                </a>
-                            </li>
-                        }
-
-                    </ul>
-                </nav>
-            </div>
-        </header>
+                                </Button>
+                            )}
+                        </Box>
+                    )}
+                </Toolbar>
+            </Container>
+        </AppBar>
     )
 }
 

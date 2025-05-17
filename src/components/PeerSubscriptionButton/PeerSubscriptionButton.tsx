@@ -2,6 +2,8 @@ import axios from "axios";
 import { useState } from "react";
 import { Button, CircularProgress } from "@mui/material";
 import { ApiRoutes } from "../../lib/routes";
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 
 interface PeerSubscriptionButtonProps {
 	isActive: boolean;
@@ -9,7 +11,6 @@ interface PeerSubscriptionButtonProps {
 }
 
 const PeerSubscriptionButton = ({ isActive, peerId }: PeerSubscriptionButtonProps) => {
-
 	const [loadingSubscription, setLoadingSubscription] = useState<boolean>(false);
 	const [isSubscribed, setIsSubscribed] = useState<boolean>(isActive);
 
@@ -50,18 +51,26 @@ const PeerSubscriptionButton = ({ isActive, peerId }: PeerSubscriptionButtonProp
 
 	const buttonText = isSubscribed ? "Отписаться" : "Подписаться";
 	const buttonVariant = isSubscribed ? "outlined" : "contained";
+	const buttonColor = isSubscribed ? "error" : "secondary";
+	const buttonIcon = isSubscribed ? <PersonRemoveIcon /> : <PersonAddIcon />;
 	const handleClick = isSubscribed ? unsubscribe : subscribe;
 
 	return (
 		<Button
-			style={{ minWidth: '140px', minHeight: '32px' }}
+			fullWidth
 			size="small"
 			variant={buttonVariant}
+			color={buttonColor}
 			onClick={handleClick}
 			disabled={loadingSubscription}
-			endIcon={
-				loadingSubscription && <CircularProgress size={15} color="inherit" />
-			}
+			startIcon={loadingSubscription ? <CircularProgress size={16} color="inherit" /> : buttonIcon}
+			sx={{
+				borderRadius: 1.5,
+				textTransform: 'none',
+				fontSize: '0.85rem',
+				padding: '6px 16px',
+				minHeight: '36px',
+			}}
 		>
 			{buttonText}
 		</Button>
