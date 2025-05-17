@@ -15,6 +15,7 @@ import Header from './components/Header/Header';
 import { Outlet } from 'react-router-dom';
 import LoginPage from './pages/Login';
 import { createContext, useState, useMemo, useContext } from 'react';
+import ChatPage from './pages/ChatPage';
 
 // Создание контекста темы
 interface ThemeContextType {
@@ -210,6 +211,7 @@ function App() {
                                     <Route path={AppRoutes.societySearch()} element={<SocietySearch />} />
                                     <Route path={AppRoutes.society()} element={<SocietyPage />} />
                                     <Route path={AppRoutes.advertSearch()} element={<AdvertSearch />} />
+                                    <Route path={AppRoutes.chat()} element={<ChatPage />} />
                                 </Route>
                             </Route>
 
