@@ -14,6 +14,7 @@ import ProfileMenu from "../ProfileMenu/ProfileMenu";
 import { Outlet } from "react-router-dom";
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
+import { NotificationProvider } from '../../contexts/NotificationContext';
 
 const AuthLayout: React.FC = () => {
   const theme = useTheme();
@@ -89,7 +90,9 @@ const AuthLayout: React.FC = () => {
                   px: { xs: 1, md: 3 }
                 }}
               >
-                <Outlet />
+                <NotificationProvider>
+                  <Outlet />
+                </NotificationProvider>
               </Box>
             </Grid>
           </Grid>

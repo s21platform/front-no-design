@@ -192,19 +192,18 @@ function App() {
             <ThemeProvider theme={theme}>
                 <CssBaseline /> {/* Сбрасывает CSS стили браузера для консистентного отображения */}
                 <AuthProvider>
-                    <NotificationProvider>
-                        <Routes>
-                            {/* Публичные маршруты */}
-                            <Route element={<PublicLayout />}>
-                                <Route path={AppRoutes.main()} element={<MainPage />} />
-                            </Route>
-                            
-                            {/* Страница авторизации */}
-                            <Route path={AppRoutes.login()} element={<LoginPage />} />
+                    <Routes>
+                        {/* Публичные маршруты */}
+                        <Route element={<PublicLayout />}>
+                            <Route path={AppRoutes.main()} element={<MainPage />} />
+                        </Route>
+                        
+                        {/* Страница авторизации */}
+                        <Route path={AppRoutes.login()} element={<LoginPage />} />
 
-                            {/* Маршруты, требующие авторизации */}
-                            <Route element={<PrivateRoute />}>
-                                <Route element={<AuthLayout />}>
+                        {/* Маршруты, требующие авторизации */}
+                        <Route element={<PrivateRoute />}>
+                            <Route element={<AuthLayout />}>
                                     <Route path={AppRoutes.profile()} element={<ProfilePage />} />
                                     <Route path={AppRoutes.newSociety()} element={<SocietyAddingPage />} />
                                     <Route path={AppRoutes.peerSearch()} element={<PeerSearch />} />
@@ -213,13 +212,12 @@ function App() {
                                     <Route path={AppRoutes.society()} element={<SocietyPage />} />
                                     <Route path={AppRoutes.advertSearch()} element={<AdvertSearch />} />
                                     <Route path={AppRoutes.chat()} element={<ChatPage />} />
-                                </Route>
                             </Route>
+                        </Route>
 
-                            {/* Fallback для всех несуществующих роутов */}
-                            <Route path="*" element={<NotFound />} />
-                        </Routes>
-                    </NotificationProvider>
+                        {/* Fallback для всех несуществующих роутов */}
+                        <Route path="*" element={<NotFound />} />
+                    </Routes>
                 </AuthProvider>
             </ThemeProvider>
         </ThemeContext.Provider>

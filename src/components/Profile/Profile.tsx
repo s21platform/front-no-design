@@ -11,11 +11,11 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogTitle, 
+    DialogTitle,
     FormControl,
-    IconButton, 
+    IconButton,
     InputAdornment,
-    Skeleton, 
+    Skeleton,
     TextField,
     Typography,
     Grid,
@@ -43,6 +43,7 @@ import LightModeIcon from "@mui/icons-material/LightMode";
 import { SelectorOption, SelectorWithSearch } from "../SelectorWithSearch/SelectorWithSearch";
 import { ApiRoutes, AppRoutes, useAuth } from "../../lib/routes";
 import { useThemeMode } from "../../App";
+import api from "../../lib/api/api";
 
 
 const Profile: React.FC = () => {
@@ -70,7 +71,7 @@ const Profile: React.FC = () => {
 
 
     useEffect(() => {
-        axios.get(ApiRoutes.profile(), {
+        api.get(ApiRoutes.profile(), {
             withCredentials: true,
         }).then(data => {
             setEditProfile(data.data)
@@ -94,7 +95,7 @@ const Profile: React.FC = () => {
     }, [update]);
 
     useEffect(() => {
-        axios.get(ApiRoutes.friendsCount(), {
+        api.get(ApiRoutes.friendsCount(), {
             withCredentials: true
         }).then(data => {
             setFriendsCount({
@@ -149,7 +150,7 @@ const Profile: React.FC = () => {
             <CardContent sx={{ p: 3, position: 'relative' }}>
                 {/* Кнопки редактирования и уведомлений */}
                 <Box sx={{ position: 'absolute', top: 16, right: 16, display: 'flex', alignItems: 'center' }}>
-                    <IconButton 
+                    <IconButton
                         onClick={() => setIsOpen(true)}
                         sx={{ mr: 1 }}
                     >
@@ -177,7 +178,7 @@ const Profile: React.FC = () => {
                                             </Typography>
                                         </Box>
                                     )}
-                                    
+
                                     {profileData.birthdate && (
                                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                                             <CakeIcon sx={{ mr: 1, color: 'text.secondary' }} />
@@ -186,15 +187,15 @@ const Profile: React.FC = () => {
                                             </Typography>
                                         </Box>
                                     )}
-                                    
+
                                     {profileData.telegram && (
                                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                                             <TelegramIcon sx={{ mr: 1, color: 'text.secondary' }} />
                                             <Typography variant="body1">
                                                 <strong>Telegram:</strong>{' '}
-                                                <Link 
+                                                <Link
                                                     href={`https://t.me/${profileData.telegram?.substring(1)}`}
-                                                    target="_blank" 
+                                                    target="_blank"
                                                     rel="noopener noreferrer"
                                                     color="secondary"
                                                 >
@@ -221,16 +222,16 @@ const Profile: React.FC = () => {
                                 <Typography variant="h6" gutterBottom>
                                     Дополнительная информация
                                 </Typography>
-                                
+
                                 <Box sx={{ mb: 3 }}>
                                     {profileData.git && (
                                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                                             <GitHubIcon sx={{ mr: 1, color: 'text.secondary' }} />
                                             <Typography variant="body1">
                                                 <strong>GitHub:</strong>{' '}
-                                                <Link 
+                                                <Link
                                                     href={`https://github.com/${profileData.git}`}
-                                                    target="_blank" 
+                                                    target="_blank"
                                                     rel="noopener noreferrer"
                                                     color="secondary"
                                                 >
@@ -239,7 +240,7 @@ const Profile: React.FC = () => {
                                             </Typography>
                                         </Box>
                                     )}
-                                    
+
                                     {profileData.os && (
                                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                                             <ComputerIcon sx={{ mr: 1, color: 'text.secondary' }} />
@@ -260,7 +261,7 @@ const Profile: React.FC = () => {
                 ) : (
                     <Grid container spacing={2} sx={{ mt: 2 }}>
                         <Grid item>
-                            <Chip 
+                            <Chip
                                 label={
                                     <Box sx={{ p: 0.5 }}>
                                         <Typography variant="body2" color="text.secondary">
@@ -272,15 +273,15 @@ const Profile: React.FC = () => {
                                     </Box>
                                 }
                                 variant="outlined"
-                                sx={{ 
-                                    height: 'auto', 
+                                sx={{
+                                    height: 'auto',
                                     borderRadius: 2,
                                     p: 1
                                 }}
                             />
                         </Grid>
                         <Grid item>
-                            <Chip 
+                            <Chip
                                 label={
                                     <Box sx={{ p: 0.5 }}>
                                         <Typography variant="body2" color="text.secondary">
@@ -292,8 +293,8 @@ const Profile: React.FC = () => {
                                     </Box>
                                 }
                                 variant="outlined"
-                                sx={{ 
-                                    height: 'auto', 
+                                sx={{
+                                    height: 'auto',
                                     borderRadius: 2,
                                     p: 1
                                 }}
@@ -302,10 +303,10 @@ const Profile: React.FC = () => {
                     </Grid>
                 )}
             </CardContent>
-            
+
             {/* Диалог редактирования профиля */}
-            <Dialog 
-                open={isOpen} 
+            <Dialog
+                open={isOpen}
                 onClose={() => setIsOpen(false)}
                 maxWidth="sm"
                 fullWidth
@@ -319,7 +320,7 @@ const Profile: React.FC = () => {
                 <DialogTitle>
                     <Typography variant="h6">Редактирование профиля</Typography>
                 </DialogTitle>
-                
+
                 <DialogContent dividers>
                     <Box sx={{ py: 1 }}>
                         <FormControl fullWidth sx={{ mb: 2 }}>
@@ -339,7 +340,7 @@ const Profile: React.FC = () => {
                                 }}
                             />
                         </FormControl>
-                        
+
                         <FormControl fullWidth sx={{ mb: 2 }}>
                             <TextField
                                 type="date"
@@ -360,7 +361,7 @@ const Profile: React.FC = () => {
                                 }}
                             />
                         </FormControl>
-                        
+
                         <FormControl fullWidth sx={{ mb: 2 }}>
                             <TextField
                                 type="text"
@@ -378,7 +379,7 @@ const Profile: React.FC = () => {
                                 }}
                             />
                         </FormControl>
-                        
+
                         <FormControl fullWidth sx={{ mb: 2 }}>
                             <TextField
                                 onChange={(e) => handleInputChange(e, "git")}
@@ -396,7 +397,7 @@ const Profile: React.FC = () => {
                                 }}
                             />
                         </FormControl>
-                        
+
                         <FormControl fullWidth sx={{ mb: 1 }}>
                             <SelectorWithSearch
                                 url={ApiRoutes.optionOs()}
@@ -407,10 +408,10 @@ const Profile: React.FC = () => {
                                 Операционная система
                             </Typography>
                         </FormControl>
-                        
+
                         {/* Переключатель темы */}
                         <Divider sx={{ my: 2 }} />
-                        
+
                         <FormControlLabel
                             control={
                                 <Switch
@@ -431,17 +432,17 @@ const Profile: React.FC = () => {
                         />
                     </Box>
                 </DialogContent>
-                
+
                 <DialogActions sx={{ px: 3, py: 2 }}>
-                    <Button 
-                        onClick={() => setIsOpen(false)} 
+                    <Button
+                        onClick={() => setIsOpen(false)}
                         color="inherit"
                         variant="outlined"
                     >
                         Отмена
                     </Button>
-                    <Button 
-                        onClick={handleSaveProfile} 
+                    <Button
+                        onClick={handleSaveProfile}
                         color="primary"
                         variant="contained"
                     >

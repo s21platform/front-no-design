@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Notification from "../Notification/Notification";
 import { ApiRoutes } from "../../lib/routes";
-import { 
-  Box, 
-  CircularProgress, 
-  TextField, 
-  Button, 
-  Typography, 
-  Paper, 
-  InputAdornment, 
+import {
+  Box,
+  CircularProgress,
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  InputAdornment,
   IconButton,
   Divider,
   Collapse
@@ -28,7 +28,7 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: IRegisterForm) => {
     const [confirmPassword, setConfirmPassword] = useState<string>('');
     const [verificationCode, setVerificationCode] = useState<string>('');
     const [registrationUuid, setRegistrationUuid] = useState<string>('');
-    
+
     // Состояния для UI
     const [codeStepVisible, setCodeStepVisible] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
@@ -36,7 +36,7 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: IRegisterForm) => {
     const [emailChecked, setEmailChecked] = useState<boolean | null>(null);
     const [emailCheckLoading, setEmailCheckLoading] = useState<boolean>(false);
     const [passwordsMatch, setPasswordsMatch] = useState<boolean | null>(null);
-    
+
     const [notification, setNotification] = useState<{ message: string; type: "error" | "success" } | null>(null);
 
     // Проверка совпадения паролей
@@ -51,18 +51,18 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: IRegisterForm) => {
     // Проверка доступности email при потере фокуса
     const checkEmail = async () => {
         if (!email) return;
-        
+
         // Базовая валидация структуры email
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const isValidFormat = emailRegex.test(email);
-        
+
         if (!isValidFormat) {
             setEmailChecked(false);
             return;
         }
-        
+
         setEmailCheckLoading(true);
-        
+
         try {
             // Выполняем GET запрос на проверку email с query параметром
             const response = await axios.get(ApiRoutes.checkEmail(), {
@@ -93,19 +93,19 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: IRegisterForm) => {
             });
             return;
         }
-        
+
         setLoading(true);
-        
+
         try {
             // Отправляем запрос на отправку кода подтверждения
-            const response = await axios.post(ApiRoutes.sendCode(), { 
-                email 
+            const response = await axios.post(ApiRoutes.sendCode(), {
+                email
             });
-            
+
             // Сохраняем uuid из ответа для последующего использования при подтверждении кода
             const uuid = response.data.uuid;
             setRegistrationUuid(uuid);
-            
+
             // Показываем поле для ввода кода
             setCodeStepVisible(true);
             setNotification({
@@ -132,32 +132,58 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: IRegisterForm) => {
             });
             return;
         }
-        
+
         setLoading(true);
-        
+
         try {
-            // Мок отправки кода верификации
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            setNotification({
-                message: "Регистрация успешно завершена",
-                type: "success"
-            });
-            
-            // После успешной регистрации вызываем колбэк
-            setTimeout(() => onSuccess(), 1500);
-            
-            // Реальный запрос будет выглядеть примерно так:
-            /*
-            await axios.post(ApiRoutes.confirmVerification(), { 
-                uuid: registrationUuid,
+            // Отправляем запрос на регистрацию
+            const registerResponse = await axios.post(ApiRoutes.registerUser(), {
+                email,
+                password,
+                confirm_password: confirmPassword,
                 code: verificationCode,
-                password 
+                code_lookup_uuid: registrationUuid
             });
-            */
-        } catch (error) {
+
+            if (registerResponse.status === 200) {
+                // После успешной регистрации выполняем автоматический вход
+                try {
+                    const loginResponse = await axios.post(ApiRoutes.login(), {
+                        login: email,
+                        password: password,
+                    });
+
+                    if (loginResponse.status === 200) {
+                        const currentTime = Date.now();
+                        const expiryTime = currentTime + 10 * 60 * 60 * 1000;
+                        localStorage.setItem("expiry", expiryTime.toString());
+                        localStorage.setItem("access_token", loginResponse.data.access_token);
+
+                        setNotification({
+                            message: "Регистрация успешна! Выполняется вход...",
+                            type: "success"
+                        });
+
+                        // После успешного входа вызываем колбэк
+                        setTimeout(() => onSuccess(), 1500);
+                    }
+                } catch (loginError) {
+                    console.error("Error during auto-login:", loginError);
+                    setNotification({
+                        message: "Регистрация успешна, но не удалось выполнить автоматический вход. Пожалуйста, войдите вручную.",
+                        type: "error"
+                    });
+                    setTimeout(() => onSuccess(), 1500);
+                }
+            }
+        } catch (error: any) {
+            console.error("Error during registration:", error);
+            let errorMessage = "Ошибка при регистрации";
+            if (error.response?.data) {
+                errorMessage = error.response.data;
+            }
             setNotification({
-                message: "Ошибка при подтверждении кода",
+                message: errorMessage,
                 type: "error"
             });
         } finally {
@@ -175,25 +201,25 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: IRegisterForm) => {
 
     return (
         <>
-            <Paper 
-                elevation={3} 
-                sx={{ 
-                    p: 4, 
+            <Paper
+                elevation={3}
+                sx={{
+                    p: 4,
                     borderRadius: 2,
                     bgcolor: 'background.paper',
                     width: '100%'
                 }}
             >
-                <Typography 
-                    variant="h4" 
-                    component="h1" 
-                    align="center" 
-                    fontWeight="bold" 
+                <Typography
+                    variant="h4"
+                    component="h1"
+                    align="center"
+                    fontWeight="bold"
                     gutterBottom
                 >
                     Регистрация
                 </Typography>
-                
+
                 {/* Поля для ввода почты и пароля */}
                 <Box sx={{ mt: 3 }}>
                     <TextField
@@ -290,19 +316,19 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: IRegisterForm) => {
                         </Button>
                     )}
                 </Box>
-                
+
                 {/* Разделитель между шагами */}
                 {codeStepVisible && (
                     <Divider sx={{ my: 3 }} />
                 )}
-                
+
                 {/* Поле для ввода кода верификации */}
                 <Collapse in={codeStepVisible}>
                     <Box sx={{ mt: 3 }}>
                         <Typography variant="body1" gutterBottom>
                             Мы отправили код подтверждения на <strong>{email}</strong>
                         </Typography>
-                        
+
                         <TextField
                             id="verification-code"
                             label="Код подтверждения"
@@ -337,13 +363,13 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: IRegisterForm) => {
                         </Button>
                     </Box>
                 </Collapse>
-                
+
                 {!codeStepVisible && (
                     <Box sx={{ mt: 2, textAlign: 'center' }}>
-                        <Button 
-                            variant="text" 
+                        <Button
+                            variant="text"
                             onClick={onSwitchToLogin}
-                            sx={{ 
+                            sx={{
                                 textTransform: 'none',
                                 color: 'secondary.main',
                                 fontWeight: 'medium',
@@ -357,7 +383,7 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: IRegisterForm) => {
                     </Box>
                 )}
             </Paper>
-            
+
             {notification &&
                 <Notification
                     message={notification?.message}
@@ -369,4 +395,4 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: IRegisterForm) => {
     );
 };
 
-export default RegisterForm; 
+export default RegisterForm;

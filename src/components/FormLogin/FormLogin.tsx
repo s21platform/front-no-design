@@ -43,7 +43,7 @@ const FormLogin = ({ setIsLoggedIn, onSwitchToRegister }: ILoginForm) => {
         
         setLoading(true);
         axios.post(ApiRoutes.login(), {
-            username: username,
+            login: username,
             password: password,
         }, {
             headers: {
