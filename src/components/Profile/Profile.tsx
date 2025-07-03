@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import Loader from "../Loader/Loader";
 import NotificationWidget from "../Widgets/NotificationWidget/NotificationWidget";
 import { ProfileProps, SubscriptionCount } from "./types";
 import ProfileSkeleton from "../Skeletons/ProfileSkeleton/ProfileSkeleton";
@@ -19,9 +17,7 @@ import {
     TextField,
     Typography,
     Grid,
-    Paper,
     Divider,
-    Container,
     Card,
     CardContent,
     Link,
@@ -31,7 +27,6 @@ import {
     Switch
 } from "@mui/material";
 import AvatarBlock from "../Avatar/AvatarBlock";
-import { AlternateEmail } from "@mui/icons-material";
 import EditIcon from "@mui/icons-material/Edit";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import TelegramIcon from "@mui/icons-material/Telegram";
@@ -131,7 +126,7 @@ const Profile: React.FC = () => {
         if (sendData.birthdate) {
             sendData.birthdate = new Date(sendData.birthdate ?? "").toISOString()
         }
-        axios.put(ApiRoutes.profile(), sendData, {
+        api.put(ApiRoutes.profile(), sendData, {
             headers: {
                 "Content-Type": "application/json",
             }

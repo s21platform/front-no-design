@@ -1,9 +1,9 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ApiRoutes, AppRoutes, useAuth } from "../../lib/routes";
-import axios from "axios";
 import { AppBar, Toolbar, Typography, Button, Box, Container, IconButton, useMediaQuery, useTheme, Menu, MenuItem } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useState } from "react";
+import api from "../../lib/api/api";
 
 const Header = () => {
     const { isAuth, setAuth } = useAuth();
@@ -22,7 +22,7 @@ const Header = () => {
     };
 
     const logout = () => {
-        axios.get(ApiRoutes.logout(), {
+        api.get(ApiRoutes.logout(), {
             withCredentials: true,
         }).then(data => {
             if (data.status === 200) {
@@ -96,24 +96,24 @@ const Header = () => {
                         /* Десктопное меню */
                         <Box>
                             {location.pathname !== AppRoutes.main() && (
-                                <Button 
-                                    color="inherit" 
-                                    component={Link} 
+                                <Button
+                                    color="inherit"
+                                    component={Link}
                                     to={AppRoutes.main()}
                                 >
                                     Главная
                                 </Button>
                             )}
-                            <Button 
-                                color="inherit" 
-                                component={Link} 
+                            <Button
+                                color="inherit"
+                                component={Link}
                                 to={AppRoutes.profile()}
                             >
                                 Профиль
                             </Button>
                             {isAuth && (
-                                <Button 
-                                    color="inherit" 
+                                <Button
+                                    color="inherit"
                                     onClick={logout}
                                 >
                                     Выход

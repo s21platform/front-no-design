@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import Notification from "../Notification/Notification";
 import { useNavigate } from "react-router-dom";
 import { ApiRoutes, AppRoutes, useAuth } from "../../lib/routes";
+import api from "../../lib/api/api";
 
 
 const FormSociety = () => {
@@ -16,7 +16,7 @@ const FormSociety = () => {
     const [notification, setNotification] = useState<{ message: string; type: "error" | "success" } | null>(null);
 
     useEffect(() => {
-        axios.get(ApiRoutes.profile(), {
+        api.get(ApiRoutes.profile(), {
             withCredentials: true,
         }).catch(err => {
             if (err.status === 401) {
@@ -28,7 +28,7 @@ const FormSociety = () => {
     }, []);
 
     const handleSubmit = () => {
-        axios.post(ApiRoutes.society(), {
+        api.post(ApiRoutes.society(), {
             name: name,
             description: description,
             is_private: isPrivate,

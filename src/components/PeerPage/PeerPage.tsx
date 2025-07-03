@@ -1,19 +1,17 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ProfileProps } from "../Profile/types";
-import axios from "axios";
 import ProfileSkeleton from "../Skeletons/ProfileSkeleton/ProfileSkeleton";
-import Loader from "../Loader/Loader";
 import AvatarPeerBlock from "../Avatar/AvatarPeerBlock";
 import PeerSubscriptionButton from "../PeerSubscriptionButton/PeerSubscriptionButton";
 import { ApiRoutes, AppRoutes, useAuth } from "../../lib/routes";
-import { 
-    Box, 
-    Card, 
-    CardContent, 
-    Typography, 
-    Grid, 
-    Divider, 
+import {
+    Box,
+    Card,
+    CardContent,
+    Typography,
+    Grid,
+    Divider,
     Link as MuiLink,
     useTheme
 } from "@mui/material";
@@ -21,6 +19,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import ComputerIcon from '@mui/icons-material/Computer';
 import PersonIcon from '@mui/icons-material/Person';
+import api from "../../lib/api/api";
 
 export const PeerPage = () => {
     const navigate = useNavigate();
@@ -37,7 +36,7 @@ export const PeerPage = () => {
     const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
 
     useEffect(() => {
-        axios.get(ApiRoutes.peer(pathParams.uuid), {
+        api.get(ApiRoutes.peer(pathParams.uuid), {
             withCredentials: true,
         }).then(data => {
             setProfileData(data.data)
@@ -50,7 +49,7 @@ export const PeerPage = () => {
             console.warn(err)
         })
 
-        axios.get(ApiRoutes.checkFriendship(), {
+        api.get(ApiRoutes.checkFriendship(), {
             params: {
                 peer: pathParams.uuid,
             },
@@ -84,7 +83,7 @@ export const PeerPage = () => {
                                             </Typography>
                                         </Box>
                                     )}
-                                    
+
                                     {profileData.name && (
                                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                                             <PersonIcon sx={{ mr: 1, color: 'text.secondary' }} />
@@ -93,7 +92,7 @@ export const PeerPage = () => {
                                             </Typography>
                                         </Box>
                                     )}
-                                    
+
                                     {profileData.birthdate && (
                                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                                             <Typography variant="body1">
@@ -101,15 +100,15 @@ export const PeerPage = () => {
                                             </Typography>
                                         </Box>
                                     )}
-                                    
+
                                     {profileData.telegram && (
                                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                                             <TelegramIcon sx={{ mr: 1, color: 'text.secondary' }} />
                                             <Typography variant="body1">
                                                 <strong>Telegram:</strong>{' '}
-                                                <MuiLink 
+                                                <MuiLink
                                                     href={`https://t.me/${profileData.telegram?.substring(1)}`}
-                                                    target="_blank" 
+                                                    target="_blank"
                                                     rel="noopener noreferrer"
                                                     color="secondary"
                                                 >
@@ -121,9 +120,9 @@ export const PeerPage = () => {
 
                                     <Box sx={{ mt: 2 }}>
                                         {!loadingSubscription && pathParams.uuid && (
-                                            <PeerSubscriptionButton 
-                                                isActive={isSubscribed} 
-                                                peerId={pathParams.uuid} 
+                                            <PeerSubscriptionButton
+                                                isActive={isSubscribed}
+                                                peerId={pathParams.uuid}
                                             />
                                         )}
                                     </Box>
@@ -134,7 +133,7 @@ export const PeerPage = () => {
                 )}
 
                 <Divider sx={{ my: 3 }} />
-                
+
                 {loading ? (
                     <ProfileSkeleton />
                 ) : (
@@ -144,16 +143,16 @@ export const PeerPage = () => {
                                 <Typography variant="h6" gutterBottom>
                                     Дополнительная информация
                                 </Typography>
-                                
+
                                 <Box sx={{ mb: 3 }}>
                                     {profileData.git && (
                                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                                             <GitHubIcon sx={{ mr: 1, color: 'text.secondary' }} />
                                             <Typography variant="body1">
                                                 <strong>GitHub:</strong>{' '}
-                                                <MuiLink 
+                                                <MuiLink
                                                     href={`https://github.com/${profileData.git}`}
-                                                    target="_blank" 
+                                                    target="_blank"
                                                     rel="noopener noreferrer"
                                                     color="secondary"
                                                 >
@@ -162,7 +161,7 @@ export const PeerPage = () => {
                                             </Typography>
                                         </Box>
                                     )}
-                                    
+
                                     {profileData.os && (
                                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                                             <ComputerIcon sx={{ mr: 1, color: 'text.secondary' }} />

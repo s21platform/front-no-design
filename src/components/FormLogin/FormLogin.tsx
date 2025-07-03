@@ -1,19 +1,19 @@
 import React, { useState } from "react";
-import axios from "axios";
 import Notification from "../Notification/Notification";
 import { ApiRoutes } from "../../lib/routes";
-import { 
-  Box, 
-  CircularProgress, 
-  TextField, 
-  Button, 
-  Typography, 
-  Container, 
-  Paper, 
-  InputAdornment, 
-  IconButton 
+import {
+  Box,
+  CircularProgress,
+  TextField,
+  Button,
+  Typography,
+  Container,
+  Paper,
+  InputAdornment,
+  IconButton
 } from "@mui/material";
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import api from "../../lib/api/api";
 
 interface ILoginForm {
     setIsLoggedIn: (isLoggedIn: boolean) => void;
@@ -32,7 +32,7 @@ const FormLogin = ({ setIsLoggedIn, onSwitchToRegister }: ILoginForm) => {
         if (event) {
             event.preventDefault();
         }
-        
+
         if (!username || !password) {
             setNotification({
                 message: "Введите имя пользователя и пароль",
@@ -40,9 +40,9 @@ const FormLogin = ({ setIsLoggedIn, onSwitchToRegister }: ILoginForm) => {
             });
             return;
         }
-        
+
         setLoading(true);
-        axios.post(ApiRoutes.login(), {
+        api.post(ApiRoutes.login(), {
             login: username,
             password: password,
         }, {
@@ -92,27 +92,27 @@ const FormLogin = ({ setIsLoggedIn, onSwitchToRegister }: ILoginForm) => {
 
     return (
         <>
-            <Box 
-                sx={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
+            <Box
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
                     justifyContent: 'center'
                 }}
             >
                 <Container maxWidth="sm">
-                    <Paper 
-                        elevation={3} 
-                        sx={{ 
-                            p: 4, 
+                    <Paper
+                        elevation={3}
+                        sx={{
+                            p: 4,
                             borderRadius: 2,
                             bgcolor: 'background.paper'
                         }}
                     >
-                        <Typography 
-                            variant="h4" 
-                            component="h1" 
-                            align="center" 
-                            fontWeight="bold" 
+                        <Typography
+                            variant="h4"
+                            component="h1"
+                            align="center"
+                            fontWeight="bold"
                             gutterBottom
                         >
                             Войти
@@ -181,13 +181,13 @@ const FormLogin = ({ setIsLoggedIn, onSwitchToRegister }: ILoginForm) => {
                                         'Войти'
                                     )}
                                 </Button>
-                                
+
                                 {onSwitchToRegister && (
                                     <Box sx={{ mt: 2, textAlign: 'center' }}>
-                                        <Button 
-                                            variant="text" 
+                                        <Button
+                                            variant="text"
                                             onClick={onSwitchToRegister}
-                                            sx={{ 
+                                            sx={{
                                                 textTransform: 'none',
                                                 color: 'secondary.main',
                                                 fontWeight: 'medium',

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../routes';
 import { ApiRoutes } from '../routes/const/apiRoutes';
 import { AppRoutes } from '../routes/const/appRoutes';
+import api from "../api/api";
 
 interface UseAuthenticatedRequestResult {
     sendRequest: <T>(config: AxiosRequestConfig) => Promise<AxiosResponse<T>>;
@@ -19,10 +20,10 @@ export const useAuthenticatedRequest = (): UseAuthenticatedRequestResult => {
 
     const refreshAccessToken = async (): Promise<string> => {
         try {
-            const response = await axios.post(ApiRoutes.refreshToken(), {}, {
+            const response = await api.post(ApiRoutes.refreshToken(), {}, {
                 withCredentials: true // для получения refresh token из куки
             });
-            
+
             const { access_token } = response.data;
             localStorage.setItem('access_token', access_token);
             return access_token;
@@ -52,13 +53,13 @@ export const useAuthenticatedRequest = (): UseAuthenticatedRequestResult => {
                 return response;
             } catch (error) {
                 const axiosError = error as AxiosError;
-                
+
                 // Если получили 401, пробуем обновить токен
                 if (axiosError.response?.status === 401) {
                     try {
                         // Пробуем обновить токен
                         const newAccessToken = await refreshAccessToken();
-                        
+
                         // Повторяем исходный запрос с новым токеном
                         const newConfigWithAuth = {
                             ...config,
@@ -67,7 +68,7 @@ export const useAuthenticatedRequest = (): UseAuthenticatedRequestResult => {
                                 Authorization: `Bearer ${newAccessToken}`
                             }
                         };
-                        
+
                         return await axios(newConfigWithAuth);
                     } catch (refreshError) {
                         // Если не удалось обновить токен, выходим из аккаунта
@@ -77,7 +78,7 @@ export const useAuthenticatedRequest = (): UseAuthenticatedRequestResult => {
                         throw new Error('Сессия истекла. Пожалуйста, войдите снова.');
                     }
                 }
-                
+
                 throw error;
             }
         } catch (error) {
@@ -90,4 +91,4 @@ export const useAuthenticatedRequest = (): UseAuthenticatedRequestResult => {
     };
 
     return { sendRequest, isLoading, error };
-}; 
+};

@@ -1,24 +1,23 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { 
-    Box, 
-    TextField, 
-    Typography, 
-    Button, 
-    Dialog, 
-    DialogActions, 
-    DialogContent, 
-    DialogTitle, 
-    FormControl, 
-    FormControlLabel, 
-    Switch, 
-    MenuItem, 
+import {
+    Box,
+    TextField,
+    Typography,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControl,
+    FormControlLabel,
+    Switch,
+    MenuItem,
     Card,
     CardContent,
     InputAdornment,
     useTheme
 } from "@mui/material";
 import { Grid } from "@mui/material";
-import axios from "axios";
 import { ApiRoutes } from "../../lib/routes";
 import { useNavigate } from "react-router-dom";
 import { SocietyCard } from "../SocietyCard/SocietyCard";
@@ -27,6 +26,7 @@ import { AppRoutes } from "../../lib/routes/const/appRoutes";
 import { POST_PERMISSIONS, SOCIETY_FORMATS } from "../../lib/consts/society";
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
+import api from "../../lib/api/api";
 
 interface SocietyData {
     uuid: string;
@@ -77,7 +77,7 @@ export const SocietySearch = () => {
     const fetchSocieties = useCallback(
         async (name = "") => {
             try {
-                const response = await axios.get(ApiRoutes.search(), {
+                const response = await api.get(ApiRoutes.search(), {
                     params: {
                         type: "society",
                         offset: 0,
@@ -122,7 +122,7 @@ export const SocietySearch = () => {
     };
 
     const handleSaveSociety = () => {
-        axios.post(ApiRoutes.society(), newSociety, {
+        api.post(ApiRoutes.society(), newSociety, {
             withCredentials: true
         })
             .then(response => {
@@ -167,8 +167,8 @@ export const SocietySearch = () => {
                     <Typography variant="h5" fontWeight="bold">
                         Поиск сообществ
                     </Typography>
-                    <Button 
-                        variant="contained" 
+                    <Button
+                        variant="contained"
                         onClick={() => setIsDialogOpen(true)}
                         color="secondary"
                         startIcon={<AddIcon />}
@@ -177,8 +177,8 @@ export const SocietySearch = () => {
                     </Button>
                 </Box>
 
-                <TextField 
-                    fullWidth 
+                <TextField
+                    fullWidth
                     variant="outlined"
                     label="Найти сообщество"
                     placeholder="Введите название сообщества"
@@ -211,9 +211,9 @@ export const SocietySearch = () => {
                 )}
             </CardContent>
 
-            <Dialog 
-                open={isDialogOpen} 
-                maxWidth="sm" 
+            <Dialog
+                open={isDialogOpen}
+                maxWidth="sm"
                 fullWidth
                 onClose={handleClose}
                 PaperProps={{
@@ -285,16 +285,16 @@ export const SocietySearch = () => {
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, py: 2 }}>
-                    <Button 
-                        onClick={handleClose} 
+                    <Button
+                        onClick={handleClose}
                         color="inherit"
                         variant="outlined"
                     >
                         Отмена
                     </Button>
-                    <Button 
-                        onClick={handleSaveSociety} 
-                        color="secondary" 
+                    <Button
+                        onClick={handleSaveSociety}
+                        color="secondary"
                         variant="contained"
                         disabled={!newSociety.name}
                     >
@@ -314,4 +314,4 @@ export const SocietySearch = () => {
     );
 };
 
-export default SocietySearch; 
+export default SocietySearch;

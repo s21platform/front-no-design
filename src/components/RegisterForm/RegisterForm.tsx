@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Notification from "../Notification/Notification";
 import { ApiRoutes } from "../../lib/routes";
 import {
@@ -15,6 +14,7 @@ import {
   Collapse
 } from "@mui/material";
 import { Visibility, VisibilityOff, CheckCircle, Cancel } from '@mui/icons-material';
+import api from "../../lib/api/api";
 
 interface IRegisterForm {
     onSuccess: () => void;
@@ -65,7 +65,7 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: IRegisterForm) => {
 
         try {
             // Выполняем GET запрос на проверку email с query параметром
-            const response = await axios.get(ApiRoutes.checkEmail(), {
+            const response = await api.get(ApiRoutes.checkEmail(), {
                 params: {
                     email: email
                 }
@@ -98,7 +98,7 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: IRegisterForm) => {
 
         try {
             // Отправляем запрос на отправку кода подтверждения
-            const response = await axios.post(ApiRoutes.sendCode(), {
+            const response = await api.post(ApiRoutes.sendCode(), {
                 email
             });
 
@@ -137,7 +137,7 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: IRegisterForm) => {
 
         try {
             // Отправляем запрос на регистрацию
-            const registerResponse = await axios.post(ApiRoutes.registerUser(), {
+            const registerResponse = await api.post(ApiRoutes.registerUser(), {
                 email,
                 password,
                 confirm_password: confirmPassword,
@@ -148,7 +148,7 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: IRegisterForm) => {
             if (registerResponse.status === 200) {
                 // После успешной регистрации выполняем автоматический вход
                 try {
-                    const loginResponse = await axios.post(ApiRoutes.login(), {
+                    const loginResponse = await api.post(ApiRoutes.login(), {
                         login: email,
                         password: password,
                     });

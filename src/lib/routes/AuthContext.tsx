@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import axios from 'axios';
 import { ApiRoutes } from './const/apiRoutes';
 import Loader from '../../components/Loader/Loader';
 import { Box } from '@mui/material';
+import api from "../api/api";
 
 interface AuthContextProps {
 	isAuth: boolean | null;
@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 
 	useEffect(() => {
-		axios
+		api
 			.get(ApiRoutes.checkAuth(), { withCredentials: true })
 			.then((data) => setIsAuth(data.data.isAuthenticated))
 			.catch((err) => {
