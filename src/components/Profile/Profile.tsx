@@ -165,11 +165,19 @@ const Profile: React.FC = () => {
                             </Grid>
                             <Grid item xs={12} sm>
                                 <Box>
-                                    {profileData.name && (
+                                    {(profileData.name && profileData.name.trim() !== "") && (
                                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                                             <PersonIcon sx={{ mr: 1, color: 'text.secondary' }} />
                                             <Typography variant="body1">
                                                 <strong>Имя:</strong> {profileData.name}
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                    {(profileData.nickname && profileData.nickname.trim() !== "") && (
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                            <PersonIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                                            <Typography variant="body1">
+                                                <strong>Ник:</strong> {profileData.nickname}
                                             </Typography>
                                         </Box>
                                     )}
