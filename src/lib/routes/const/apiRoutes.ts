@@ -1,5 +1,5 @@
 export const ApiRoutes = {
-	checkAuth: () => '/auth/check-auth',
+	// checkAuth: () => '/auth/check-auth',
 	login: () => '/auth/v2/login',
 	logout: () => '/auth/logout',
 	profile: () => '/api/profile',
@@ -17,7 +17,7 @@ export const ApiRoutes = {
 	avatar: () => '/api/avatar/user',
 	optionOs: () => '/api/option/os',
 	advert: () => '/api/advert',
-	
+
 	// Новые эндпоинты для регистрации
 	checkEmail: () => '/auth/check-email',
 	sendCode: () => '/auth/send-code',

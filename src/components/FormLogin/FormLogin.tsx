@@ -52,9 +52,10 @@ const FormLogin = ({ setIsLoggedIn, onSwitchToRegister }: ILoginForm) => {
         }).then(res => {
             if (res.status === 200) {
                 const currentTime = Date.now();
-                const expiryTime = currentTime + 10 * 60 * 60 * 1000;
+                const expiryTime = currentTime + 15 * 60 * 1000;
 
-                localStorage.setItem("expiry", expiryTime.toString());
+                localStorage.setItem("token_expires_at", expiryTime.toString());
+                localStorage.setItem("access_token", res.data.access_token);
                 setIsLoggedIn(true);
                 setNotification({
                     message: "Успешная авторизация",

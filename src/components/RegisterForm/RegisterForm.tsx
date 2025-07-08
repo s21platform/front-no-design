@@ -155,8 +155,8 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: IRegisterForm) => {
 
                     if (loginResponse.status === 200) {
                         const currentTime = Date.now();
-                        const expiryTime = currentTime + 10 * 60 * 60 * 1000;
-                        localStorage.setItem("expiry", expiryTime.toString());
+                        const expiryTime = currentTime + 15 * 60 * 1000;
+                        localStorage.setItem("token_expires_at", expiryTime.toString());
                         localStorage.setItem("access_token", loginResponse.data.access_token);
 
                         setNotification({
