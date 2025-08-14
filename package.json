@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@blocknote/core": "^0.35.0",
+    "@blocknote/mantine": "^0.35.0",
+    "@blocknote/react": "^0.35.0",
     "@date-io/date-fns": "^3.0.0",
     "@emotion/react": "^11.13.5",
     "@emotion/styled": "^11.13.5",
@@ -24,7 +27,7 @@
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.2",
     "react-scripts": "5.0.1",
-    "typescript": "^4.9.5",
+    "typescript": "^5.9.2",
     "uuid": "^11.0.2",
     "web-vitals": "^2.1.4"
   },

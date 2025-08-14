@@ -1,4 +1,7 @@
 export const AppRoutes = {
+	materials: () => '/materials',
+	materialsNew: () => '/materials/new',
+	materialView: (id?: string) => id ? `/materials/${id}` : '/materials/:id',
 	main: () => '/',
 	login: () => '/login',
 	profile: () => '/profile',
