@@ -1,17 +1,19 @@
-import React from "react";
-import { 
-  Box, 
-  Container, 
-  Typography, 
-  Card, 
-  Button, 
-  Grid, 
-  Avatar, 
+import React, {useState} from "react";
+import {
+  Box,
+  Container,
+  Typography,
+  Card,
+  Button,
+  Grid,
+  Avatar,
   Stack,
   Paper,
   useTheme
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+
+
 
 // Моковые данные пользователей и проектов
 const mockUsers = [
@@ -51,10 +53,10 @@ const UserCard: React.FC<{
 }> = ({ name, jobTitle, avatar, description, projects }) => {
     return (
         <Card sx={{ display: 'flex', p: 2, height: '100%', bgcolor: 'background.paper' }}>
-            <Avatar 
-                src={avatar} 
-                alt={name} 
-                sx={{ width: 64, height: 64, mr: 2 }} 
+            <Avatar
+                src={avatar}
+                alt={name}
+                sx={{ width: 64, height: 64, mr: 2 }}
             />
             <Box>
                 <Typography variant="h6" component="div">{name}</Typography>
@@ -166,25 +168,25 @@ const Home: React.FC = () => {
     return (
         <Box>
             {/* Hero Section */}
-            <Box 
-                sx={{ 
+            <Box
+                sx={{
                     background: 'linear-gradient(180deg, #000000 0%, rgba(79, 70, 229, 0.3) 50%, #1e1e1e 100%)',
-                    color: 'white', 
-                    pt: 8, 
+                    color: 'white',
+                    pt: 8,
                     pb: 12,
                     textAlign: 'center'
                 }}
             >
                 <Container maxWidth="lg">
                     <Box sx={{ mb: 2 }}>
-                        <Typography 
-                            variant="overline" 
-                            component="div" 
-                            sx={{ 
-                                display: 'inline-block', 
-                                bgcolor: 'rgba(255,255,255,0.1)', 
-                                px: 1.5, 
-                                py: 0.5, 
+                        <Typography
+                            variant="overline"
+                            component="div"
+                            sx={{
+                                display: 'inline-block',
+                                bgcolor: 'rgba(255,255,255,0.1)',
+                                px: 1.5,
+                                py: 0.5,
                                 borderRadius: '16px',
                                 mb: 2
                             }}
@@ -192,25 +194,25 @@ const Home: React.FC = () => {
                             Для ИТ-специалистов
                         </Typography>
                     </Box>
-                    
+
                     <Typography variant="h2" component="h1" gutterBottom fontWeight="bold">
                         Общение. Обучение. Отдых.
                     </Typography>
-                    
+
                     <Typography variant="h6" color="rgba(255,255,255,0.7)" sx={{ maxWidth: 600, mx: 'auto', mb: 4 }}>
                         Тестовая площадка для общения и обмена опытом между разработчиками
                     </Typography>
-                    
-                    <Stack 
-                        direction={{ xs: 'column', sm: 'row' }} 
-                        spacing={2} 
+
+                    <Stack
+                        direction={{ xs: 'column', sm: 'row' }}
+                        spacing={2}
                         justifyContent="center"
                     >
-                        <Button 
-                            variant="contained" 
-                            size="large" 
-                            sx={{ 
-                                bgcolor: 'white', 
+                        <Button
+                            variant="contained"
+                            size="large"
+                            sx={{
+                                bgcolor: 'white',
                                 color: 'black',
                                 '&:hover': {
                                     bgcolor: 'rgba(255,255,255,0.9)'
@@ -219,11 +221,11 @@ const Home: React.FC = () => {
                         >
                             Начать
                         </Button>
-                        <Button 
-                            variant="outlined" 
-                            size="large" 
-                            sx={{ 
-                                borderColor: 'white', 
+                        <Button
+                            variant="outlined"
+                            size="large"
+                            sx={{
+                                borderColor: 'white',
                                 color: 'white',
                                 '&:hover': {
                                     borderColor: 'rgba(255,255,255,0.9)',
@@ -240,34 +242,34 @@ const Home: React.FC = () => {
             {/* Platform Features Section */}
             <Box sx={{ py: 8, bgcolor: 'background.default' }}>
                 <Container maxWidth="lg">
-                    <Typography 
-                        variant="h3" 
-                        component="h2" 
-                        textAlign="center" 
-                        fontWeight="bold" 
+                    <Typography
+                        variant="h3"
+                        component="h2"
+                        textAlign="center"
+                        fontWeight="bold"
                         gutterBottom
                     >
                         Ключевые возможности
                     </Typography>
-                    
-                    <Typography 
-                        variant="subtitle1" 
-                        color="text.secondary" 
-                        textAlign="center" 
+
+                    <Typography
+                        variant="subtitle1"
+                        color="text.secondary"
+                        textAlign="center"
                         sx={{ maxWidth: 700, mx: 'auto', mb: 6 }}
                     >
                         Набор инструментов, необходимых для комфортной работы на платформе
                     </Typography>
-                    
+
                     <Grid container spacing={3}>
                         {features.map((feature, index) => (
                             <Grid item xs={12} sm={6} md={4} key={index}>
-                                <Paper 
-                                    elevation={0} 
-                                    sx={{ 
-                                        p: 3, 
-                                        height: '100%', 
-                                        display: 'flex', 
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        p: 3,
+                                        height: '100%',
+                                        display: 'flex',
                                         flexDirection: 'column',
                                         alignItems: 'center',
                                         textAlign: 'center',
@@ -276,9 +278,9 @@ const Home: React.FC = () => {
                                         border: `1px solid ${theme.palette.divider}`
                                     }}
                                 >
-                                    <Typography 
-                                        variant="h3" 
-                                        component="div" 
+                                    <Typography
+                                        variant="h3"
+                                        component="div"
                                         sx={{ mb: 1 }}
                                     >
                                         {feature.icon}
@@ -286,8 +288,8 @@ const Home: React.FC = () => {
                                     <Typography variant="h6" gutterBottom>
                                         {feature.title}
                                     </Typography>
-                                    <Typography 
-                                        variant="body2" 
+                                    <Typography
+                                        variant="body2"
                                         color="text.secondary"
                                     >
                                         {feature.description}
@@ -296,7 +298,7 @@ const Home: React.FC = () => {
                             </Grid>
                         ))}
                     </Grid>
-                    
+
                     {/* Image Placeholder */}
                     <StyledBox>
                         <Typography variant="body1" color="text.secondary">

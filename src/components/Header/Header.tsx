@@ -86,7 +86,10 @@ const Header = () => {
                                 {location.pathname !== AppRoutes.main() && (
                                     <MenuItem onClick={() => navigateTo(AppRoutes.main())}>Главная</MenuItem>
                                 )}
-                                <MenuItem onClick={() => navigateTo(AppRoutes.profile())}>Профиль</MenuItem>
+                                <MenuItem onClick={() => navigateTo(AppRoutes.materials())}>Материалы</MenuItem>
+                                {isAuth && (
+                                    <MenuItem onClick={() => navigateTo(AppRoutes.profile())}>Профиль</MenuItem>
+                                )}
                                 {isAuth && (
                                     <MenuItem onClick={logout}>Выход</MenuItem>
                                 )}
@@ -107,10 +110,19 @@ const Header = () => {
                             <Button
                                 color="inherit"
                                 component={Link}
-                                to={AppRoutes.profile()}
+                                to={AppRoutes.materials()}
                             >
-                                Профиль
+                                Материалы
                             </Button>
+                            {isAuth && (
+                                <Button
+                                    color="inherit"
+                                    component={Link}
+                                    to={AppRoutes.profile()}
+                                >
+                                    Профиль
+                                </Button>
+                            )}
                             {isAuth && (
                                 <Button
                                     color="inherit"
