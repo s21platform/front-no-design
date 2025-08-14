@@ -19,8 +19,8 @@ import DoneAllIcon from '@mui/icons-material/DoneAll';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import axios from 'axios';
 import { ApiRoutes } from '../../../lib/routes';
+import api from "../../../lib/api/api";
 
 const StyledPopper = styled(Popper)(({ theme }) => ({
     zIndex: 1000,
@@ -73,8 +73,8 @@ const LoadingState = styled(Box)(({ theme }) => ({
 
 const NotificationDivider = styled(Box)(({ theme }) => ({
     padding: theme.spacing(1.5),
-    backgroundColor: theme.palette.mode === 'dark' 
-        ? 'rgba(18, 18, 18, 0.9)' 
+    backgroundColor: theme.palette.mode === 'dark'
+        ? 'rgba(18, 18, 18, 0.9)'
         : 'rgba(255, 255, 255, 0.9)',
     borderBottom: `1px solid ${theme.palette.divider}`,
     borderTop: `1px solid ${theme.palette.divider}`,
@@ -112,7 +112,7 @@ const NotificationListItem: React.FC<{
                 (entries) => {
                     const entry = entries[0];
                     const isVisible = entry.isIntersecting;
-                    
+
                     if (isVisible && !visibilityStartTime.current) {
                         visibilityStartTime.current = Date.now();
                         setIsFullyVisible(true);
@@ -122,14 +122,14 @@ const NotificationListItem: React.FC<{
                     }
 
                     // Если элемент видим более 2 секунд и не был прочитан
-                    if (isVisible && 
-                        visibilityStartTime.current && 
-                        Date.now() - visibilityStartTime.current >= 2000 && 
+                    if (isVisible &&
+                        visibilityStartTime.current &&
+                        Date.now() - visibilityStartTime.current >= 2000 &&
                         !notification.isRead) {
                         onVisible?.();
                     }
                 },
-                { 
+                {
                     threshold: 0.9, // Увеличиваем порог видимости до 90%
                     rootMargin: '-10px' // Уменьшаем отступ для более точного определения
                 }
@@ -174,8 +174,8 @@ const NotificationListItem: React.FC<{
                 <Typography
                     variant="caption"
                     color="textSecondary"
-                    sx={{ 
-                        display: 'block', 
+                    sx={{
+                        display: 'block',
                         mt: 1,
                         opacity: notification.isRead ? 0.7 : 1,
                         transition: 'opacity 0.3s ease-in-out'
@@ -195,7 +195,7 @@ const NotificationWidget: React.FC = () => {
     const [newNotificationsCount, setNewNotificationsCount] = useState<number>(0);
     const anchorRef = useRef<HTMLButtonElement>(null);
     const offsetAdjustmentRef = useRef<number>(0);
-    
+
     const {
         notifications,
         unreadCount,
@@ -215,14 +215,14 @@ const NotificationWidget: React.FC = () => {
     // Отслеживаем новые уведомления только когда дропдаун закрыт
     useEffect(() => {
         let interval: NodeJS.Timeout;
-        
+
         if (!isDropdownOpen) {
             // Сразу проверяем наличие новых уведомлений
             const checkNewNotifications = async () => {
                 try {
-                    const response = await axios.get(ApiRoutes.notificationCount());
+                    const response = await api.get(ApiRoutes.notificationCount());
                     const newCount = Math.min(response.data.count || 0, 9);
-                    
+
                     if (newCount > unreadCount) {
                         const difference = newCount - unreadCount;
                         offsetAdjustmentRef.current += difference;
@@ -235,7 +235,7 @@ const NotificationWidget: React.FC = () => {
 
             // Проверяем сразу при закрытии дропдауна
             checkNewNotifications();
-            
+
             // Устанавливаем интервал для периодической проверки
             interval = setInterval(checkNewNotifications, 20000);
         }
@@ -310,19 +310,19 @@ const NotificationWidget: React.FC = () => {
                 Уведомления
             </Typography>
             <Tooltip title="Обновить">
-                <IconButton 
-                    size="small" 
+                <IconButton
+                    size="small"
                     onClick={handleRefresh}
                     disabled={isRefreshing}
                 >
-                    <RefreshIcon 
-                        sx={{ 
+                    <RefreshIcon
+                        sx={{
                             animation: isRefreshing ? 'spin 1s linear infinite' : 'none',
                             '@keyframes spin': {
                                 '0%': { transform: 'rotate(0deg)' },
                                 '100%': { transform: 'rotate(360deg)' }
                             }
-                        }} 
+                        }}
                     />
                 </IconButton>
             </Tooltip>
@@ -461,7 +461,7 @@ const NotificationWidget: React.FC = () => {
                             onWheel={(e) => {
                                 const element = e.currentTarget;
                                 const { scrollTop, scrollHeight, clientHeight } = element;
-                                
+
                                 // Предотвращаем прокрутку страницы только если:
                                 // 1. Скроллим вверх и мы не в самом верху списка
                                 // 2. Скроллим вниз и мы не в самом низу списка

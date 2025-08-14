@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Avatar, CircularProgress, Box } from "@mui/material";
-import axios from "axios";
 import { ApiRoutes } from "../../lib/routes";
+import api from "../../lib/api/api";
 
 interface SocietyAvatarProps {
 	currentUrl: string;
@@ -37,7 +37,7 @@ const SocietyAvatar: React.FC<SocietyAvatarProps> = ({
 
 		setLoading(true);
 		try {
-			const response = await axios.post(ApiRoutes.societyAvatar(), formData, {
+			const response = await api.post(ApiRoutes.societyAvatar(), formData, {
 				headers: {
 					"Content-Type": "multipart/form-data",
 				},

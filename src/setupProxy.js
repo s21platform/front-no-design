@@ -9,20 +9,20 @@ module.exports = function(app) {
             changeOrigin: true,
         })
     );
-    // app.use(
-    //     '/api',
-    //     createProxyMiddleware({
-    //         target: 'http://217.28.222.68:6050', // Сервер, на который будет идти проксирование
-    //         changeOrigin: true,
-    //     })
-    // );
     app.use(
         '/api',
         createProxyMiddleware({
-            target: 'http://127.0.0.1:3099', // Сервер, на который будет идти проксирование
+            target: 'http://217.28.222.68:6050', // Сервер, на который будет идти проксирование
             changeOrigin: true,
         })
     );
+    // app.use(
+    //     '/api',
+    //     createProxyMiddleware({
+    //         target: 'http://127.0.0.1:3099', // Сервер, на который будет идти проксирование
+    //         changeOrigin: true,
+    //     })
+    // );
     app.use(
         '/ws',
         createProxyMiddleware({

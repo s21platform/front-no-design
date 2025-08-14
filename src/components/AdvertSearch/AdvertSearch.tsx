@@ -1,28 +1,28 @@
 import React, { useState } from "react";
-import { 
-    Box, 
-    TextField, 
-    Typography, 
-    Button, 
-    Dialog, 
-    DialogActions, 
-    DialogContent, 
-    DialogTitle, 
-    FormControl, 
-    MenuItem, 
-    Checkbox, 
+import {
+    Box,
+    TextField,
+    Typography,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControl,
+    MenuItem,
+    Checkbox,
     ListItemText,
     Card,
     CardContent,
     useTheme,
     InputAdornment
 } from "@mui/material";
-import axios from "axios";
 import { ApiRoutes } from "../../lib/routes";
 import { OS_TYPES } from "../../lib/consts/advert";
 import Notification from "../Notification/Notification";
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
+import api from "../../lib/api/api";
 
 interface NewAdvert {
     uuid: string;
@@ -68,8 +68,8 @@ export const AdvertSearch = () => {
             ...newAdvert,
             expires_at: new Date(newAdvert.expires_at).toISOString()
         };
-        
-        axios.post(ApiRoutes.advert(), submitData, {
+
+        api.post(ApiRoutes.advert(), submitData, {
             withCredentials: true
         })
         .then(response => {
@@ -89,7 +89,7 @@ export const AdvertSearch = () => {
             }
             setNotification({
                 message: "Ошибка при создании рекламной кампании",
-                type: "error"  
+                type: "error"
             });
         });
     };
@@ -113,8 +113,8 @@ export const AdvertSearch = () => {
                     <Typography variant="h5" fontWeight="bold">
                         Рекламные кампании
                     </Typography>
-                    <Button 
-                        variant="contained" 
+                    <Button
+                        variant="contained"
                         onClick={() => setIsDialogOpen(true)}
                         color="secondary"
                         startIcon={<AddIcon />}
@@ -123,11 +123,11 @@ export const AdvertSearch = () => {
                     </Button>
                 </Box>
 
-                <TextField 
-                    fullWidth 
+                <TextField
+                    fullWidth
                     variant="outlined"
-                    label="Поиск кампаний" 
-                    placeholder="Введите текст для поиска" 
+                    label="Поиск кампаний"
+                    placeholder="Введите текст для поиска"
                     margin="normal"
                     InputProps={{
                         startAdornment: (
@@ -145,9 +145,9 @@ export const AdvertSearch = () => {
                 </Box>
             </CardContent>
 
-            <Dialog 
-                open={isDialogOpen} 
-                maxWidth="sm" 
+            <Dialog
+                open={isDialogOpen}
+                maxWidth="sm"
                 fullWidth
                 onClose={handleClose}
                 PaperProps={{
@@ -183,7 +183,7 @@ export const AdvertSearch = () => {
                                 onChange={(e) => handleInputChange('user.os', typeof e.target.value === 'string' ? e.target.value.split(',').map(Number) : e.target.value)}
                                 SelectProps={{
                                     multiple: true,
-                                    renderValue: (selected: unknown) => 
+                                    renderValue: (selected: unknown) =>
                                         ((selected as number[])
                                             .map(value => OS_TYPES.find(os => os.value === value)?.label)
                                             .join(', '))
@@ -216,15 +216,15 @@ export const AdvertSearch = () => {
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, py: 2 }}>
-                    <Button 
-                        onClick={handleClose} 
+                    <Button
+                        onClick={handleClose}
                         color="inherit"
                         variant="outlined"
                     >
                         Отмена
                     </Button>
-                    <Button 
-                        onClick={handleSaveAdvert} 
+                    <Button
+                        onClick={handleSaveAdvert}
                         variant="contained"
                         color="secondary"
                         disabled={!newAdvert.text || newAdvert.user.os.length === 0}
@@ -245,4 +245,4 @@ export const AdvertSearch = () => {
     );
 };
 
-export default AdvertSearch; 
+export default AdvertSearch;

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
 import { ApiRoutes } from '../lib/routes';
+import api from "../lib/api/api";
 
 export interface Notification {
     id: number;
@@ -42,7 +42,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     const fetchUnreadCount = useCallback(async () => {
         try {
-            const response = await axios.get(ApiRoutes.notificationCount());
+            const response = await api.get(ApiRoutes.notificationCount());
             const newCount = Math.min(response.data.count || 0, 9);
             setUnreadCount(newCount);
         } catch (error) {
@@ -53,11 +53,11 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     const refreshNotifications = async () => {
         try {
-            const response = await axios.get(ApiRoutes.notification(), {
+            const response = await api.get(ApiRoutes.notification(), {
                 params: { limit, offset: 0 },
             });
             const newNotifications: Notification[] = response.data.notifications || [];
-            
+
             setNotifications(newNotifications);
             setOffset(limit);
             setHasMore(newNotifications.length === limit);
@@ -73,7 +73,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         if (!hasMore || isInitialLoad) return;
 
         try {
-            const response = await axios.get(ApiRoutes.notification(), {
+            const response = await api.get(ApiRoutes.notification(), {
                 params: { limit, offset: offset + offsetAdjustment },
             });
             const newNotifications: Notification[] = response.data.notifications || [];
@@ -94,9 +94,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     const markAsRead = async (ids: number[]) => {
         if (!ids || ids.length === 0) return;
-        
+
         try {
-            await axios.patch(ApiRoutes.notification(), { data: { ids } });
+            await api.patch(ApiRoutes.notification(), { data: { ids } });
             setNotifications(prev =>
                 prev.map(notification =>
                     ids.includes(notification.id) ? { ...notification, isRead: true } : notification
@@ -111,7 +111,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     const markSingleNotificationAsRead = async (id: number) => {
         try {
-            await axios.patch(ApiRoutes.notification(), { data: { ids: [id] } });
+            await api.patch(ApiRoutes.notification(), { data: { ids: [id] } });
             setNotifications(prev =>
                 prev.map(notification =>
                     notification.id === id ? { ...notification, isRead: true } : notification
@@ -147,4 +147,4 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             {children}
         </NotificationContext.Provider>
     );
-}; 
+};

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import Loader from "../Loader/Loader";
 import AvatarSkeleton from "../Skeletons/AvatarSkeleton/AvatarSkeleton";
 import Avatar from "@mui/material/Avatar"
 import LoadingButton from "@mui/lab/LoadingButton";
 import { ApiRoutes } from '../../lib/routes';
+import api from "../../lib/api/api";
 
 interface AvatarUploaderProps {
     initialAvatarUrl: string;
@@ -42,7 +42,7 @@ const AvatarBlock: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatar
         setLoading(true);
 
         try {
-            const response = await axios.post(ApiRoutes.avatar(), formData, {
+            const response = await api.post(ApiRoutes.avatar(), formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -64,7 +64,7 @@ const AvatarBlock: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatar
         setIsPopupOpen(true);
         setLoadingAll(true)
         try {
-            const response = await axios.get(ApiRoutes.avatar());
+            const response = await api.get(ApiRoutes.avatar());
             setAllAvatars(response.data.avatar_list);
             setCurrentAvatarIndex(response.data.avatars.findIndex((url: string) => url === avatarUrl));
         } catch (error) {
@@ -92,7 +92,7 @@ const AvatarBlock: React.FC<AvatarUploaderProps> = ({ initialAvatarUrl, onAvatar
 
     const deleteAvatar = () => {
         if (window.confirm("Удалить аватар?")) {
-            axios.delete(ApiRoutes.avatar(), {
+            api.delete(ApiRoutes.avatar(), {
                 data: {
                     id: allAvatars[currentAvatarIndex].id,
                 },

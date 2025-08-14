@@ -1,10 +1,10 @@
 import { Box, TextField, Typography, Pagination, Card, Grid, Container, useTheme } from "@mui/material";
 import PeerCard from "../PeerCard/PeerCard";
 import { useCallback, useEffect, useState } from "react";
-import axios from "axios";
 import { ApiRoutes } from "../../lib/routes";
 import SearchIcon from '@mui/icons-material/Search';
 import { InputAdornment } from "@mui/material";
+import api from "../../lib/api/api";
 
 export interface PeerData {
     uuid: string,
@@ -21,7 +21,7 @@ export const PeerSearch = () => {
     const [debouncedText, setDebouncedText] = useState<string>("");
     const [isEmpty, setIsEmpty] = useState(false);
     const theme = useTheme();
-    
+
     // Добавляем состояния для пагинации
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -52,7 +52,7 @@ export const PeerSearch = () => {
     const fetchPeers = useCallback(
         async (nickname = "") => {
             try {
-                const response = await axios.get(ApiRoutes.search(), {
+                const response = await api.get(ApiRoutes.search(), {
                     params: {
                         type: "peer",
                         offset: (currentPage - 1) * itemsPerPage, // Вычисляем смещение
@@ -100,13 +100,13 @@ export const PeerSearch = () => {
             <Typography variant="h5" gutterBottom fontWeight="bold">
                 Поиск пиров
             </Typography>
-            
-            <TextField 
-                fullWidth 
+
+            <TextField
+                fullWidth
                 variant="outlined"
-                label="Найти пира" 
-                placeholder="Введите имя пользователя" 
-                margin="normal" 
+                label="Найти пира"
+                placeholder="Введите имя пользователя"
+                margin="normal"
                 value={searchText}
                 onChange={handleSearchChange}
                 InputProps={{
@@ -133,9 +133,9 @@ export const PeerSearch = () => {
                             </Grid>
                         ))}
                     </Grid>
-                    
+
                     <Box display="flex" justifyContent="center" sx={{ mt: 4, mb: 2 }}>
-                        <Pagination 
+                        <Pagination
                             count={totalPages}
                             page={currentPage}
                             onChange={handlePageChange}

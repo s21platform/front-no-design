@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
-    Box, 
-    Typography, 
-    Button, 
-    Skeleton, 
+    Box,
+    Typography,
+    Button,
+    Skeleton,
     IconButton,
-    Dialog, 
-    DialogTitle, 
-    DialogContent, 
+    Dialog,
+    DialogTitle,
+    DialogContent,
     DialogActions,
-    FormControl, 
-    TextField, 
-    FormControlLabel, 
-    Switch, 
+    FormControl,
+    TextField,
+    FormControlLabel,
+    Switch,
     MenuItem,
     CircularProgress,
     Card,
@@ -29,10 +29,10 @@ import PeopleIcon from '@mui/icons-material/People';
 import LabelIcon from '@mui/icons-material/Label';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import SettingsIcon from '@mui/icons-material/Settings';
-import axios from "axios";
 import { ApiRoutes } from "../../lib/routes/const/apiRoutes";
 import { POST_PERMISSIONS, SOCIETY_FORMATS } from "../../lib/consts/society";
 import SocietyAvatar from "../SocietyAvatar/SocietyAvatar";
+import api from "../../lib/api/api";
 
 const Tags = [{
     value: 1,
@@ -72,13 +72,13 @@ export const SocietyPage = () => {
     useEffect(() => {
         const fetchSocietyData = async () => {
             try {
-                const response = await axios.get(ApiRoutes.society(), {
+                const response = await api.get(ApiRoutes.society(), {
                     params: { society_id: uuid },
                     withCredentials: true
                 });
 
                 const societyData = response.data;
-                const avatarRes = await axios.get(ApiRoutes.societyAvatar(), {
+                const avatarRes = await api.get(ApiRoutes.societyAvatar(), {
                     params: { societyUUID: uuid },
                     withCredentials: true
                 });
@@ -141,7 +141,7 @@ export const SocietyPage = () => {
 
         setSaving(true);
 
-        axios.put(ApiRoutes.society(), { ...editing, societyUUID: uuid }, {
+        api.put(ApiRoutes.society(), { ...editing, societyUUID: uuid }, {
             withCredentials: true
         })
             .then(response => {
@@ -163,12 +163,12 @@ export const SocietyPage = () => {
             console.error('Society UUID is not available');
             return;
         }
-        
+
         setLoadingSubscription(true);
         try {
-            await axios.post(ApiRoutes.societyJoin(uuid));
+            await api.post(ApiRoutes.societyJoin(uuid));
             // Обновляем данные сообщества после успешного присоединения
-            const response = await axios.get(ApiRoutes.society(), {
+            const response = await api.get(ApiRoutes.society(), {
                 params: { society_id: uuid },
                 withCredentials: true
             });
@@ -214,8 +214,8 @@ export const SocietyPage = () => {
     return (
         <Card elevation={2} sx={{ borderRadius: 2, overflow: 'hidden' }}>
             {/* Область аватара */}
-            <Box 
-                sx={{ 
+            <Box
+                sx={{
                     position: 'relative',
                     height: 200,
                     bgcolor: 'background.paper',
@@ -236,21 +236,21 @@ export const SocietyPage = () => {
             <CardContent sx={{ p: 4, position: 'relative' }}>
                 {/* Кнопка редактирования */}
                 {society.can_edit_society && (
-                    <IconButton 
+                    <IconButton
                         onClick={handleEditOpen}
                         sx={{ position: 'absolute', top: 16, right: 16 }}
                     >
                         <EditIcon />
                     </IconButton>
                 )}
-                
+
                 <Grid container spacing={3}>
                     <Grid item xs={12} md={8}>
                         {/* Название и информация */}
                         <Typography variant="h4" fontWeight="bold" gutterBottom>
                             {society.name}
                         </Typography>
-                        
+
                         <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2, mb: 2 }}>
                             <Chip
                                 icon={<SettingsIcon fontSize="small" />}
@@ -274,14 +274,14 @@ export const SocietyPage = () => {
                                 />
                             )}
                         </Box>
-                        
+
                         <Divider sx={{ my: 2 }} />
-                        
+
                         {/* Описание */}
                         <Typography variant="body1" paragraph>
                             {society.description}
                         </Typography>
-                        
+
                         {/* Теги */}
                         <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                             {Tags.map((tag) => (
@@ -296,7 +296,7 @@ export const SocietyPage = () => {
                             ))}
                         </Box>
                     </Grid>
-                    
+
                     <Grid item xs={12} md={4} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
                         {/* Кнопка подписки */}
                         <Button
@@ -306,7 +306,7 @@ export const SocietyPage = () => {
                             onClick={handleSubscribe}
                             disabled={loadingSubscription}
                             startIcon={!loadingSubscription && <PeopleIcon fontSize="small" />}
-                            sx={{ 
+                            sx={{
                                 minWidth: 'auto',
                                 px: 2,
                                 py: 1,
@@ -327,10 +327,10 @@ export const SocietyPage = () => {
             </CardContent>
 
             {/* Диалог редактирования сообщества */}
-            <Dialog 
-                open={isDialogOpen} 
-                maxWidth="sm" 
-                fullWidth 
+            <Dialog
+                open={isDialogOpen}
+                maxWidth="sm"
+                fullWidth
                 PaperProps={{
                     sx: {
                         borderRadius: 2,
@@ -355,7 +355,7 @@ export const SocietyPage = () => {
                                     required
                                 />
                             </FormControl>
-                            
+
                             <FormControl fullWidth sx={{ mb: 2 }}>
                                 <TextField
                                     select
@@ -371,7 +371,7 @@ export const SocietyPage = () => {
                                     ))}
                                 </TextField>
                             </FormControl>
-                            
+
                             <FormControl fullWidth sx={{ mb: 2 }}>
                                 <TextField
                                     select
@@ -387,7 +387,7 @@ export const SocietyPage = () => {
                                     ))}
                                 </TextField>
                             </FormControl>
-                            
+
                             <FormControl fullWidth sx={{ mb: 2 }}>
                                 <TextField
                                     select
@@ -417,7 +417,7 @@ export const SocietyPage = () => {
                                     multiline
                                 />
                             </FormControl>
-                            
+
                             <FormControlLabel
                                 control={
                                     <Switch
@@ -432,7 +432,7 @@ export const SocietyPage = () => {
                     )}
                 </DialogContent>
                 <DialogActions sx={{ px: 3, py: 2 }}>
-                    <Button 
+                    <Button
                         onClick={handleClose}
                         color="inherit"
                         variant="outlined"
