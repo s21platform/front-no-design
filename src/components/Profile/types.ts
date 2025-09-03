@@ -17,3 +17,20 @@ export type SubscriptionCount = {
     followersCount: number,
     followingCount: number,
 }
+
+// Новые типы для динамического профиля
+export type ProfileItem = {
+    title: string;
+    type: string;
+    value?: string;
+    enum_values?: string[];
+}
+
+export type MyPersonality = {
+    data: ProfileItem[];
+}
+
+export type ProfileBlock = {
+    title: string;
+    items: ProfileItem[];
+}
