@@ -12,20 +12,19 @@ interface ProfileItemRendererProps {
 }
 
 const ProfileItemRenderer: React.FC<ProfileItemRendererProps> = ({ item }) => {
-    console.log(item)
+    console.log("item", item)
     const renderValue = () => {
         switch (item.type) {
-            case 'text':
-            case 'string':
-            case 'number':
-            case 'date':
+            case 'STRING':
+            case 'NUMBER':
+            case 'DATE':
                 return (
                     <Typography variant="body1">
                         <strong>{item.title}:</strong> {item.value || 'Не указано'}
                     </Typography>
                 );
 
-            case 'enum':
+            case 'ENUM':
             case 'multi_select':
                 if (!item.enum_values || item.enum_values.length === 0) {
                     return (
@@ -58,7 +57,7 @@ const ProfileItemRenderer: React.FC<ProfileItemRendererProps> = ({ item }) => {
                     </Box>
                 );
 
-            case 'boolean':
+            case 'BOOL':
                 return (
                     <Typography variant="body1">
                         <strong>{item.title}:</strong> {item.value === 'true' ? 'Да' : 'Нет'}
@@ -82,4 +81,5 @@ const ProfileItemRenderer: React.FC<ProfileItemRendererProps> = ({ item }) => {
 };
 
 export default ProfileItemRenderer;
+
 
