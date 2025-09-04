@@ -17,6 +17,7 @@ export const ApiRoutes = {
 	avatar: () => '/api/avatar/user',
 	optionOs: () => '/api/option/os',
 	advert: () => '/api/advert',
+	personality: () => '/api/user/me/personality',
 
 	// Новые эндпоинты для регистрации
 	checkEmail: () => '/auth/check-email',
