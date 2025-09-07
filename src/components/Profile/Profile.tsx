@@ -163,6 +163,9 @@ const Profile: React.FC = () => {
                     case 'BOOLEAN':
                         initialValues[attr.attribute_id] = attr.value_string === 'true';
                         break;
+                    case 'OPTION':
+                        initialValues[attr.attribute_id] = attr.value_int; // ID опции
+                        break;
                     default:
                         initialValues[attr.attribute_id] = attr.value_string;
                         break;

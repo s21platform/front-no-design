@@ -51,3 +51,14 @@ export type UserAttributesResponse = {
 
 // Константа с ID атрибутов для формы редактирования
 export const PROFILE_ATTRIBUTE_IDS = [2, 3, 4, 5, 6];
+
+// Типы для API опций
+export type OptionItem = {
+    label: string;
+    option_id: number;
+    attribute_id: number;
+}
+
+export type OptionsResponse = {
+    data: OptionItem[];
+}

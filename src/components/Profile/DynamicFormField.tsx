@@ -13,6 +13,7 @@ import {
     Stack
 } from '@mui/material';
 import { AttributeItem } from './types';
+import OptionField from './OptionField';
 
 interface DynamicFormFieldProps {
     attribute: AttributeItem;
@@ -39,6 +40,10 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
             case 'BOOLEAN':
                 newValue = event.target.checked;
                 break;
+            case 'OPTION':
+                // Для OPTION типа значение - это ID опции
+                newValue = parseInt(newValue) || null;
+                break;
             default:
                 // STRING и другие типы остаются как есть
                 break;
@@ -55,6 +60,9 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
                 return attribute.value_date || '';
             case 'BOOLEAN':
                 return attribute.value_string === 'true';
+            case 'OPTION':
+                // Для OPTION типа значение может быть в value_int (ID опции)
+                return attribute.value_int || '';
             default:
                 return attribute.value_string || '';
         }
@@ -117,6 +125,15 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
                         }
                         label={attribute.title}
                         sx={{ ml: 0 }}
+                    />
+                );
+
+            case 'OPTION':
+                return (
+                    <OptionField
+                        attribute={attribute}
+                        value={currentValue}
+                        onChange={onChange}
                     />
                 );
 

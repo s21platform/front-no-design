@@ -19,6 +19,7 @@ export const ApiRoutes = {
 	advert: () => '/api/advert',
 	personality: () => '/api/user/me/personality',
 	userAttributes: () => '/api/user/attributes',
+	optionHubOptions: (attributeId: number) => `/api/optionhub/options?attribute_id=${attributeId}`,
 
 	// Новые эндпоинты для регистрации
 	checkEmail: () => '/auth/check-email',
