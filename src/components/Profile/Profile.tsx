@@ -213,29 +213,35 @@ const Profile: React.FC = () => {
             sendData.birthdate = new Date(sendData.birthdate ?? "").toISOString()
         }
         
-        // Сформируем карту атрибутов { [attribute_id]: value }
+        // Сформируем карту атрибутов { [attribute_id]: value } только для заполненных полей
         const attributesData: Record<number, any> = {};
         formAttributes.forEach(attr => {
             const rawValue = formValues[attr.attribute_id];
+            
+            // Проверяем, что поле заполнено
+            if (rawValue === undefined || rawValue === null || rawValue === '') {
+                return; // Пропускаем пустые поля
+            }
+            
             let transformed: any = rawValue;
             switch (attr.type) {
                 case 'DATE':
                     // Ожидаем строку даты из input type=date -> преобразуем в RFC3339
-                    transformed = rawValue ? new Date(rawValue).toISOString() : null;
+                    transformed = new Date(rawValue).toISOString();
                     break;
                 case 'OPTION':
-                    // Для OPTION отправляем option_id (число или null)
-                    transformed = rawValue ?? null;
+                    // Для OPTION отправляем option_id (число)
+                    transformed = typeof rawValue === 'number' ? rawValue : parseInt(rawValue);
                     break;
                 case 'INTEGER':
-                    transformed = typeof rawValue === 'number' ? rawValue : (rawValue ? parseInt(rawValue) : null);
+                    transformed = typeof rawValue === 'number' ? rawValue : parseInt(rawValue);
                     break;
                 case 'BOOLEAN':
                     transformed = !!rawValue;
                     break;
                 default:
-                    // STRING и прочие как есть (или null)
-                    transformed = rawValue ?? null;
+                    // STRING и прочие как есть
+                    transformed = rawValue;
             }
             attributesData[attr.attribute_id] = transformed;
         });
