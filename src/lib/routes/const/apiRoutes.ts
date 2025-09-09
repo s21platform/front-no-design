@@ -3,6 +3,7 @@ export const ApiRoutes = {
 	login: () => '/auth/v2/login',
 	logout: () => '/auth/logout',
 	profile: () => '/api/profile',
+	userUpdate: () => '/api/user/update',
 	society: () => '/api/society',
 	societyAvatar: () => '/api/avatar/society',
 	search: () => '/api/search',

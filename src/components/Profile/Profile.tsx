@@ -77,6 +77,7 @@ const Profile: React.FC = () => {
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [update, setUpdate] = useState<boolean>(false);
+    const [userUuid, setUserUuid] = useState<string>("");
 
 
     useEffect(() => {
@@ -84,6 +85,9 @@ const Profile: React.FC = () => {
             withCredentials: true,
         }).then(data => {
             setEditProfile(data.data)
+            if (data.data?.uuid) {
+                setUserUuid(data.data.uuid);
+            }
             if (data.data.birthdate) {
                 const birthdayFull = new Date(data.data.birthdate)
                 const day = String(birthdayFull.getDate()).padStart(2, "0");
@@ -209,13 +213,31 @@ const Profile: React.FC = () => {
             sendData.birthdate = new Date(sendData.birthdate ?? "").toISOString()
         }
         
-        // Добавляем данные динамических атрибутов
-        const attributesData = formAttributes.map(attr => {
-            const value = formValues[attr.attribute_id];
-            return {
-                attribute_id: attr.attribute_id,
-                value: value
-            };
+        // Сформируем карту атрибутов { [attribute_id]: value }
+        const attributesData: Record<number, any> = {};
+        formAttributes.forEach(attr => {
+            const rawValue = formValues[attr.attribute_id];
+            let transformed: any = rawValue;
+            switch (attr.type) {
+                case 'DATE':
+                    // Ожидаем строку даты из input type=date -> преобразуем в RFC3339
+                    transformed = rawValue ? new Date(rawValue).toISOString() : null;
+                    break;
+                case 'OPTION':
+                    // Для OPTION отправляем option_id (число или null)
+                    transformed = rawValue ?? null;
+                    break;
+                case 'INTEGER':
+                    transformed = typeof rawValue === 'number' ? rawValue : (rawValue ? parseInt(rawValue) : null);
+                    break;
+                case 'BOOLEAN':
+                    transformed = !!rawValue;
+                    break;
+                default:
+                    // STRING и прочие как есть (или null)
+                    transformed = rawValue ?? null;
+            }
+            attributesData[attr.attribute_id] = transformed;
         });
 
         // Отправляем данные профиля
@@ -223,16 +245,21 @@ const Profile: React.FC = () => {
             headers: {
                 "Content-Type": "application/json",
             }
-        }).then(data => {
-            if (data.status === 200 && data.data.status) {
-                // Здесь можно добавить отправку атрибутов, если есть соответствующий API
-                console.log('Атрибуты для отправки:', attributesData);
-                setUpdate(!update)
+        }).catch(err => console.log(err));
+
+        // Отправляем динамические атрибуты по контракту /api/user/update
+        api.put(ApiRoutes.userUpdate(), { attributes: attributesData }, {
+            headers: {
+                "Content-Type": "application/json",
+                'X-User-Uuid': userUuid,
+            },
+            withCredentials: true,
+        }).then(resp => {
+            if (resp.status === 200) {
+                setUpdate(!update);
                 setIsOpen(false);
-                console.log(editProfile)
             }
-        })
-            .catch(err => console.log(err))
+        }).catch(err => console.log(err));
     };
 
     return (
