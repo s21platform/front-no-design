@@ -3,6 +3,7 @@ export const ApiRoutes = {
 	login: () => '/auth/v2/login',
 	logout: () => '/auth/logout',
 	profile: () => '/api/profile',
+	userUpdate: () => '/api/user/update',
 	society: () => '/api/society',
 	societyAvatar: () => '/api/avatar/society',
 	search: () => '/api/search',
@@ -17,6 +18,9 @@ export const ApiRoutes = {
 	avatar: () => '/api/avatar/user',
 	optionOs: () => '/api/option/os',
 	advert: () => '/api/advert',
+	personality: () => '/api/user/me/personality',
+	userAttributes: () => '/api/user/attributes',
+	optionHubOptions: (attributeId: number) => `/api/optionhub/options?attribute_id=${attributeId}`,
 
 	// Новые эндпоинты для регистрации
 	checkEmail: () => '/auth/check-email',

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NotificationWidget from "../Widgets/NotificationWidget/NotificationWidget";
-import { ProfileProps, SubscriptionCount } from "./types";
+import {ProfileProps, SubscriptionCount, MyPersonality, ProfileBlock, ProfileItem, AttributeItem, UserAttributesResponse, PROFILE_ATTRIBUTE_IDS} from "./types";
 import ProfileSkeleton from "../Skeletons/ProfileSkeleton/ProfileSkeleton";
+import ProfileBlockRenderer from "./ProfileBlockRenderer";
+import { mockContactsBlock, mockAboutBlock } from "./mockData";
 import {
     Box,
     Button,
@@ -39,6 +41,7 @@ import { SelectorOption, SelectorWithSearch } from "../SelectorWithSearch/Select
 import { ApiRoutes, AppRoutes, useAuth } from "../../lib/routes";
 import { useThemeMode } from "../../App";
 import api from "../../lib/api/api";
+import DynamicFormField from "./DynamicFormField";
 
 
 const Profile: React.FC = () => {
@@ -58,11 +61,23 @@ const Profile: React.FC = () => {
         followingCount: 0
     });
 
+    // Новые состояния для блоков профиля
+    const [personalityBlock, setPersonalityBlock] = useState<ProfileBlock | null>(null);
+    const [contactsBlock] = useState<ProfileBlock>(mockContactsBlock);
+    const [aboutBlock] = useState<ProfileBlock>(mockAboutBlock);
+
+    // Состояния для динамических атрибутов формы
+    const [formAttributes, setFormAttributes] = useState<AttributeItem[]>([]);
+    const [formValues, setFormValues] = useState<Record<number, any>>({});
+    const [loadingFormAttributes, setLoadingFormAttributes] = useState<boolean>(true);
+
     const [loading, setLoading] = useState<boolean>(true);
     const [loadingSubscribe, setLoadingSubscribe] = useState<boolean>(true);
+    const [loadingPersonality, setLoadingPersonality] = useState<boolean>(true);
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [update, setUpdate] = useState<boolean>(false);
+    const [userUuid, setUserUuid] = useState<string>("");
 
 
     useEffect(() => {
@@ -70,6 +85,9 @@ const Profile: React.FC = () => {
             withCredentials: true,
         }).then(data => {
             setEditProfile(data.data)
+            if (data.data?.uuid) {
+                setUserUuid(data.data.uuid);
+            }
             if (data.data.birthdate) {
                 const birthdayFull = new Date(data.data.birthdate)
                 const day = String(birthdayFull.getDate()).padStart(2, "0");
@@ -104,6 +122,67 @@ const Profile: React.FC = () => {
         })
     }, [])
 
+    // Загрузка данных personality блока
+    useEffect(() => {
+        api.get(ApiRoutes.personality(), {
+            withCredentials: true,
+        }).then((response) => {
+            const personalityData: ProfileItem[] = response.data;
+            console.log("data", response.data)
+            setPersonalityBlock({
+                title: 'Личность',
+                items: personalityData
+            });
+        }).catch(err => {
+            console.warn('Ошибка загрузки personality данных:', err);
+            // В случае ошибки оставляем блок пустым
+            setPersonalityBlock({
+                title: 'Личность',
+                items: []
+            });
+        }).finally(() => {
+            setLoadingPersonality(false);
+        })
+    }, [update])
+
+    // Загрузка атрибутов для формы редактирования
+    useEffect(() => {
+        const attributeIds = PROFILE_ATTRIBUTE_IDS.join(',');
+        api.get(`${ApiRoutes.userAttributes()}?attribute_ids=${attributeIds}`, {
+            withCredentials: true,
+        }).then((response: { data: UserAttributesResponse }) => {
+            const attributes = response.data.data;
+            setFormAttributes(attributes);
+            
+            // Инициализируем значения формы
+            const initialValues: Record<number, any> = {};
+            attributes.forEach(attr => {
+                switch (attr.type) {
+                    case 'INTEGER':
+                        initialValues[attr.attribute_id] = attr.value_int;
+                        break;
+                    case 'DATE':
+                        initialValues[attr.attribute_id] = attr.value_date;
+                        break;
+                    case 'BOOLEAN':
+                        initialValues[attr.attribute_id] = attr.value_string === 'true';
+                        break;
+                    case 'OPTION':
+                        initialValues[attr.attribute_id] = attr.value_int; // ID опции
+                        break;
+                    default:
+                        initialValues[attr.attribute_id] = attr.value_string;
+                        break;
+                }
+            });
+            setFormValues(initialValues);
+        }).catch(err => {
+            console.warn('Ошибка загрузки атрибутов формы:', err);
+        }).finally(() => {
+            setLoadingFormAttributes(false);
+        });
+    }, [update]);
+
     const handleOptionChange = (selectedOption: SelectorOption | null) => {
         setEditProfile({
             ...editProfile,
@@ -121,191 +200,186 @@ const Profile: React.FC = () => {
         console.log(value, typeof value);
     };
 
+    const handleAttributeChange = (attributeId: number, value: any) => {
+        setFormValues(prev => ({
+            ...prev,
+            [attributeId]: value
+        }));
+    };
+
     const handleSaveProfile = () => {
         const sendData = { ...editProfile }
         if (sendData.birthdate) {
             sendData.birthdate = new Date(sendData.birthdate ?? "").toISOString()
         }
+        
+        // Сформируем карту атрибутов { [attribute_id]: value } только для заполненных полей
+        const attributesData: Record<number, any> = {};
+        formAttributes.forEach(attr => {
+            const rawValue = formValues[attr.attribute_id];
+            
+            // Проверяем, что поле заполнено
+            if (rawValue === undefined || rawValue === null || rawValue === '') {
+                return; // Пропускаем пустые поля
+            }
+            
+            let transformed: any = rawValue;
+            switch (attr.type) {
+                case 'DATE':
+                    // Ожидаем строку даты из input type=date -> преобразуем в RFC3339
+                    transformed = new Date(rawValue).toISOString();
+                    break;
+                case 'OPTION':
+                    // Для OPTION отправляем option_id (число)
+                    transformed = typeof rawValue === 'number' ? rawValue : parseInt(rawValue);
+                    break;
+                case 'INTEGER':
+                    transformed = typeof rawValue === 'number' ? rawValue : parseInt(rawValue);
+                    break;
+                case 'BOOLEAN':
+                    transformed = !!rawValue;
+                    break;
+                default:
+                    // STRING и прочие как есть
+                    transformed = rawValue;
+            }
+            attributesData[attr.attribute_id] = transformed;
+        });
+
+        // Отправляем данные профиля
         api.put(ApiRoutes.profile(), sendData, {
             headers: {
                 "Content-Type": "application/json",
             }
-        }).then(data => {
-            if (data.status === 200 && data.data.status) {
-                setUpdate(!update)
+        }).catch(err => console.log(err));
+
+        // Отправляем динамические атрибуты по контракту /api/user/update
+        api.put(ApiRoutes.userUpdate(), { attributes: attributesData }, {
+            headers: {
+                "Content-Type": "application/json",
+                'X-User-Uuid': userUuid,
+            },
+            withCredentials: true,
+        }).then(resp => {
+            if (resp.status === 200) {
+                setUpdate(!update);
                 setIsOpen(false);
-                console.log(editProfile)
             }
-        })
-            .catch(err => console.log(err))
+        }).catch(err => console.log(err));
     };
 
     return (
-        <Card elevation={2} sx={{ borderRadius: 2, overflow: 'hidden' }}>
-            <CardContent sx={{ p: 3, position: 'relative' }}>
-                {/* Кнопки редактирования и уведомлений */}
-                <Box sx={{ position: 'absolute', top: 16, right: 16, display: 'flex', alignItems: 'center' }}>
-                    <IconButton
-                        onClick={() => setIsOpen(true)}
-                        sx={{ mr: 1 }}
-                    >
-                        <EditIcon />
-                    </IconButton>
-                    <NotificationWidget />
-                </Box>
+        <>
+            {/* Шапка профиля с аватаром и кнопками */}
+            <Card elevation={2} sx={{ borderRadius: 2, overflow: 'hidden', mb: 3 }}>
+                <CardContent sx={{ p: 3, position: 'relative' }}>
+                    {/* Кнопки редактирования и уведомлений */}
+                    <Box sx={{ position: 'absolute', top: 16, right: 16, display: 'flex', alignItems: 'center' }}>
+                        <IconButton
+                            onClick={() => setIsOpen(true)}
+                            sx={{ mr: 1 }}
+                        >
+                            <EditIcon />
+                        </IconButton>
+                        <NotificationWidget />
+                    </Box>
 
-                {/* Профиль пользователя */}
-                {loading ? (
-                    <ProfileSkeleton />
-                ) : (
-                    <Box sx={{ mb: 4 }}>
-                        <Grid container spacing={3}>
+                    {/* Аватар и базовая информация */}
+                    {loading ? (
+                        <ProfileSkeleton />
+                    ) : (
+                        <Grid container spacing={3} alignItems="center">
                             <Grid item xs={12} sm="auto">
                                 <AvatarBlock initialAvatarUrl={profileData.avatar} />
                             </Grid>
                             <Grid item xs={12} sm>
                                 <Box>
                                     {(profileData.name && profileData.name.trim() !== "") && (
-                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                            <PersonIcon sx={{ mr: 1, color: 'text.secondary' }} />
-                                            <Typography variant="body1">
-                                                <strong>Имя:</strong> {profileData.name}
-                                            </Typography>
-                                        </Box>
+                                        <Typography variant="h5" sx={{ mb: 1, fontWeight: 600 }}>
+                                            {profileData.name}
+                                        </Typography>
                                     )}
                                     {(profileData.nickname && profileData.nickname.trim() !== "") && (
-                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                            <PersonIcon sx={{ mr: 1, color: 'text.secondary' }} />
-                                            <Typography variant="body1">
-                                                <strong>Ник:</strong> {profileData.nickname}
-                                            </Typography>
-                                        </Box>
+                                        <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
+                                            @{profileData.nickname}
+                                        </Typography>
                                     )}
 
-                                    {profileData.birthdate && (
-                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                            <CakeIcon sx={{ mr: 1, color: 'text.secondary' }} />
-                                            <Typography variant="body1">
-                                                <strong>Дата рождения:</strong> {profileData.birthdate}
-                                            </Typography>
-                                        </Box>
-                                    )}
-
-                                    {profileData.telegram && (
-                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                            <TelegramIcon sx={{ mr: 1, color: 'text.secondary' }} />
-                                            <Typography variant="body1">
-                                                <strong>Telegram:</strong>{' '}
-                                                <Link
-                                                    href={`https://t.me/${profileData.telegram?.substring(1)}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    color="secondary"
-                                                >
-                                                    {profileData.telegram}
-                                                </Link>
-                                            </Typography>
-                                        </Box>
+                                    {/* Счетчики подписок */}
+                                    {loadingSubscribe ? (
+                                        <Skeleton width={200} height={60} />
+                                    ) : (
+                                        <Grid container spacing={2} sx={{ mt: 1 }}>
+                                            <Grid item>
+                                                <Chip
+                                                    label={
+                                                        <Box sx={{ p: 0.5 }}>
+                                                            <Typography variant="body2" color="text.secondary">
+                                                                Подписчиков
+                                                            </Typography>
+                                                            <Typography variant="h6" component="div">
+                                                                {friendsCount.followersCount}
+                                                            </Typography>
+                                                        </Box>
+                                                    }
+                                                    variant="outlined"
+                                                    sx={{
+                                                        height: 'auto',
+                                                        borderRadius: 2,
+                                                        p: 1
+                                                    }}
+                                                />
+                                            </Grid>
+                                            <Grid item>
+                                                <Chip
+                                                    label={
+                                                        <Box sx={{ p: 0.5 }}>
+                                                            <Typography variant="body2" color="text.secondary">
+                                                                Подписок
+                                                            </Typography>
+                                                            <Typography variant="h6" component="div">
+                                                                {friendsCount.followingCount}
+                                                            </Typography>
+                                                        </Box>
+                                                    }
+                                                    variant="outlined"
+                                                    sx={{
+                                                        height: 'auto',
+                                                        borderRadius: 2,
+                                                        p: 1
+                                                    }}
+                                                />
+                                            </Grid>
+                                        </Grid>
                                     )}
                                 </Box>
                             </Grid>
                         </Grid>
-                    </Box>
-                )}
+                    )}
+                </CardContent>
+            </Card>
 
-                <Divider sx={{ my: 3 }} />
+            {/* Блоки профиля */}
+            <Grid container spacing={3}>
+                {/* Personality блок */}
+                <Grid item xs={12} md={6} lg={4}>
+                    {loadingPersonality ? (
+                        <ProfileSkeleton />
+                    ) : personalityBlock && (
+                        <ProfileBlockRenderer block={personalityBlock} />
+                    )}
+                </Grid>
 
-                {/* Дополнительная информация */}
-                {loading ? (
-                    <ProfileSkeleton />
-                ) : (
-                    <Box sx={{ mb: 4 }}>
-                        {Object.keys(profileData).length > 0 && (
-                            <>
-                                <Typography variant="h6" gutterBottom>
-                                    Дополнительная информация
-                                </Typography>
+                {/* Contacts блок */}
+                <Grid item xs={12} md={6} lg={4}>
+                    <ProfileBlockRenderer block={contactsBlock} />
+                </Grid>
 
-                                <Box sx={{ mb: 3 }}>
-                                    {profileData.git && (
-                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                            <GitHubIcon sx={{ mr: 1, color: 'text.secondary' }} />
-                                            <Typography variant="body1">
-                                                <strong>GitHub:</strong>{' '}
-                                                <Link
-                                                    href={`https://github.com/${profileData.git}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    color="secondary"
-                                                >
-                                                    {profileData.git}
-                                                </Link>
-                                            </Typography>
-                                        </Box>
-                                    )}
-
-                                    {profileData.os && (
-                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                            <ComputerIcon sx={{ mr: 1, color: 'text.secondary' }} />
-                                            <Typography variant="body1">
-                                                <strong>Операционная система:</strong> {profileData.os.label ?? "Отсутсвует"}
-                                            </Typography>
-                                        </Box>
-                                    )}
-                                </Box>
-                            </>
-                        )}
-                    </Box>
-                )}
-
-                {/* Счетчики подписок */}
-                {loadingSubscribe ? (
-                    <Skeleton width={200} height={60} />
-                ) : (
-                    <Grid container spacing={2} sx={{ mt: 2 }}>
-                        <Grid item>
-                            <Chip
-                                label={
-                                    <Box sx={{ p: 0.5 }}>
-                                        <Typography variant="body2" color="text.secondary">
-                                            Подписчиков
-                                        </Typography>
-                                        <Typography variant="h6" component="div">
-                                            {friendsCount.followersCount}
-                                        </Typography>
-                                    </Box>
-                                }
-                                variant="outlined"
-                                sx={{
-                                    height: 'auto',
-                                    borderRadius: 2,
-                                    p: 1
-                                }}
-                            />
-                        </Grid>
-                        <Grid item>
-                            <Chip
-                                label={
-                                    <Box sx={{ p: 0.5 }}>
-                                        <Typography variant="body2" color="text.secondary">
-                                            Подписок
-                                        </Typography>
-                                        <Typography variant="h6" component="div">
-                                            {friendsCount.followingCount}
-                                        </Typography>
-                                    </Box>
-                                }
-                                variant="outlined"
-                                sx={{
-                                    height: 'auto',
-                                    borderRadius: 2,
-                                    p: 1
-                                }}
-                            />
-                        </Grid>
-                    </Grid>
-                )}
-            </CardContent>
+                {/* About блок */}
+                <Grid item xs={12} md={6} lg={4}>
+                    <ProfileBlockRenderer block={aboutBlock} />
+                </Grid>
+            </Grid>
 
             {/* Диалог редактирования профиля */}
             <Dialog
@@ -326,81 +400,32 @@ const Profile: React.FC = () => {
 
                 <DialogContent dividers>
                     <Box sx={{ py: 1 }}>
-                        <FormControl fullWidth sx={{ mb: 2 }}>
-                            <TextField
-                                onChange={(e) => handleInputChange(e, "name")}
-                                value={editProfile.name || ''}
-                                variant="outlined"
-                                label="Имя и Фамилия"
-                                margin="dense"
-                                fullWidth
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <PersonIcon />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
-                        </FormControl>
+                        {/* Динамические поля из API */}
+                        {loadingFormAttributes ? (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                    <TextField
+                                        key={i}
+                                        fullWidth
+                                        variant="outlined"
+                                        margin="dense"
+                                        disabled
+                                        placeholder="Загрузка..."
+                                    />
+                                ))}
+                            </Box>
+                        ) : (
+                            formAttributes.map((attribute) => (
+                                <DynamicFormField
+                                    key={attribute.attribute_id}
+                                    attribute={attribute}
+                                    value={formValues[attribute.attribute_id]}
+                                    onChange={handleAttributeChange}
+                                />
+                            ))
+                        )}
 
-                        <FormControl fullWidth sx={{ mb: 2 }}>
-                            <TextField
-                                type="date"
-                                label="Дата рождения"
-                                value={editProfile.birthdate || ''}
-                                onChange={(e) => handleInputChange(e, "birthdate")}
-                                fullWidth
-                                margin="dense"
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <CakeIcon />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
-                        </FormControl>
-
-                        <FormControl fullWidth sx={{ mb: 2 }}>
-                            <TextField
-                                type="text"
-                                label="Telegram"
-                                value={editProfile.telegram || ''}
-                                onChange={(e) => handleInputChange(e, "telegram")}
-                                fullWidth
-                                margin="dense"
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <TelegramIcon />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
-                        </FormControl>
-
-                        <FormControl fullWidth sx={{ mb: 2 }}>
-                            <TextField
-                                onChange={(e) => handleInputChange(e, "git")}
-                                value={editProfile.git || ''}
-                                variant="outlined"
-                                label="GitHub"
-                                margin="dense"
-                                fullWidth
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <GitHubIcon />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
-                        </FormControl>
-
+                        {/* Поле выбора ОС (оставляем как было) */}
                         <FormControl fullWidth sx={{ mb: 1 }}>
                             <SelectorWithSearch
                                 url={ApiRoutes.optionOs()}
@@ -453,7 +478,7 @@ const Profile: React.FC = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </Card>
+        </>
     );
 };
 
