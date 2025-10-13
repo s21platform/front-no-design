@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NotificationWidget from "../Widgets/NotificationWidget/NotificationWidget";
-import {ProfileProps, SubscriptionCount, MyPersonality, ProfileBlock, ProfileItem} from "./types";
+import {ProfileProps, SubscriptionCount, MyPersonality, ProfileBlock, ProfileItem, AttributeItem, UserAttributesResponse, PROFILE_ATTRIBUTE_IDS} from "./types";
 import ProfileSkeleton from "../Skeletons/ProfileSkeleton/ProfileSkeleton";
 import ProfileBlockRenderer from "./ProfileBlockRenderer";
 import { mockContactsBlock, mockAboutBlock } from "./mockData";
@@ -41,6 +41,7 @@ import { SelectorOption, SelectorWithSearch } from "../SelectorWithSearch/Select
 import { ApiRoutes, AppRoutes, useAuth } from "../../lib/routes";
 import { useThemeMode } from "../../App";
 import api from "../../lib/api/api";
+import DynamicFormField from "./DynamicFormField";
 
 
 const Profile: React.FC = () => {
@@ -65,12 +66,18 @@ const Profile: React.FC = () => {
     const [contactsBlock] = useState<ProfileBlock>(mockContactsBlock);
     const [aboutBlock] = useState<ProfileBlock>(mockAboutBlock);
 
+    // Состояния для динамических атрибутов формы
+    const [formAttributes, setFormAttributes] = useState<AttributeItem[]>([]);
+    const [formValues, setFormValues] = useState<Record<number, any>>({});
+    const [loadingFormAttributes, setLoadingFormAttributes] = useState<boolean>(true);
+
     const [loading, setLoading] = useState<boolean>(true);
     const [loadingSubscribe, setLoadingSubscribe] = useState<boolean>(true);
     const [loadingPersonality, setLoadingPersonality] = useState<boolean>(true);
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [update, setUpdate] = useState<boolean>(false);
+    const [userUuid, setUserUuid] = useState<string>("");
 
 
     useEffect(() => {
@@ -78,6 +85,9 @@ const Profile: React.FC = () => {
             withCredentials: true,
         }).then(data => {
             setEditProfile(data.data)
+            if (data.data?.uuid) {
+                setUserUuid(data.data.uuid);
+            }
             if (data.data.birthdate) {
                 const birthdayFull = new Date(data.data.birthdate)
                 const day = String(birthdayFull.getDate()).padStart(2, "0");
@@ -135,6 +145,44 @@ const Profile: React.FC = () => {
         })
     }, [update])
 
+    // Загрузка атрибутов для формы редактирования
+    useEffect(() => {
+        const attributeIds = PROFILE_ATTRIBUTE_IDS.join(',');
+        api.get(`${ApiRoutes.userAttributes()}?attribute_ids=${attributeIds}`, {
+            withCredentials: true,
+        }).then((response: { data: UserAttributesResponse }) => {
+            const attributes = response.data.data;
+            setFormAttributes(attributes);
+            
+            // Инициализируем значения формы
+            const initialValues: Record<number, any> = {};
+            attributes.forEach(attr => {
+                switch (attr.type) {
+                    case 'INTEGER':
+                        initialValues[attr.attribute_id] = attr.value_int;
+                        break;
+                    case 'DATE':
+                        initialValues[attr.attribute_id] = attr.value_date;
+                        break;
+                    case 'BOOLEAN':
+                        initialValues[attr.attribute_id] = attr.value_string === 'true';
+                        break;
+                    case 'OPTION':
+                        initialValues[attr.attribute_id] = attr.value_int; // ID опции
+                        break;
+                    default:
+                        initialValues[attr.attribute_id] = attr.value_string;
+                        break;
+                }
+            });
+            setFormValues(initialValues);
+        }).catch(err => {
+            console.warn('Ошибка загрузки атрибутов формы:', err);
+        }).finally(() => {
+            setLoadingFormAttributes(false);
+        });
+    }, [update]);
+
     const handleOptionChange = (selectedOption: SelectorOption | null) => {
         setEditProfile({
             ...editProfile,
@@ -152,23 +200,72 @@ const Profile: React.FC = () => {
         console.log(value, typeof value);
     };
 
+    const handleAttributeChange = (attributeId: number, value: any) => {
+        setFormValues(prev => ({
+            ...prev,
+            [attributeId]: value
+        }));
+    };
+
     const handleSaveProfile = () => {
         const sendData = { ...editProfile }
         if (sendData.birthdate) {
             sendData.birthdate = new Date(sendData.birthdate ?? "").toISOString()
         }
+        
+        // Сформируем карту атрибутов { [attribute_id]: value } только для заполненных полей
+        const attributesData: Record<number, any> = {};
+        formAttributes.forEach(attr => {
+            const rawValue = formValues[attr.attribute_id];
+            
+            // Проверяем, что поле заполнено
+            if (rawValue === undefined || rawValue === null || rawValue === '') {
+                return; // Пропускаем пустые поля
+            }
+            
+            let transformed: any = rawValue;
+            switch (attr.type) {
+                case 'DATE':
+                    // Ожидаем строку даты из input type=date -> преобразуем в RFC3339
+                    transformed = new Date(rawValue).toISOString();
+                    break;
+                case 'OPTION':
+                    // Для OPTION отправляем option_id (число)
+                    transformed = typeof rawValue === 'number' ? rawValue : parseInt(rawValue);
+                    break;
+                case 'INTEGER':
+                    transformed = typeof rawValue === 'number' ? rawValue : parseInt(rawValue);
+                    break;
+                case 'BOOLEAN':
+                    transformed = !!rawValue;
+                    break;
+                default:
+                    // STRING и прочие как есть
+                    transformed = rawValue;
+            }
+            attributesData[attr.attribute_id] = transformed;
+        });
+
+        // Отправляем данные профиля
         api.put(ApiRoutes.profile(), sendData, {
             headers: {
                 "Content-Type": "application/json",
             }
-        }).then(data => {
-            if (data.status === 200 && data.data.status) {
-                setUpdate(!update)
+        }).catch(err => console.log(err));
+
+        // Отправляем динамические атрибуты по контракту /api/user/update
+        api.put(ApiRoutes.userUpdate(), { attributes: attributesData }, {
+            headers: {
+                "Content-Type": "application/json",
+                'X-User-Uuid': userUuid,
+            },
+            withCredentials: true,
+        }).then(resp => {
+            if (resp.status === 200) {
+                setUpdate(!update);
                 setIsOpen(false);
-                console.log(editProfile)
             }
-        })
-            .catch(err => console.log(err))
+        }).catch(err => console.log(err));
     };
 
     return (
@@ -303,81 +400,32 @@ const Profile: React.FC = () => {
 
                 <DialogContent dividers>
                     <Box sx={{ py: 1 }}>
-                        <FormControl fullWidth sx={{ mb: 2 }}>
-                            <TextField
-                                onChange={(e) => handleInputChange(e, "name")}
-                                value={editProfile.name || ''}
-                                variant="outlined"
-                                label="Имя и Фамилия"
-                                margin="dense"
-                                fullWidth
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <PersonIcon />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
-                        </FormControl>
+                        {/* Динамические поля из API */}
+                        {loadingFormAttributes ? (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                {[1, 2, 3, 4, 5].map((i) => (
+                                    <TextField
+                                        key={i}
+                                        fullWidth
+                                        variant="outlined"
+                                        margin="dense"
+                                        disabled
+                                        placeholder="Загрузка..."
+                                    />
+                                ))}
+                            </Box>
+                        ) : (
+                            formAttributes.map((attribute) => (
+                                <DynamicFormField
+                                    key={attribute.attribute_id}
+                                    attribute={attribute}
+                                    value={formValues[attribute.attribute_id]}
+                                    onChange={handleAttributeChange}
+                                />
+                            ))
+                        )}
 
-                        <FormControl fullWidth sx={{ mb: 2 }}>
-                            <TextField
-                                type="date"
-                                label="Дата рождения"
-                                value={editProfile.birthdate || ''}
-                                onChange={(e) => handleInputChange(e, "birthdate")}
-                                fullWidth
-                                margin="dense"
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <CakeIcon />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
-                        </FormControl>
-
-                        <FormControl fullWidth sx={{ mb: 2 }}>
-                            <TextField
-                                type="text"
-                                label="Telegram"
-                                value={editProfile.telegram || ''}
-                                onChange={(e) => handleInputChange(e, "telegram")}
-                                fullWidth
-                                margin="dense"
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <TelegramIcon />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
-                        </FormControl>
-
-                        <FormControl fullWidth sx={{ mb: 2 }}>
-                            <TextField
-                                onChange={(e) => handleInputChange(e, "git")}
-                                value={editProfile.git || ''}
-                                variant="outlined"
-                                label="GitHub"
-                                margin="dense"
-                                fullWidth
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <GitHubIcon />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
-                        </FormControl>
-
+                        {/* Поле выбора ОС (оставляем как было) */}
                         <FormControl fullWidth sx={{ mb: 1 }}>
                             <SelectorWithSearch
                                 url={ApiRoutes.optionOs()}
