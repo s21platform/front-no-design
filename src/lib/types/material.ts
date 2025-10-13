@@ -1,4 +1,66 @@
+// API Types based on materials.yaml
 export interface Material {
+  uuid: string;
+  owner_uuid?: string;
+  title: string;
+  cover_image_url: string;
+  description: string;
+  content: string;
+  read_time_minutes: number;
+  status: 'draft' | 'published';
+}
+
+// Request/Response types
+export interface SaveDraftMaterialRequest {
+  title: string;
+  cover_image_url: string;
+  description: string;
+  content: string;
+  read_time_minutes: number;
+}
+
+export interface SaveDraftMaterialResponse {
+  uuid: string;
+}
+
+export interface PublishMaterialRequest {
+  uuid: string;
+  description: string;
+}
+
+export interface PublishMaterialResponse {
+  material: Material;
+}
+
+export interface EditMaterialRequest {
+  uuid: string;
+  owner_uuid?: string;
+  title: string;
+  cover_image_url: string;
+  description: string;
+  content: string;
+  read_time_minutes: number;
+}
+
+export interface EditMaterialResponse {
+  material: Material;
+}
+
+export interface GetAllMaterialsResponse {
+  material_list: Material[];
+}
+
+export interface ToggleLikeRequest {
+  material_uuid: string;
+}
+
+export interface ToggleLikeResponse {
+  is_liked: boolean;
+  likes_count: number;
+}
+
+// Legacy type for compatibility (can be removed later)
+export interface MaterialLegacy {
   id: string;
   title: string;
   description: string;
@@ -10,11 +72,11 @@ export interface Material {
   };
   createdAt: string;
   updatedAt: string;
-  readingTime: number; // в минутах
+  readingTime: number;
 }
 
-// Моковые данные для материалов
-export const mockMaterials: Material[] = [
+// Моковые данные для материалов (старый формат)
+export const mockMaterials: MaterialLegacy[] = [
   {
     id: "1",
     title: "Введение в TypeScript: основы типизации",

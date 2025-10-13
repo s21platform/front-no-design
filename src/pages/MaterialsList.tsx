@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Typography,
   Box,
   Button,
-  Paper,
   Stack,
   MenuItem,
   Select,
@@ -12,50 +11,76 @@ import {
   InputLabel,
   Pagination,
   SelectChangeEvent,
+  CircularProgress,
+  Alert,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { AppRoutes, useAuth } from "../lib/routes";
-import { mockMaterials } from "../lib/types/material";
+import { Material } from "../lib/types/material";
+import { getAllMaterials } from "../lib/api/materials";
 import AddIcon from "@mui/icons-material/Add";
-
-// Будет создан в следующем шаге
 import MaterialCard from "../components/MaterialCard/MaterialCard";
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 10;
 
 const MaterialsList: React.FC = () => {
   const navigate = useNavigate();
   const { isAuth } = useAuth();
   const [page, setPage] = useState(1);
-  const [sortBy, setSortBy] = useState("newest");
+  const [materials, setMaterials] = useState<Material[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [totalPages, setTotalPages] = useState(1);
 
-  // В будущем это будет API-запрос
-  const sortedMaterials = [...mockMaterials].sort((a, b) => {
-    if (sortBy === "newest") {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    }
-    if (sortBy === "oldest") {
-      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-    }
-    if (sortBy === "readingTime") {
-      return a.readingTime - b.readingTime;
-    }
-    return 0;
-  });
+  // Загрузка материалов с API
+  useEffect(() => {
+    const fetchMaterials = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await getAllMaterials(page, ITEMS_PER_PAGE);
+        setMaterials(response.material_list);
+        // Предполагаем, что бэкенд возвращает все материалы без пагинации на данном этапе
+        // В будущем можно добавить total_count в ответ API
+        setTotalPages(Math.ceil(response.material_list.length / ITEMS_PER_PAGE));
+      } catch (err: any) {
+        console.error("Ошибка загрузки материалов:", err);
+        setError(err.response?.data?.message || "Не удалось загрузить материалы");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const totalPages = Math.ceil(sortedMaterials.length / ITEMS_PER_PAGE);
-  const currentMaterials = sortedMaterials.slice(
-    (page - 1) * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE
-  );
+    fetchMaterials();
+  }, [page]);
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSortChange = (event: SelectChangeEvent) => {
-    setSortBy(event.target.value);
-  };
+  if (loading) {
+    return (
+      <Container maxWidth="lg" sx={{ py: 4, display: 'flex', justifyContent: 'center' }}>
+        <CircularProgress />
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Alert severity="error">{error}</Alert>
+        <Button 
+          variant="contained" 
+          onClick={() => window.location.reload()} 
+          sx={{ mt: 2 }}
+        >
+          Попробовать снова
+        </Button>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -64,19 +89,6 @@ const MaterialsList: React.FC = () => {
           Материалы
         </Typography>
         <Stack direction="row" spacing={2} alignItems="center">
-          <FormControl sx={{ minWidth: 200 }}>
-            <InputLabel id="sort-select-label">Сортировка</InputLabel>
-            <Select
-              labelId="sort-select-label"
-              value={sortBy}
-              label="Сортировка"
-              onChange={handleSortChange}
-            >
-              <MenuItem value="newest">Сначала новые</MenuItem>
-              <MenuItem value="oldest">Сначала старые</MenuItem>
-              <MenuItem value="readingTime">По времени чтения</MenuItem>
-            </Select>
-          </FormControl>
           {isAuth && (
             <Button
               variant="contained"
@@ -90,25 +102,33 @@ const MaterialsList: React.FC = () => {
         </Stack>
       </Box>
 
-      <Stack spacing={3}>
-        {currentMaterials.map((material) => (
-          <MaterialCard
-            key={material.id}
-            material={material}
-            onReadMore={() => navigate(AppRoutes.materialView(material.id))}
-          />
-        ))}
-      </Stack>
+      {materials.length === 0 ? (
+        <Alert severity="info">Материалы пока не добавлены</Alert>
+      ) : (
+        <>
+          <Stack spacing={3}>
+            {materials.map((material) => (
+              <MaterialCard
+                key={material.uuid}
+                material={material}
+                onReadMore={() => navigate(AppRoutes.materialView(material.uuid))}
+              />
+            ))}
+          </Stack>
 
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-        <Pagination
-          count={totalPages}
-          page={page}
-          onChange={handlePageChange}
-          color="primary"
-          size="large"
-        />
-      </Box>
+          {totalPages > 1 && (
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={handlePageChange}
+                color="primary"
+                size="large"
+              />
+            </Box>
+          )}
+        </>
+      )}
     </Container>
   );
 };

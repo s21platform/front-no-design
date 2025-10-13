@@ -16,17 +16,28 @@ interface EditorProps {
 const Editor: React.FC<EditorProps> = ({ initialContent, onChange }) => {
   const theme = useTheme();
   
+  // Безопасная обработка initialContent
+  const getInitialContent = () => {
+    if (!initialContent) return undefined;
+    try {
+      return JSON.parse(initialContent);
+    } catch {
+      return undefined;
+    }
+  };
+  
   const editor = useCreateBlockNote({
-    initialContent: initialContent ? JSON.parse(initialContent) : undefined,
+    initialContent: getInitialContent(),
   });
 
   // Обработчик изменений в редакторе
   React.useEffect(() => {
     if (onChange) {
-      editor.onEditorContentChange(() => {
+      const unsubscribe = editor.onChange(() => {
         const saveData = JSON.stringify(editor.document);
         onChange(saveData);
       });
+      return () => unsubscribe?.();
     }
   }, [editor, onChange]);
 
@@ -52,17 +63,7 @@ const Editor: React.FC<EditorProps> = ({ initialContent, onChange }) => {
     }}>
       <BlockNoteView 
         editor={editor}
-        style={{
-          height: '100%',
-          backgroundColor: 'inherit',
-          '--bn-colors-editor-text': theme.palette.text.primary,
-          '--bn-colors-editor-background': 'inherit',
-          '--bn-colors-menu-background': theme.palette.mode === 'dark' ? theme.palette.background.default : '#f5f5f5',
-          '--bn-colors-menu-text': theme.palette.text.primary,
-          '--bn-colors-tooltip-background': theme.palette.mode === 'dark' ? theme.palette.background.default : '#f5f5f5',
-          '--bn-colors-tooltip-text': theme.palette.text.primary,
-          '--bn-colors-menu-divider': theme.palette.divider,
-        } as React.CSSProperties}
+        theme={theme.palette.mode === 'dark' ? 'dark' : 'light'}
       />
     </Box>
   );

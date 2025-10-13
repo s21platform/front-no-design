@@ -1,0 +1,359 @@
+openapi: 3.0.3
+info:
+  title: Materials Service
+  version: 1.0.0
+paths:
+  /api/materials/save-draft-material:
+    post:
+      summary: Save a draft material
+      operationId: SaveDraftMaterial
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveDraftMaterialIn'
+      responses:
+        '200':
+          description: Draft material saved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SaveDraftMaterialOut'
+        '400':
+          description: Invalid input, missing required title
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthenticated, user UUID not provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/materials/publish-material:
+    post:
+      summary: Publish a material
+      operationId: PublishMaterial
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublishMaterialIn'
+      responses:
+        '200':
+          description: Material published successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublishMaterialOut'
+        '400':
+          description: Invalid input, missing required material UUID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthenticated, user UUID not provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Permission denied, user is not the owner
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '412':
+          description: Material does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/materials:
+    put:
+      summary: Toggle like on a material
+      operationId: ToggleLike
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ToggleLikeIn'
+      responses:
+        '200':
+          description: Like toggled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToggleLikeOut'
+        '400':
+          description: Invalid input, missing required material UUID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthenticated, user UUID not provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      summary: Get all materials
+      operationId: GetAllMaterials
+      parameters:
+        - name: page
+          in: query
+          description: Page number (starting from 1)
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: limit
+          in: query
+          description: Number of materials per page (max 10)
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: Materials retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllMaterialsOut'
+        '400':
+          description: Invalid pagination parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/materials/edit-material:
+    post:
+      summary: Edit a material
+      operationId: EditMaterial
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditMaterialIn'
+      responses:
+        '200':
+          description: Material edited successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EditMaterialOut'
+        '400':
+          description: Invalid input, missing required material UUID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthenticated, user UUID not provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Permission denied, user is not the owner
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '412':
+          description: Material does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    SaveDraftMaterialIn:
+      type: object
+      required:
+        - title
+        - cover_image_url
+        - description
+        - content
+        - read_time_minutes
+      properties:
+        title:
+          type: string
+        cover_image_url:
+          type: string
+        description:
+          type: string
+        content:
+          type: string
+        read_time_minutes:
+          type: integer
+          format: int32
+    SaveDraftMaterialOut:
+      type: object
+      required:
+        - uuid
+      properties:
+        uuid:
+          type: string
+    PublishMaterialIn:
+      type: object
+      required:
+        - uuid
+        - description
+      properties:
+        uuid:
+          type: string
+          description: UUID of the material to publish
+    PublishMaterialOut:
+      type: object
+      required:
+        - material
+      properties:
+        material:
+          $ref: '#/components/schemas/Material'
+    Material:
+      type: object
+      required:
+        - uuid
+        - title
+        - cover_image_url
+        - description
+        - content
+        - read_time_minutes
+        - status
+      properties:
+        uuid:
+          type: string
+        owner_uuid:
+          type: string
+        title:
+          type: string
+        cover_image_url:
+          type: string
+        description:
+          type: string
+        content:
+          type: string
+        read_time_minutes:
+          type: integer
+          format: int32
+        status:
+          type: string
+    ToggleLikeIn:
+      type: object
+      required:
+        - material_uuid
+      properties:
+        material_uuid:
+          type: string
+          description: UUID of the material to toggle like on
+    ToggleLikeOut:
+      type: object
+      required:
+        - is_liked
+        - likes_count
+      properties:
+        is_liked:
+          type: boolean
+          description: Whether the material is now liked by the user
+        likes_count:
+          type: integer
+          format: int32
+          description: Updated count of likes on the material
+    EditMaterialIn:
+      required:
+        - uuid
+        - title
+        - cover_image_url
+        - description
+        - content
+        - read_time_minutes
+      properties:
+        uuid:
+          type: string
+        owner_uuid:
+          type: string
+        title:
+          type: string
+        cover_image_url:
+          type: string
+        description:
+          type: string
+        content:
+          type: string
+        read_time_minutes:
+          type: integer
+          format: int32
+    EditMaterialOut:
+      type: object
+      required:
+        - material
+      properties:
+        material:
+          $ref: '#/components/schemas/Material'
+    GetAllMaterialsOut:
+      type: object
+      required:
+        - material_list
+      properties:
+        material_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/Material'
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          example: 400
+        message:
+          type: string
+          example: "title is required"
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer

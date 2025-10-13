@@ -87,11 +87,13 @@ const Header = () => {
                                     <MenuItem onClick={() => navigateTo(AppRoutes.main())}>Главная</MenuItem>
                                 )}
                                 <MenuItem onClick={() => navigateTo(AppRoutes.materials())}>Материалы</MenuItem>
-                                {isAuth && (
-                                    <MenuItem onClick={() => navigateTo(AppRoutes.profile())}>Профиль</MenuItem>
-                                )}
-                                {isAuth && (
-                                    <MenuItem onClick={logout}>Выход</MenuItem>
+                                {isAuth ? (
+                                    <>
+                                        <MenuItem onClick={() => navigateTo(AppRoutes.profile())}>Профиль</MenuItem>
+                                        <MenuItem onClick={logout}>Выход</MenuItem>
+                                    </>
+                                ) : (
+                                    <MenuItem onClick={() => navigateTo(AppRoutes.login())}>Вход</MenuItem>
                                 )}
                             </Menu>
                         </Box>
@@ -114,21 +116,29 @@ const Header = () => {
                             >
                                 Материалы
                             </Button>
-                            {isAuth && (
+                            {isAuth ? (
+                                <>
+                                    <Button
+                                        color="inherit"
+                                        component={Link}
+                                        to={AppRoutes.profile()}
+                                    >
+                                        Профиль
+                                    </Button>
+                                    <Button
+                                        color="inherit"
+                                        onClick={logout}
+                                    >
+                                        Выход
+                                    </Button>
+                                </>
+                            ) : (
                                 <Button
                                     color="inherit"
                                     component={Link}
-                                    to={AppRoutes.profile()}
+                                    to={AppRoutes.login()}
                                 >
-                                    Профиль
-                                </Button>
-                            )}
-                            {isAuth && (
-                                <Button
-                                    color="inherit"
-                                    onClick={logout}
-                                >
-                                    Выход
+                                    Вход
                                 </Button>
                             )}
                         </Box>

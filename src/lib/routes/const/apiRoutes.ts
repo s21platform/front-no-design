@@ -28,4 +28,12 @@ export const ApiRoutes = {
 	registerUser: () => '/auth/register-user',
 	confirmVerification: () => '/auth/confirm_verification',
 	refreshToken: () => '/auth/refresh',
+
+	// Materials endpoints
+	saveDraftMaterial: () => '/api/materials/save-draft-material',
+	publishMaterial: () => '/api/materials/publish-material',
+	editMaterial: () => '/api/materials/edit-material',
+	materials: () => '/api/materials',
+	toggleLike: () => '/api/materials',
+	material: (uuid?: string) => uuid ? `/api/materials/${uuid}` : '/api/materials/:uuid',
 }

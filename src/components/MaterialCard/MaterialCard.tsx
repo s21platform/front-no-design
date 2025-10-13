@@ -2,9 +2,9 @@ import React from "react";
 import {
   Card,
   CardContent,
+  CardMedia,
   Typography,
   Box,
-  Avatar,
   Button,
   Chip,
   Stack,
@@ -18,54 +18,39 @@ interface MaterialCardProps {
 }
 
 const MaterialCard: React.FC<MaterialCardProps> = ({ material, onReadMore }) => {
-  // Форматируем дату
-  const formattedDate = new Date(material.createdAt).toLocaleDateString("ru-RU", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-
-  // Обрезаем контент для превью (первые 300 символов)
-  const previewContent = material.content.slice(0, 300) + "...";
-
   return (
-    <Card sx={{ width: "100%" }}>
-      <CardContent>
-        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-          <Avatar
-            src={material.author.avatar}
-            alt={material.author.name}
-            sx={{ mr: 2 }}
-          />
-          <Box>
-            <Typography variant="subtitle2">{material.author.name}</Typography>
-            <Typography variant="caption" color="text.secondary">
-              {formattedDate}
-            </Typography>
-          </Box>
-        </Box>
-
+    <Card sx={{ width: "100%", display: 'flex', flexDirection: { xs: 'column', sm: 'row' } }}>
+      {material.cover_image_url && (
+        <CardMedia
+          component="img"
+          sx={{ 
+            width: { xs: '100%', sm: 200 }, 
+            height: { xs: 200, sm: 'auto' },
+            objectFit: 'cover'
+          }}
+          image={material.cover_image_url}
+          alt={material.title}
+        />
+      )}
+      <CardContent sx={{ flex: 1 }}>
         <Typography variant="h5" component="h2" gutterBottom>
           {material.title}
         </Typography>
 
-        <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-          {material.description}
-        </Typography>
-
-        <Typography
-          variant="body1"
-          color="text.secondary"
+        <Typography 
+          variant="subtitle1" 
+          color="text.secondary" 
+          gutterBottom
           sx={{
             mb: 2,
             display: "-webkit-box",
-            WebkitLineClamp: 3,
+            WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
             textOverflow: "ellipsis",
           }}
         >
-          {previewContent}
+          {material.description}
         </Typography>
 
         <Stack
@@ -76,7 +61,7 @@ const MaterialCard: React.FC<MaterialCardProps> = ({ material, onReadMore }) => 
         >
           <Chip
             icon={<AccessTimeIcon />}
-            label={`${material.readingTime} мин`}
+            label={`${material.read_time_minutes} мин`}
             variant="outlined"
             size="small"
           />
