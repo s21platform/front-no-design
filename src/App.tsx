@@ -17,6 +17,9 @@ import LoginPage from './pages/Login';
 import { createContext, useState, useMemo, useContext } from 'react';
 import ChatPage from './pages/ChatPage';
 import NotFound from './pages/NotFound';
+import MaterialsList from './pages/MaterialsList';
+import MaterialsNew from './pages/MaterialsNew';
+import MaterialView from './pages/MaterialView';
 
 // Создание контекста темы
 interface ThemeContextType {
@@ -196,6 +199,9 @@ function App() {
                         {/* Публичные маршруты */}
                         <Route element={<PublicLayout />}>
                             <Route path={AppRoutes.main()} element={<MainPage />} />
+                            <Route path={AppRoutes.materials()} element={<MaterialsList />} />
+                            <Route path={AppRoutes.materialsNew()} element={<MaterialsNew />} />
+                            <Route path={AppRoutes.materialView()} element={<MaterialView />} />
                         </Route>
                         
                         {/* Страница авторизации */}
